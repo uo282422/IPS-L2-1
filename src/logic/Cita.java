@@ -13,14 +13,14 @@ public class Cita {
 	private boolean urgente;
 	private int sala;
 	
-	public Cita(int id, String n, String fecha, int sala, boolean urgente) {
+	public Cita(int id, String n, String f,String h, int s, boolean u) {
 		idCita=generarId();
 		setIdPaciente(id);
 		setNombre(n);
-		setFecha(fecha);
-		setHora(fecha);
-		setSala(sala);
-		setUrgente(urgente);
+		setFecha(f);
+		setHora(h);
+		setSala(s);
+		setUrgente(u);
 		
 	}
 
@@ -59,11 +59,11 @@ public class Cita {
 		this.fecha=c.getTime();
 	}
 	
-	public void setHora(String fecha) {
-		String[] sep=fecha.split("/");
+	public void setHora(String hora) {
+		String[] sep=hora.split(":");
 		Calendar c=Calendar.getInstance();
-		c.set(Calendar.HOUR, Integer.parseInt(sep[3]));
-		c.set(Calendar.MINUTE, Integer.parseInt(sep[4]));
+		c.set(Calendar.HOUR, Integer.parseInt(sep[0]));
+		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
 		this.hora=c.getTime();
 	}
 }

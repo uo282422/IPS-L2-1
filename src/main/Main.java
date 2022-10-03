@@ -1,10 +1,22 @@
 package main;
 
+import java.awt.EventQueue;
+
+import ui.VentanaCrearCita;
+
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+//					VentanaCrearCita frame = new VentanaCrearCita();
+//					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 }

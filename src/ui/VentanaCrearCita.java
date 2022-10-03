@@ -6,6 +6,9 @@ import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import nexus.GestorCitas;
+
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import javax.swing.JLabel;
@@ -15,6 +18,9 @@ import javax.swing.SwingConstants;
 import javax.swing.JRadioButton;
 import java.awt.Font;
 import java.awt.ComponentOrientation;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class VentanaCrearCita extends JFrame {
 
@@ -42,32 +48,24 @@ public class VentanaCrearCita extends JFrame {
 	private JRadioButton rbNo;
 	private JPanel panelTitulo;
 	private JLabel lbTitulo;
+	private JPanel panelBotonCrear;
+	private JButton btCrear;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaCrearCita frame = new VentanaCrearCita();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+	private ButtonGroup bgUrgente;
+	private GestorCitas gestorCitas;
+	
+	
 
 	/**
 	 * Create the frame.
 	 */
 	public VentanaCrearCita() {
+		gestorCitas=new GestorCitas();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 334, 303);
+		setBounds(100, 100, 314, 332);
 		panelPrincipalCrearCita = new JPanel();
 		panelPrincipalCrearCita.setBorder(new EmptyBorder(5, 5, 5, 5));
-
+		bgUrgente=new ButtonGroup();
 		setContentPane(panelPrincipalCrearCita);
 		panelPrincipalCrearCita.setLayout(new BorderLayout(0, 0));
 		panelPrincipalCrearCita.add(getPanelCampos(), BorderLayout.CENTER);
@@ -83,6 +81,7 @@ public class VentanaCrearCita extends JFrame {
 			panelCampos.add(getPanelFecha());
 			panelCampos.add(getPanelSala());
 			panelCampos.add(getPanelUrgente());
+			panelCampos.add(getPanelBotonCrear());
 		}
 		return panelCampos;
 	}
@@ -91,7 +90,7 @@ public class VentanaCrearCita extends JFrame {
 			panelID = new JPanel();
 			panelID.setLayout(new GridLayout(0, 3, 10, 0));
 			panelID.add(getLbPacienteId_1());
-			panelID.add(getTextField_1_1());
+			panelID.add(getTfId());
 		}
 		return panelID;
 	}
@@ -108,7 +107,7 @@ public class VentanaCrearCita extends JFrame {
 		if (lbPacienteId == null) {
 			lbPacienteId = new JLabel("Id del paciente :");
 			lbPacienteId.setHorizontalAlignment(SwingConstants.RIGHT);
-			lbPacienteId.setLabelFor(getTextField_1_1());
+			lbPacienteId.setLabelFor(getTfId());
 		}
 		return lbPacienteId;
 	}
@@ -123,14 +122,15 @@ public class VentanaCrearCita extends JFrame {
 	private JTextField getTfNombre() {
 		if (tfNombre == null) {
 			tfNombre = new JTextField();
-			tfNombre.setHorizontalAlignment(SwingConstants.RIGHT);
+			tfNombre.setHorizontalAlignment(SwingConstants.LEFT);
 			tfNombre.setColumns(10);
 		}
 		return tfNombre;
 	}
-	private JTextField getTextField_1_1() {
+	private JTextField getTfId() {
 		if (tfId == null) {
 			tfId = new JTextField();
+			tfId.setHorizontalAlignment(SwingConstants.LEFT);
 			tfId.setColumns(10);
 		}
 		return tfId;
@@ -206,7 +206,7 @@ public class VentanaCrearCita extends JFrame {
 	private JTextField getTfHora() {
 		if (tfHora == null) {
 			tfHora = new JTextField();
-			tfHora.setHorizontalAlignment(SwingConstants.RIGHT);
+			tfHora.setHorizontalAlignment(SwingConstants.LEFT);
 			tfHora.setColumns(10);
 		}
 		return tfHora;
@@ -214,7 +214,7 @@ public class VentanaCrearCita extends JFrame {
 	private JTextField getTfFecha() {
 		if (tfFecha == null) {
 			tfFecha = new JTextField();
-			tfFecha.setHorizontalAlignment(SwingConstants.RIGHT);
+			tfFecha.setHorizontalAlignment(SwingConstants.LEFT);
 			tfFecha.setColumns(10);
 		}
 		return tfFecha;
@@ -222,7 +222,7 @@ public class VentanaCrearCita extends JFrame {
 	private JTextField getTfSala() {
 		if (tfSala == null) {
 			tfSala = new JTextField();
-			tfSala.setHorizontalAlignment(SwingConstants.RIGHT);
+			tfSala.setHorizontalAlignment(SwingConstants.LEFT);
 			tfSala.setColumns(10);
 		}
 		return tfSala;
@@ -230,8 +230,11 @@ public class VentanaCrearCita extends JFrame {
 	private JPanel getPanelRb() {
 		if (panelRb == null) {
 			panelRb = new JPanel();
+			bgUrgente.add(getRbSi());
+			bgUrgente.add(getRbNo());
 			panelRb.add(getRbSi());
 			panelRb.add(getRbNo());
+			
 		}
 		return panelRb;
 	}
@@ -260,5 +263,55 @@ public class VentanaCrearCita extends JFrame {
 			lbTitulo.setFont(new Font("Tahoma", Font.BOLD, 17));
 		}
 		return lbTitulo;
+	}
+	private JPanel getPanelBotonCrear() {
+		if (panelBotonCrear == null) {
+			panelBotonCrear = new JPanel();
+			panelBotonCrear.add(getBtCrear());
+		}
+		return panelBotonCrear;
+	}
+	private JButton getBtCrear() {
+		if (btCrear == null) {
+			btCrear = new JButton("Crear cita");
+			btCrear.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					crearCita();
+				}
+
+				
+			});
+		}
+		return btCrear;
+	}
+	
+	private void crearCita() {
+		int idPaciente=Integer.parseInt(getTfId().getText());
+		String nombre=getTfNombre().getText();
+		String fecha=getTfFecha().getText();
+		String hora=getTfHora().getText();
+		int sala=Integer.parseInt(getTfSala().getText());
+		
+		boolean urg;
+		if(getRbSi().isSelected()) {
+			urg=true;
+		}else urg=false;
+		//gestorCitas.nuevaCita(idPaciente, nombre, fecha, hora, sala, urg);
+		resetear();
+		
+		
+	}
+
+	private void resetear() {
+		getTfId().setText("");
+		getTfNombre().setText("");
+		getTfFecha().setText("");
+		getTfHora().setText("");
+		getTfSala().setText("");
+		getRbSi().setSelected(false);
+		getRbNo().setSelected(false);
+		
+		
+		
 	}
 }
