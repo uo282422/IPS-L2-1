@@ -46,8 +46,8 @@ public class Cita {
 	/*
 	 * Pasa del string guardado en bd a un objeto del tipo fecha
 	 * Formato:
-	 * 		DDMMYYYYHHMM
-	 * 		0 1  2  3 4
+	 * 		DD/MM/YYYY
+	 * 		0 1  2  
 	 */
 	public void setFecha(String fecha) {
 		String[] sep=fecha.split("/");
@@ -58,7 +58,10 @@ public class Cita {
 		
 		this.fecha=c.getTime();
 	}
-	
+	/*
+	 * HH:MM
+	 * 0  1
+	 */
 	public void setHora(String hora) {
 		String[] sep=hora.split(":");
 		Calendar c=Calendar.getInstance();
