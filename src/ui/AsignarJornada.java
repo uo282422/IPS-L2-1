@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 
 import javax.swing.JButton;
@@ -9,6 +10,8 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JCalendar;
+
+import logic.GestorJornada;
 
 import java.awt.GridLayout;
 import javax.swing.JLabel;
@@ -19,6 +22,8 @@ import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JToggleButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class AsignarJornada extends JDialog {
 
@@ -35,6 +40,7 @@ public class AsignarJornada extends JDialog {
 	private JLabel hInicioLb;
 	private JLabel hFinalLb;
 	private JLabel diasLb;
+	private GestorJornada gestorJornada = new GestorJornada();
 
 	/**
 	 * Launch the application.
@@ -81,10 +87,8 @@ public class AsignarJornada extends JDialog {
 		}
 		{
 			JComboBox<String> hInicioCmb = new JComboBox<>();
-			DefaultComboBoxModel<String> hIModel = new DefaultComboBoxModel<>();
-			hIModel = (DefaultComboBoxModel<String>) fillTimeCombo();
-			hInicioCmb.setModel(hIModel);
 			hInicioLb.setLabelFor(hInicioCmb);
+			hInicioCmb.setModel(setUpComboModel(generateTimeList(0, 23)));
 			medPn.add(hInicioCmb);
 		}
 		{
@@ -94,6 +98,7 @@ public class AsignarJornada extends JDialog {
 		{
 			JComboBox<String> hFinCmb = new JComboBox<>();
 			hFinalLb.setLabelFor(hFinCmb);
+			hFinCmb.setModel(setUpComboModel(generateTimeList(0, 23)));
 			medPn.add(hFinCmb);
 		}
 		{
@@ -167,24 +172,66 @@ public class AsignarJornada extends JDialog {
 			getContentPane().add(btnPn, BorderLayout.SOUTH);
 			{
 				JButton confirmarBtn = new JButton("Confirmar");
+				confirmarBtn.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						if (comprobarCampos()) {
+							guardarDatos();
+							dispose();
+							//Mover de ventana (abrir nueva o volver atrás, no se
+							//cierra la aplicación)
+						}
+					}
+				});
 				confirmarBtn.setActionCommand("OK");
 				btnPn.add(confirmarBtn);
 				getRootPane().setDefaultButton(confirmarBtn);
 			}
 			{
 				JButton cancelarBtn = new JButton("Cancelar");
+				cancelarBtn.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						dispose();
+						//Volver a la ventana previa ??
+					}
+				});
 				cancelarBtn.setActionCommand("Cancel");
 				btnPn.add(cancelarBtn);
 			}
 		}
 	}
-
-	private List<String> fillTimeCombo() {
+	
+	/**
+	 * Este método genera una lista llena con Strings de horas con una 
+	 * separación de 1 hora entre las mismas.
+	 * 
+	 * Es utilizado para generar el modelo de las combos dedicadas
+	 * a asignar las horas de la jornada
+	 * @return List<String> Conteniendo las horas.
+	 */
+	private List<String> generateTimeList(int inicio, int fin) {
 		ArrayList<String> times = new ArrayList<>();
-		for (int i = 0; i < 25; i++) {
+		for (int i = inicio; i <= fin; i++) {
 			times.add(i + ":00");
 		}
 		return times;
 	}
-
+	
+	/**
+	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la 
+	 * lista recibida.
+	 * @param l List<String> con la que se quiere generar el modelo de combo
+	 * @return DefaultComboBoxModel<String> conteniendo la lista recibida.
+	 */
+	private DefaultComboBoxModel<String> setUpComboModel(List<String> l){
+		String[] array = l.toArray(new String[l.size()]);
+		return new DefaultComboBoxModel<String>(array);
+	}
+	
+	private boolean comprobarCampos() {
+		return false;
+	}
+	
+	private void guardarDatos() {
+		
+	}
 }
