@@ -14,18 +14,18 @@ import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.JComboBox;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.BoxLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.Component;
-import javax.swing.JCheckBox;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JToggleButton;
 
 public class AsignarJornada extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final JPanel contentPanel = new JPanel();
 	private JPanel medPn;
 	private JPanel jornadaPn;
@@ -71,7 +71,7 @@ public class AsignarJornada extends JDialog {
 			medPn.add(medLb);
 		}
 		{
-			JComboBox medCmb = new JComboBox();
+			JComboBox<String> medCmb = new JComboBox<>();
 			medLb.setLabelFor(medCmb);
 			medPn.add(medCmb);
 		}
@@ -80,7 +80,10 @@ public class AsignarJornada extends JDialog {
 			medPn.add(hInicioLb);
 		}
 		{
-			JComboBox hInicioCmb = new JComboBox();
+			JComboBox<String> hInicioCmb = new JComboBox<>();
+			DefaultComboBoxModel<String> hIModel = new DefaultComboBoxModel<>();
+			hIModel = (DefaultComboBoxModel<String>) fillTimeCombo();
+			hInicioCmb.setModel(hIModel);
 			hInicioLb.setLabelFor(hInicioCmb);
 			medPn.add(hInicioCmb);
 		}
@@ -89,7 +92,7 @@ public class AsignarJornada extends JDialog {
 			medPn.add(hFinalLb);
 		}
 		{
-			JComboBox hFinCmb = new JComboBox();
+			JComboBox<String> hFinCmb = new JComboBox<>();
 			hFinalLb.setLabelFor(hFinCmb);
 			medPn.add(hFinCmb);
 		}
@@ -174,6 +177,14 @@ public class AsignarJornada extends JDialog {
 				btnPn.add(cancelarBtn);
 			}
 		}
+	}
+
+	private List<String> fillTimeCombo() {
+		ArrayList<String> times = new ArrayList<>();
+		for (int i = 0; i < 25; i++) {
+			times.add(i + ":00");
+		}
+		return times;
 	}
 
 }
