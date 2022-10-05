@@ -7,6 +7,9 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import com.toedter.calendar.JCalendar;
+
 import java.awt.GridLayout;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -26,6 +29,12 @@ public class AsignarJornada extends JDialog {
 	private final JPanel contentPanel = new JPanel();
 	private JPanel medPn;
 	private JPanel jornadaPn;
+	private JLabel diaFLb;
+	private JLabel diaILb;
+	private JLabel medLb;
+	private JLabel hInicioLb;
+	private JLabel hFinalLb;
+	private JLabel diasLb;
 
 	/**
 	 * Launch the application.
@@ -44,7 +53,7 @@ public class AsignarJornada extends JDialog {
 	 * Create the dialog.
 	 */
 	public AsignarJornada() {
-		setBounds(100, 100, 674, 300);
+		setBounds(100, 100, 952, 558);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -58,35 +67,39 @@ public class AsignarJornada extends JDialog {
 		contentPanel.add(medPn);
 		medPn.setLayout(new GridLayout(8, 0, 0, 0));
 		{
-			JLabel medLb = new JLabel("Médico:");
+			medLb = new JLabel("Médico:");
 			medPn.add(medLb);
 		}
 		{
 			JComboBox medCmb = new JComboBox();
+			medLb.setLabelFor(medCmb);
 			medPn.add(medCmb);
 		}
 		{
-			JLabel hInicioLb = new JLabel("Hora de inicio: ");
+			hInicioLb = new JLabel("Hora de inicio: ");
 			medPn.add(hInicioLb);
 		}
 		{
 			JComboBox hInicioCmb = new JComboBox();
+			hInicioLb.setLabelFor(hInicioCmb);
 			medPn.add(hInicioCmb);
 		}
 		{
-			JLabel hFinalLb = new JLabel("Hora de fin:");
+			hFinalLb = new JLabel("Hora de fin:");
 			medPn.add(hFinalLb);
 		}
 		{
 			JComboBox hFinCmb = new JComboBox();
+			hFinalLb.setLabelFor(hFinCmb);
 			medPn.add(hFinCmb);
 		}
 		{
-			JLabel diasLb = new JLabel("Días:");
+			diasLb = new JLabel("Días:");
 			medPn.add(diasLb);
 		}
 		{
 			JPanel semanaPn = new JPanel();
+			diasLb.setLabelFor(semanaPn);
 			medPn.add(semanaPn);
 			semanaPn.setLayout(new GridLayout(0, 7, 0, 0));
 			{
@@ -119,10 +132,31 @@ public class AsignarJornada extends JDialog {
 			}
 		}
 		contentPanel.add(jornadaPn);
+		jornadaPn.setLayout(new GridLayout(0, 1, 0, 0));
 		{
 			JPanel pnCalendarios = new JPanel();
 			jornadaPn.add(pnCalendarios);
-			pnCalendarios.setLayout(new GridLayout(1, 0, 0, 0));
+			pnCalendarios.setLayout(new GridLayout(4, 0, 0, 0));
+			{
+				diaILb = new JLabel("Día inicio jornada:");
+				diaILb.setHorizontalAlignment(SwingConstants.CENTER);
+				pnCalendarios.add(diaILb);
+			}
+			{
+				JCalendar calendarI = new JCalendar();
+				diaILb.setLabelFor(calendarI);
+				pnCalendarios.add(calendarI);
+			}
+			{
+				diaFLb = new JLabel("Día final jornada:");
+				diaFLb.setHorizontalAlignment(SwingConstants.CENTER);
+				pnCalendarios.add(diaFLb);
+			}
+			{
+				JCalendar calendarF = new JCalendar();
+				diaFLb.setLabelFor(calendarF);
+				pnCalendarios.add(calendarF);
+			}
 		}
 		{
 			JPanel btnPn = new JPanel();
