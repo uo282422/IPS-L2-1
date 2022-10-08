@@ -1,26 +1,24 @@
 package ui;
 
-import java.awt.EventQueue;
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.ButtonGroup;
+import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import nexus.GestorCitas;
-
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import java.awt.FlowLayout;
-import javax.swing.SwingConstants;
-import javax.swing.JRadioButton;
-import java.awt.Font;
-import java.awt.ComponentOrientation;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import nexus.GestorPacientes;
 
 public class VentanaCrearCita extends JFrame {
 
@@ -53,16 +51,19 @@ public class VentanaCrearCita extends JFrame {
 
 	private ButtonGroup bgUrgente;
 	private GestorCitas gestorCitas;
-	
-	
+	private JPanel panelContacto;
+	private JButton btContacto;
+	private GestorPacientes gP;
+	private DialogoInfoContacto dialContacto;
 
 	/**
 	 * Create the frame.
 	 */
 	public VentanaCrearCita() {
+		gP=new GestorPacientes();
 		gestorCitas=new GestorCitas();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 314, 332);
+		setBounds(100, 100, 455, 408);
 		panelPrincipalCrearCita = new JPanel();
 		panelPrincipalCrearCita.setBorder(new EmptyBorder(5, 5, 5, 5));
 		bgUrgente=new ButtonGroup();
@@ -91,6 +92,7 @@ public class VentanaCrearCita extends JFrame {
 			panelID.setLayout(new GridLayout(0, 3, 10, 0));
 			panelID.add(getLbPacienteId_1());
 			panelID.add(getTfId());
+			panelID.add(getPanelContacto());
 		}
 		return panelID;
 	}
@@ -313,5 +315,32 @@ public class VentanaCrearCita extends JFrame {
 		
 		
 		
+	}
+	private JPanel getPanelContacto() {
+		if (panelContacto == null) {
+			panelContacto = new JPanel();
+			FlowLayout flowLayout = (FlowLayout) panelContacto.getLayout();
+			flowLayout.setAlignment(FlowLayout.LEFT);
+			panelContacto.add(getBtContacto());
+		}
+		return panelContacto;
+	}
+	private JButton getBtContacto() {
+		if (btContacto == null) {
+			btContacto = new JButton("Info contacto");
+			btContacto.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					mostrarVentanaInfoContacto();
+				}
+
+				
+			});
+		}
+		return btContacto;
+	}
+	
+	private void mostrarVentanaInfoContacto() {
+		dialContacto=new DialogoInfoContacto(gP,Integer.parseInt(getTfId().getText()));
+		dialContacto.setVisible(true);
 	}
 }
