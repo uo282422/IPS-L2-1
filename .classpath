@@ -10,5 +10,6 @@
 	<classpathentry kind="lib" path="C:/Users/X421FA/Documents/tercero/IPS/ws/lib/jgoodies-common-1.2.0.jar"/>
 	<classpathentry kind="lib" path="C:/Users/X421FA/Documents/tercero/IPS/ws/lib/jgoodies-looks-2.4.1.jar"/>
 	<classpathentry kind="lib" path="C:/Users/X421FA/Documents/tercero/IPS/ws/lib/junit-4.6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/X421FA/Documents/tercero/IPS/ws/4_5908840766876158863/data/lib/hsqldb.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

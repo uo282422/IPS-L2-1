@@ -3,27 +3,32 @@ package ui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JCalendar;
 
 import logic.GestorJornada;
-
-import java.awt.GridLayout;
-import javax.swing.JLabel;
-import javax.swing.SwingConstants;
-import javax.swing.JComboBox;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JToggleButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import logic.Medico;
+import util.DataBase;
 
 public class AsignarJornada extends JDialog {
 
@@ -40,7 +45,14 @@ public class AsignarJornada extends JDialog {
 	private JLabel hInicioLb;
 	private JLabel hFinalLb;
 	private JLabel diasLb;
+	private JComboBox<String> medCmb;
+	private JComboBox<String> hInicioCmb;
+	private JComboBox<String> hFinCmb;
+	private JCalendar calendarI = new JCalendar();
+	private JCalendar calendarF = new JCalendar();
+	private JPanel semanaPn;
 	private GestorJornada gestorJornada = new GestorJornada();
+	private DataBase db = new DataBase();
 
 	/**
 	 * Launch the application.
@@ -77,8 +89,9 @@ public class AsignarJornada extends JDialog {
 			medPn.add(medLb);
 		}
 		{
-			JComboBox<String> medCmb = new JComboBox<>();
+			medCmb = new JComboBox<>();
 			medLb.setLabelFor(medCmb);
+			medCmb.setModel(setUpComboModelMed(db.cargarMedicos()));
 			medPn.add(medCmb);
 		}
 		{
@@ -86,7 +99,7 @@ public class AsignarJornada extends JDialog {
 			medPn.add(hInicioLb);
 		}
 		{
-			JComboBox<String> hInicioCmb = new JComboBox<>();
+			hInicioCmb = new JComboBox<>();
 			hInicioLb.setLabelFor(hInicioCmb);
 			hInicioCmb.setModel(setUpComboModel(generateTimeList(0, 23)));
 			medPn.add(hInicioCmb);
@@ -96,7 +109,7 @@ public class AsignarJornada extends JDialog {
 			medPn.add(hFinalLb);
 		}
 		{
-			JComboBox<String> hFinCmb = new JComboBox<>();
+			hFinCmb = new JComboBox<>();
 			hFinalLb.setLabelFor(hFinCmb);
 			hFinCmb.setModel(setUpComboModel(generateTimeList(0, 23)));
 			medPn.add(hFinCmb);
@@ -106,7 +119,7 @@ public class AsignarJornada extends JDialog {
 			medPn.add(diasLb);
 		}
 		{
-			JPanel semanaPn = new JPanel();
+			semanaPn = new JPanel();
 			diasLb.setLabelFor(semanaPn);
 			medPn.add(semanaPn);
 			semanaPn.setLayout(new GridLayout(0, 7, 0, 0));
@@ -151,7 +164,15 @@ public class AsignarJornada extends JDialog {
 				pnCalendarios.add(diaILb);
 			}
 			{
-				JCalendar calendarI = new JCalendar();
+				setCalendars();
+				calendarI.getDayChooser().setAlwaysFireDayProperty(true);
+				calendarI.getDayChooser().addPropertyChangeListener("day",
+						new PropertyChangeListener() {
+							public void propertyChange(
+									PropertyChangeEvent evt) {
+								setCalendars();
+							}
+						});
 				diaILb.setLabelFor(calendarI);
 				pnCalendarios.add(calendarI);
 			}
@@ -161,7 +182,7 @@ public class AsignarJornada extends JDialog {
 				pnCalendarios.add(diaFLb);
 			}
 			{
-				JCalendar calendarF = new JCalendar();
+				// calendarF = new JCalendar();
 				diaFLb.setLabelFor(calendarF);
 				pnCalendarios.add(calendarF);
 			}
@@ -175,10 +196,19 @@ public class AsignarJornada extends JDialog {
 				confirmarBtn.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						if (comprobarCampos()) {
-							guardarDatos();
-							dispose();
-							//Mover de ventana (abrir nueva o volver atrás, no se
-							//cierra la aplicación)
+							if (JOptionPane.showConfirmDialog(null,
+									"¿Seguro que quiere crear la jornada?") == JOptionPane.YES_OPTION) {
+								guardarDatos();
+								JOptionPane.showMessageDialog(null,
+										"Se ha creado la jornada");
+								reset();
+							} else {
+								JOptionPane.showMessageDialog(null,
+										"La jornada no se ha creado");
+							}
+						} else {
+							JOptionPane.showMessageDialog(null,
+									"Los datos seleccionados no son viables");
 						}
 					}
 				});
@@ -191,7 +221,6 @@ public class AsignarJornada extends JDialog {
 				cancelarBtn.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						dispose();
-						//Volver a la ventana previa ??
 					}
 				});
 				cancelarBtn.setActionCommand("Cancel");
@@ -199,13 +228,22 @@ public class AsignarJornada extends JDialog {
 			}
 		}
 	}
-	
+
+	private ComboBoxModel<String> setUpComboModelMed(List<Medico> meds) {
+		String[] array = new String[meds.size()];
+		for (int i = 0; i < array.length; i++) {
+			array[i] = meds.get(i).getId();
+		}
+		return new DefaultComboBoxModel<String>(array);
+	}
+
 	/**
-	 * Este método genera una lista llena con Strings de horas con una 
+	 * Este método genera una lista llena con Strings de horas con una
 	 * separación de 1 hora entre las mismas.
 	 * 
-	 * Es utilizado para generar el modelo de las combos dedicadas
-	 * a asignar las horas de la jornada
+	 * Es utilizado para generar el modelo de las combos dedicadas a asignar las
+	 * horas de la jornada
+	 * 
 	 * @return List<String> Conteniendo las horas.
 	 */
 	private List<String> generateTimeList(int inicio, int fin) {
@@ -215,23 +253,100 @@ public class AsignarJornada extends JDialog {
 		}
 		return times;
 	}
-	
+
 	/**
-	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la 
+	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la
 	 * lista recibida.
+	 * 
 	 * @param l List<String> con la que se quiere generar el modelo de combo
 	 * @return DefaultComboBoxModel<String> conteniendo la lista recibida.
 	 */
-	private DefaultComboBoxModel<String> setUpComboModel(List<String> l){
+	private DefaultComboBoxModel<String> setUpComboModel(List<String> l) {
 		String[] array = l.toArray(new String[l.size()]);
 		return new DefaultComboBoxModel<String>(array);
 	}
-	
-	private boolean comprobarCampos() {
-		return false;
+
+	/**
+	 * Método encargado de dejar todos los componentes de la ventana en su
+	 * selección por defecto.
+	 */
+	private void reset() {
+		// medCmb.setSelectedIndex(0);
+		hInicioCmb.setSelectedIndex(0);
+		hFinCmb.setSelectedIndex(0);
+		for (Component c : semanaPn.getComponents()) {
+			JToggleButton jtb = (JToggleButton) c;
+			jtb.setSelected(false);
+		}
+		calendarI.setCalendar(Calendar.getInstance());
+		calendarF.setCalendar(Calendar.getInstance());
+		setCalendars();
 	}
-	
+
+	/**
+	 * Se encarga de ajustar de manera adecuada las fechas de los calendarios.
+	 */
+	private void setCalendars() {
+		calendarF.setMinSelectableDate(calendarI.getDate());
+	}
+
+	/**
+	 * Revisa que los campos están rellenados de manera adecuada.
+	 * 
+	 * @return
+	 */
+	private boolean comprobarCampos() {
+		if (compruebaHoras() && compruebaDias())
+			return true;
+		else
+			return false;
+	}
+
+	/**
+	 * Comprueba que la duración de la jornada no excede de las 12 horas
+	 * ininterrumpidas
+	 * 
+	 * @return true si no excede la condición
+	 */
+	private boolean compruebaHoras() {
+		int hC = hInicioCmb.getSelectedIndex();
+		int hF = hFinCmb.getSelectedIndex();
+		return hC < hF;
+	}
+
+	/**
+	 * Comprueba que el día de inicio es distinto al día de fin, y que no son
+	 * nulas
+	 * 
+	 * @return true si se cumple esta condición
+	 */
+	private boolean compruebaDias() {
+		return calendarI.getDate() != null && calendarF.getDate() != null
+				&& calendarI.getDate().before(calendarF.getDate());
+	}
+
+	/**
+	 * Envía a la clase gestorJornada los datos seleccionados en la ventana
+	 */
 	private void guardarDatos() {
-		
+		gestorJornada.parse(medCmb.getSelectedItem().toString(),
+				hInicioCmb.getSelectedItem().toString(),
+				hFinCmb.getSelectedItem().toString(), calendarI.getDate(),
+				calendarF.getDate(), getDays());
+		gestorJornada.guardarJornada();
+	}
+
+	/**
+	 * Método que elabora un String con los días de la togglebuttos de los dias
+	 * de la semana activos
+	 */
+	private String getDays() {
+		String semana = "";
+		for (Component c : semanaPn.getComponents()) {
+			JToggleButton day = (JToggleButton) c;
+			if (day.isSelected())
+				semana += day.getText();
+		}
+		return semana;
 	}
 }

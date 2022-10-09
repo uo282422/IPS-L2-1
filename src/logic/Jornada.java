@@ -1,15 +1,25 @@
 package logic;
 
-import java.sql.Time;
+import java.util.Random;
 
 public class Jornada {
-	
+
+	private String id;
 	private Medico medico;
 	private String dias;
-	private Time horaComienzo;
-	private Time horaFinal;
+	private String horaComienzo;
+	private String horaFinal;
 	private String diaInicio;
 	private String diaFinal;
+
+	public Jornada() {
+		// Falta un sistema de creación de ids únicos
+		id = "" + Math.abs(new Random().nextInt());
+	}
+
+	public String getId() {
+		return id;
+	}
 
 	public Medico getMedico() {
 		return medico;
@@ -19,11 +29,11 @@ public class Jornada {
 		return dias;
 	}
 
-	public Time getHoraComienzo() {
+	public String getHoraComienzo() {
 		return horaComienzo;
 	}
 
-	public Time getHoraFinal() {
+	public String getHoraFinal() {
 		return horaFinal;
 	}
 
@@ -39,11 +49,11 @@ public class Jornada {
 		this.dias = dias;
 	}
 
-	public void setHoraComienzo(Time horaComienzo) {
+	public void setHoraComienzo(String horaComienzo) {
 		this.horaComienzo = horaComienzo;
 	}
 
-	public void setHoraFinal(Time horaFinal) {
+	public void setHoraFinal(String horaFinal) {
 		this.horaFinal = horaFinal;
 	}
 
@@ -54,8 +64,8 @@ public class Jornada {
 	public void setDiaFinal(String diaFinal) {
 		this.diaFinal = diaFinal;
 	}
-	
-	private void setMedico(Medico m) {
+
+	public void setMedico(Medico m) {
 		medico = m;
 	}
 }
