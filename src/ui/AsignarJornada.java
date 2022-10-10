@@ -91,7 +91,7 @@ public class AsignarJornada extends JDialog {
 		{
 			medCmb = new JComboBox<>();
 			medLb.setLabelFor(medCmb);
-			medCmb.setModel(setUpComboModelMed(db.cargarMedicos()));
+			//medCmb.setModel(setUpComboModelMed(db.cargarMedicos()));
 			medPn.add(medCmb);
 		}
 		{
