@@ -298,6 +298,7 @@ public class VentanaCrearCita extends JFrame {
 		if(getRbSi().isSelected()) {
 			urg=true;
 		}else urg=false;
+		
 		//gestorCitas.nuevaCita(idPaciente, nombre, fecha, hora, sala, urg);
 		resetear();
 		

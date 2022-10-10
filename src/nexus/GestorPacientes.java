@@ -6,7 +6,7 @@ import logic.Paciente;
 
 public class GestorPacientes {
 	public GestorPacientes() {
-		//listaPacientes.add(new Paciente(12,999, "correito"));
+		listaPacientes.add(new Paciente(12,999, "correito"));
 	}
 
 	private ArrayList<Paciente> listaPacientes=new ArrayList<>();
