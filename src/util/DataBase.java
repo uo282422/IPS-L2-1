@@ -10,6 +10,7 @@ import java.util.List;
 
 import logic.Jornada;
 import logic.Medico;
+import logic.Paciente;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";
@@ -38,6 +39,50 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 		return medicos;
+	}
+	
+	public ArrayList<Paciente> cargarPacientes() {
+		ArrayList<Paciente> pacientes = new ArrayList<Paciente>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery("select * from paciente");
+				while (rs.next()) {
+					boolean valido=true;
+					String id = rs.getString("paciente_id");
+					String nombre = "";
+					String apellido = "";
+					String telefono="";
+					String correo = "";
+					String otros = rs.getString("paciente_otros");
+					if(!apellido.isBlank() && !apellido.isEmpty())
+						apellido= rs.getString("paciente_apellido");
+					else valido=false;
+					if(!nombre.isBlank() && !nombre.isEmpty())
+						nombre= rs.getString("paciente_nombre");
+					else valido=false;
+					if(!telefono.isBlank() && !telefono.isEmpty())
+						telefono= rs.getString("paciente_telefono");
+					else valido=false;
+					if(!correo.isBlank() && !correo.isEmpty())
+						correo= rs.getString("paciente_correo");
+					else valido=false;
+					
+					
+					if(valido)
+						pacientes.add(new Paciente(Integer.parseInt(id), nombre,apellido, Integer.parseInt(telefono), correo, otros));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return pacientes;
 	}
 
 	public void cargarDatosDePrueba() {
@@ -76,4 +121,8 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 	}
+	
+
+	
+	
 }

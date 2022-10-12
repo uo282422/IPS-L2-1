@@ -14,15 +14,25 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import nexus.GestorPacientes;
+import java.awt.GridLayout;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 public class DialogoInfoContacto extends JDialog {
 
 	private final JPanel panelDialogoPrincipal = new JPanel();
 
-
+//	gP.getContactoPaciente(idPaciente)
+	
+	
+	
+//	gP.actualizarContactoPaciente(idPaciente,str);
+//	textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
 	private GestorPacientes gP;
-	private JTextArea textAreaPrincipal;
 	private int idPaciente;
+	private JTextField tfCorreo;
+	private JTextField tfTlf;
+	private JTextPane tpOtros;
 	/**
 	 * Create the dialog.
 	 */
@@ -48,10 +58,54 @@ public class DialogoInfoContacto extends JDialog {
 		getContentPane().add(panelDialogoPrincipal, BorderLayout.CENTER);
 		panelDialogoPrincipal.setLayout(new BorderLayout(0, 0));
 		{
-			textAreaPrincipal = new JTextArea();
-			textAreaPrincipal.setEditable(true);
-			textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
-			panelDialogoPrincipal.add(textAreaPrincipal, BorderLayout.CENTER);
+			JPanel panelNorte = new JPanel();
+			FlowLayout fl_panelNorte = (FlowLayout) panelNorte.getLayout();
+			fl_panelNorte.setAlignment(FlowLayout.LEFT);
+			panelDialogoPrincipal.add(panelNorte, BorderLayout.NORTH);
+			{
+				JPanel panelTelefono = new JPanel();
+				panelNorte.add(panelTelefono);
+				{
+					JLabel lblTelfono = new JLabel("Teléfono");
+					panelTelefono.add(lblTelfono);
+				}
+				{
+					tfTlf = new JTextField();
+					tfTlf.setColumns(10);
+					tfTlf.setText(gP.getTelefonoPaciente(idPaciente));
+					panelTelefono.add(tfTlf);
+				}
+			}
+			{
+				JPanel panelCorreo = new JPanel();
+				panelNorte.add(panelCorreo);
+				{
+					JLabel lblCorreo = new JLabel("Correo");
+					
+					panelCorreo.add(lblCorreo);
+				}
+				{
+					tfCorreo = new JTextField();
+					tfCorreo.setColumns(10);
+					tfCorreo.setText(gP.getCorreoPaciente(idPaciente));
+					panelCorreo.add(tfCorreo);
+				}
+			}
+		}
+		{
+			JPanel panelOeste = new JPanel();
+			panelDialogoPrincipal.add(panelOeste, BorderLayout.WEST);
+			panelOeste.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lbOtros = new JLabel("Otra información de contacto:");
+				panelOeste.add(lbOtros, BorderLayout.NORTH);
+			}
+			{
+				JTextPane tpOtros = new JTextPane();
+				this.tpOtros=tpOtros;
+				tpOtros.setText(gP.getOtrosContactosPaciente(id));
+				panelOeste.add(tpOtros);
+			}
 		}
 		{
 			JPanel panelBotones = new JPanel();
@@ -64,12 +118,12 @@ public class DialogoInfoContacto extends JDialog {
 						guardar();
 					}
 
-					private void guardar() {
-						textAreaPrincipal.setEditable(false);
-						String str=textAreaPrincipal.getText();
+					private void guardar() {						
+						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
+						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
+						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());
+
 						
-						gP.actualizarContactoPaciente(idPaciente,str);
-						textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
 					}
 				});
 				panelBotones.add(btGuardar);

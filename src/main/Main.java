@@ -11,8 +11,9 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-//					new DataBase().cargarDatosDePrueba();
-					VentanaCrearCita frame = new VentanaCrearCita();
+					DataBase bd=new DataBase();
+					bd.cargarDatosDePrueba();
+					VentanaCrearCita frame = new VentanaCrearCita(bd);
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();

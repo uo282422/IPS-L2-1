@@ -11,13 +11,18 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import logic.Cita;
+import util.DataBase;
 
 public class GestorCitas {
 	
 	private ArrayList<Cita> listaCitas=new ArrayList<>();
 
-	public void nuevaCita(int idPaciente, String nombre, String fecha, String hora, int sala, boolean urg) {
-		Cita c=new Cita(idPaciente, nombre, fecha,hora, sala, urg);
+	public GestorCitas(DataBase bd) {
+		
+	}
+
+	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala, boolean urg) {
+		Cita c=new Cita(idPaciente, nombre, fecha,horaE, horaS, sala, urg);
 		listaCitas.add(c);
 		if(urg)enviarCorreo(c);
 	}
