@@ -7,77 +7,79 @@ import util.DataBase;
 
 public class GestorPacientes {
 	public GestorPacientes(DataBase bd) {
-		//listaPacientes=bd.cargarPacientes();
-		listaPacientes.add(new Paciente(12,"Juan","Iglesias", 999, "correito","otro contacto 1"));
+		listaPacientes = bd.cargarPacientes();
+		// listaPacientes.add(new Paciente(12,"Juan","Iglesias", 999, "correito","otro
+		// contacto 1"));
 	}
-	
-	private ArrayList<Paciente> listaPacientes=new ArrayList<>();
-	
+
+	private ArrayList<Paciente> listaPacientes = new ArrayList<>();
+
 	public void actualizarTelefonoPaciente(int id, int num) {
-		for(Paciente p: listaPacientes) {
-			if(p.getId()==id) {
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
 				p.setTelefono(num);
 			}
 		}
 	}
-	
+
 	public void actualizarCorreoPaciente(int id, String mail) {
-		for(Paciente p: listaPacientes) {
-			if(p.getId()==id) {
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
 				p.setCorreo(mail);
 			}
 		}
 	}
-	
-	
+
 	public void actualizarOtrosContactosPaciente(int id, String otro) {
-		for(Paciente p: listaPacientes) {
-			if(p.getId()==id) {
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
 				p.setOtrosContactos(otro);
 			}
 		}
 	}
+
 	public String getTelefonoPaciente(int id) {
-		String str="";
-		for(Paciente p: listaPacientes) {
-			if(p.getId()==id) {
-				str+=p.getTelefono();
+		String str = "";
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
+				str += p.getTelefono();
 			}
 		}
 		return str;
 	}
-	
+
 	public String getOtrosContactosPaciente(int id) {
-		String str="";
-		for(Paciente p: listaPacientes) {
-			if(p.getId()==id) {
-				str=p.getOtrosContactos();
+		String str = "";
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
+				str = p.getOtrosContactos();
 			}
 		}
 		return str;
 	}
+
 	public String getCorreoPaciente(int id) {
-		String str="";
-		for(Paciente p: listaPacientes) {
-			if(p.getId()==id) {
-				str= p.getCorreo();
+		String str = "";
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
+				str = p.getCorreo();
 			}
 		}
 		return str;
-		
+
 	}
 
 	public int buscarIdPaciente(String n, String a) {
-		int i=-1;
-		for(Paciente p: listaPacientes) {
-			if(p.getNombre().equals(n) && p.getApellido().equals(a)){
-				i= p.getId();
+		int i = -1;
+		for (Paciente p : listaPacientes) {
+			if (p.getNombre().equals(n) && p.getApellido().equals(a)) {
+				i = p.getId();
 			}
 		}
 		return i;
 	}
-	
-	public ArrayList<Paciente> getListaPacientes(){
+
+	public ArrayList<Paciente> getListaPacientes() {
 		return this.listaPacientes;
 	}
 }

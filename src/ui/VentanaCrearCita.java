@@ -10,9 +10,11 @@ import java.text.ParseException;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -20,17 +22,25 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
 
+import logic.Medico;
 import logic.Paciente;
 import nexus.GestorCitas;
+import nexus.GestorMedico;
 import nexus.GestorPacientes;
 import util.DataBase;
+import javax.swing.JTextArea;
+import javax.swing.DropMode;
+import java.awt.Component;
+import javax.swing.Box;
 
 public class VentanaCrearCita extends JFrame {
 
+	private static final long serialVersionUID = 1L;
+
 	private JPanel panelPrincipalCrearCita;
 	private JPanel panelCampos;
-	private JPanel panelNombre;
-	private JLabel lbNombre;
+	private JPanel panelPaciente;
+	private JLabel lbPaciente;
 	private JPanel panelHoraEntrada;
 	private JLabel lbHoraEntrada;
 	private JPanel panelFecha;
@@ -53,6 +63,7 @@ public class VentanaCrearCita extends JFrame {
 	private ButtonGroup bgUrgente;
 	private GestorCitas gC;
 	private GestorPacientes gP;
+	private GestorMedico gM;
 	private DialogoInfoContacto dialContacto;
 	private JPanel panelContacto;
 	private JButton btContacto;
@@ -60,29 +71,41 @@ public class VentanaCrearCita extends JFrame {
 	private JPanel panelHoraSalida;
 	private JLabel lbHoraSalida;
 	private JFormattedTextField tfHoraSalida;
+	private JPanel panelMedicos;
+	private JLabel lblMedico;
+	private JComboBox<Medico> cbMedicos;
+	private JPanel panelAdd;
+	private JButton btAdd;
+	private JPanel panelMedicosAgregados;
+	private JTextArea taMedicos;
+	private Component horizontalStrut;
+	private Component horizontalStrut_1;
 
-	private DataBase baseDatos;
 	/**
 	 * Create the frame.
 	 */
 	public VentanaCrearCita(DataBase bd) {
-		gP=new GestorPacientes(bd);
-		gC=new GestorCitas(bd);
+		gP = new GestorPacientes(bd);
+		gC = new GestorCitas(bd);
+		gM = new GestorMedico(bd);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 455, 408);
 		panelPrincipalCrearCita = new JPanel();
 		panelPrincipalCrearCita.setBorder(new EmptyBorder(5, 5, 5, 5));
-		bgUrgente=new ButtonGroup();
+		bgUrgente = new ButtonGroup();
 		setContentPane(panelPrincipalCrearCita);
 		panelPrincipalCrearCita.setLayout(new BorderLayout(0, 0));
 		panelPrincipalCrearCita.add(getPanelCampos(), BorderLayout.CENTER);
 		panelPrincipalCrearCita.add(getPanelTitulo(), BorderLayout.NORTH);
 	}
+
 	private JPanel getPanelCampos() {
 		if (panelCampos == null) {
 			panelCampos = new JPanel();
 			panelCampos.setLayout(new GridLayout(0, 1, 10, 10));
-			panelCampos.add(getPanelNombre());
+			panelCampos.add(getPanelMedicos());
+			panelCampos.add(getPanelMedicosAgregados());
+			panelCampos.add(getPanelPaciente());
 			panelCampos.add(getPanelHoraEntrada());
 			panelCampos.add(getPanelHoraSalida());
 			panelCampos.add(getPanelFecha());
@@ -92,23 +115,26 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelCampos;
 	}
-	private JPanel getPanelNombre() {
-		if (panelNombre == null) {
-			panelNombre = new JPanel();
-			panelNombre.setLayout(new GridLayout(0, 3, 10, 0));
-			panelNombre.add(getLbNombre());
-			panelNombre.add(getCbPacientes());
-			panelNombre.add(getPanelContacto_1());
+
+	private JPanel getPanelPaciente() {
+		if (panelPaciente == null) {
+			panelPaciente = new JPanel();
+			panelPaciente.setLayout(new GridLayout(0, 3, 10, 0));
+			panelPaciente.add(getLbPaciente());
+			panelPaciente.add(getCbPacientes());
+			panelPaciente.add(getPanelContacto_1());
 		}
-		return panelNombre;
+		return panelPaciente;
 	}
-	private JLabel getLbNombre() {
-		if (lbNombre == null) {
-			lbNombre = new JLabel("Nombre y Apellido:");
-			lbNombre.setHorizontalAlignment(SwingConstants.RIGHT);
+
+	private JLabel getLbPaciente() {
+		if (lbPaciente == null) {
+			lbPaciente = new JLabel("Paciente:");
+			lbPaciente.setHorizontalAlignment(SwingConstants.RIGHT);
 		}
-		return lbNombre;
+		return lbPaciente;
 	}
+
 	private JPanel getPanelHoraEntrada() {
 		if (panelHoraEntrada == null) {
 			panelHoraEntrada = new JPanel();
@@ -118,6 +144,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelHoraEntrada;
 	}
+
 	private JLabel getLbHora_1() {
 		if (lbHoraEntrada == null) {
 			lbHoraEntrada = new JLabel("Hora entrada :");
@@ -127,6 +154,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return lbHoraEntrada;
 	}
+
 	private JPanel getPanelFecha() {
 		if (panelFecha == null) {
 			panelFecha = new JPanel();
@@ -136,6 +164,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelFecha;
 	}
+
 	private JLabel getLbFecha_1() {
 		if (lbFecha == null) {
 			lbFecha = new JLabel("Fecha :");
@@ -144,6 +173,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return lbFecha;
 	}
+
 	private JPanel getPanelSala() {
 		if (panelSala == null) {
 			panelSala = new JPanel();
@@ -153,6 +183,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelSala;
 	}
+
 	private JLabel getLbSala_1() {
 		if (lbSala == null) {
 			lbSala = new JLabel("Sala :");
@@ -161,6 +192,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return lbSala;
 	}
+
 	private JPanel getPanelUrgente() {
 		if (panelUrgente == null) {
 			panelUrgente = new JPanel();
@@ -170,6 +202,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelUrgente;
 	}
+
 	private JLabel getLbUrgente_1() {
 		if (lbUrgente == null) {
 			lbUrgente = new JLabel("Urgente :");
@@ -177,35 +210,37 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return lbUrgente;
 	}
+
 	private JTextField getTfHoraEntrada() {
 		if (tfHoraEntrada == null) {
 			try {
-				MaskFormatter mf=new MaskFormatter("##:##");
+				MaskFormatter mf = new MaskFormatter("##:##");
 				tfHoraEntrada = new JFormattedTextField(mf);
 				tfHoraEntrada.setHorizontalAlignment(SwingConstants.CENTER);
-				
+
 				tfHoraEntrada.setColumns(10);
-			}catch(ParseException e) {
+			} catch (ParseException e) {
 				e.printStackTrace();
 			}
-			
-			
+
 		}
 		return tfHoraEntrada;
 	}
+
 	private JTextField getTfFecha() {
 		if (tfFecha == null) {
 			try {
-				MaskFormatter mf=new MaskFormatter("##/##/####");
+				MaskFormatter mf = new MaskFormatter("##/##/####");
 				tfFecha = new JFormattedTextField(mf);
 				tfFecha.setHorizontalAlignment(SwingConstants.CENTER);
 				tfFecha.setColumns(10);
-			}catch(ParseException e) {
+			} catch (ParseException e) {
 				e.printStackTrace();
 			}
 		}
 		return tfFecha;
 	}
+
 	private JTextField getTfSala() {
 		if (tfSala == null) {
 			tfSala = new JTextField();
@@ -214,6 +249,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return tfSala;
 	}
+
 	private JPanel getPanelRb() {
 		if (panelRb == null) {
 			panelRb = new JPanel();
@@ -221,22 +257,25 @@ public class VentanaCrearCita extends JFrame {
 			bgUrgente.add(getRbNo());
 			panelRb.add(getRbSi());
 			panelRb.add(getRbNo());
-			
+
 		}
 		return panelRb;
 	}
+
 	private JRadioButton getRbSi() {
 		if (rbSi == null) {
 			rbSi = new JRadioButton("Si");
 		}
 		return rbSi;
 	}
+
 	private JRadioButton getRbNo() {
 		if (rbNo == null) {
 			rbNo = new JRadioButton("No");
 		}
 		return rbNo;
 	}
+
 	private JPanel getPanelTitulo() {
 		if (panelTitulo == null) {
 			panelTitulo = new JPanel();
@@ -244,6 +283,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelTitulo;
 	}
+
 	private JLabel getLbTitulo() {
 		if (lbTitulo == null) {
 			lbTitulo = new JLabel("CREAR NUEVA CITA");
@@ -251,6 +291,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return lbTitulo;
 	}
+
 	private JPanel getPanelBotonCrear() {
 		if (panelBotonCrear == null) {
 			panelBotonCrear = new JPanel();
@@ -258,71 +299,75 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelBotonCrear;
 	}
+
 	private JButton getBtCrear() {
 		if (btCrear == null) {
 			btCrear = new JButton("Crear cita");
 			btCrear.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					comprobarYCrear();
-						
+
 				}
 
-				
 			});
 		}
 		return btCrear;
 	}
-	
+
 	protected void comprobarYCrear() {
-		boolean valido=true;
-		String[] nomApe=getCbPacientes().getSelectedItem().toString().split(" ");
-		String nombre=nomApe[0];
-		String apellido=nomApe[1];
-		int idPaciente=gP.buscarIdPaciente(nombre, apellido);
-		if(idPaciente==-1)valido=false;
-		String horaE="";
-		String horaS="";
-		if(comprobarHoraDisponible(nomApe)) {
-			 horaE=getTfHoraEntrada().getText();
-			 horaS=getTfHoraSalida().getText();
-		}else valido=false;
-		
-		String fecha="";
-		if(comprobarFechaDisponible(nomApe)) {
-			fecha=getTfFecha().getText();
-		}else valido=false;
-		
-		
-		
-		int sala=-1;
-		if(!getTfSala().getText().isBlank() && !getTfSala().getText().isEmpty() && !getTfSala().getText().equals("-1"))
-			sala=Integer.parseInt(getTfSala().getText());
-		else valido=false;
+		boolean valido = true;
+		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
+		String nombre = nomApe[0];
+		String apellido = nomApe[1];
+		int idPaciente = gP.buscarIdPaciente(nombre, apellido);
+		if (idPaciente == -1)
+			valido = false;
+		String horaE = "";
+		String horaS = "";
+		if (comprobarHoraDisponible(nomApe)) {
+			horaE = getTfHoraEntrada().getText();
+			horaS = getTfHoraSalida().getText();
+		} else
+			valido = false;
+
+		String fecha = "";
+		if (comprobarFechaDisponible(nomApe)) {
+			fecha = getTfFecha().getText();
+		} else
+			valido = false;
+
+		int sala = -1;
+		if (!getTfSala().getText().isBlank() && !getTfSala().getText().isEmpty() && !getTfSala().getText().equals("-1"))
+			sala = Integer.parseInt(getTfSala().getText());
+		else
+			valido = false;
 		boolean urg;
-		if(getRbSi().isSelected()) {
-			urg=true;
-		}else urg=false;
-		
-		if(valido)
-			crearCita(idPaciente, nombre, fecha, horaE,horaS, sala, urg);
-		
-		
+		if (getRbSi().isSelected()) {
+			urg = true;
+		} else
+			urg = false;
+
+		if (valido)
+			crearCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg);
+
 	}
+
 	private boolean comprobarFechaDisponible(String[] nomApe) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
+
 	private boolean comprobarHoraDisponible(String[] nomApe) {
 		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
-	
-	private void crearCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala, boolean urg) {
 
-		gC.nuevaCita(idPaciente, nombre, fecha, horaE,horaS, sala, urg);
+	private void crearCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala,
+			boolean urg) {
+
+		gC.nuevaCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg);
 		resetear();
-		
-		
+
 	}
 
 	private void resetear() {
@@ -333,16 +378,15 @@ public class VentanaCrearCita extends JFrame {
 		getTfSala().setText("");
 		getRbSi().setSelected(false);
 		getRbNo().setSelected(false);
-		
-		
-		
+
 	}
-	
+
 	private void mostrarVentanaInfoContacto() {
-		String[] nomApe=getCbPacientes().getSelectedItem().toString().split(" ");
-		dialContacto=new DialogoInfoContacto(gP,gP.buscarIdPaciente(nomApe[0], nomApe[1]));
+		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
+		dialContacto = new DialogoInfoContacto(gP, gP.buscarIdPaciente(nomApe[0], nomApe[1]));
 		dialContacto.setVisible(true);
 	}
+
 	private JPanel getPanelContacto_1() {
 		if (panelContacto == null) {
 			panelContacto = new JPanel();
@@ -350,6 +394,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelContacto;
 	}
+
 	private JButton getBtContacto_1() {
 		if (btContacto == null) {
 			btContacto = new JButton("Info contacto");
@@ -358,11 +403,11 @@ public class VentanaCrearCita extends JFrame {
 					mostrarVentanaInfoContacto();
 				}
 
-				
 			});
 		}
 		return btContacto;
 	}
+
 	private JComboBox getCbPacientes() {
 		if (cbPacientes == null) {
 			cbPacientes = new JComboBox();
@@ -370,12 +415,13 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return cbPacientes;
 	}
-	
+
 	private void cargarComboPacientes() {
-		for(Paciente p: gP.getListaPacientes()) {
-			getCbPacientes().addItem(p.getNombre()+" "+p.getApellido());
+		for (Paciente p : gP.getListaPacientes()) {
+			getCbPacientes().addItem(p.getNombre() + " " + p.getApellido());
 		}
 	}
+
 	private JPanel getPanelHoraSalida() {
 		if (panelHoraSalida == null) {
 			panelHoraSalida = new JPanel();
@@ -385,6 +431,7 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return panelHoraSalida;
 	}
+
 	private JLabel getLbHoraSalida() {
 		if (lbHoraSalida == null) {
 			lbHoraSalida = new JLabel("Hora salida:");
@@ -393,18 +440,113 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return lbHoraSalida;
 	}
+
 	private JFormattedTextField getTfHoraSalida() {
 		if (tfHoraSalida == null) {
 			try {
-				MaskFormatter mf=new MaskFormatter("##:##");
+				MaskFormatter mf = new MaskFormatter("##:##");
 				tfHoraSalida = new JFormattedTextField(mf);
 				tfHoraSalida.setHorizontalAlignment(SwingConstants.CENTER);
-				
+
 				tfHoraSalida.setColumns(10);
-			}catch(ParseException e) {
+			} catch (ParseException e) {
 				e.printStackTrace();
 			}
 		}
 		return tfHoraSalida;
+	}
+
+	private JPanel getPanelMedicos() {
+		if (panelMedicos == null) {
+			panelMedicos = new JPanel();
+			panelMedicos.setLayout(new GridLayout(0, 3, 10, 0));
+			panelMedicos.add(getLblMedico());
+			panelMedicos.add(getCbMedicos());
+			panelMedicos.add(getPanelAdd());
+		}
+		return panelMedicos;
+	}
+
+	private JLabel getLblMedico() {
+		if (lblMedico == null) {
+			lblMedico = new JLabel("Medicos:");
+			lblMedico.setHorizontalAlignment(SwingConstants.RIGHT);
+		}
+		return lblMedico;
+	}
+
+	private JComboBox<Medico> getCbMedicos() {
+		if (cbMedicos == null) {
+			cbMedicos = new JComboBox<Medico>();
+			for (Medico m : gM.getMedicos()) {
+				cbMedicos.addItem(m);
+			}
+		}
+		return cbMedicos;
+	}
+
+	private JPanel getPanelAdd() {
+		if (panelAdd == null) {
+			panelAdd = new JPanel();
+			panelAdd.add(getBtAdd());
+		}
+		return panelAdd;
+	}
+
+	private JButton getBtAdd() {
+		if (btAdd == null) {
+			btAdd = new JButton("Agregar");
+			btAdd.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					moverMedicoATxtArea();
+				}
+			});
+		}
+		return btAdd;
+	}
+
+	private void moverMedicoATxtArea() {
+		if (gC.agregarMedico((Medico) getCbMedicos().getSelectedItem())) {
+			JOptionPane.showMessageDialog(this, "Este medico ya se ha agregado");
+		}
+		StringBuilder sb = new StringBuilder("");
+		for (Medico m : gC.getMedicosAgregados()) {
+			sb.append(m + "\n");
+		}
+		getTaMedicos().setText(sb.toString());
+	}
+
+	private JPanel getPanelMedicosAgregados() {
+		if (panelMedicosAgregados == null) {
+			panelMedicosAgregados = new JPanel();
+			panelMedicosAgregados.setLayout(new GridLayout(0, 3, 0, 0));
+			panelMedicosAgregados.add(getHorizontalStrut());
+			panelMedicosAgregados.add(getTaMedicos());
+			panelMedicosAgregados.add(getHorizontalStrut_1());
+		}
+		return panelMedicosAgregados;
+	}
+
+	private JTextArea getTaMedicos() {
+		if (taMedicos == null) {
+			taMedicos = new JTextArea();
+			taMedicos.setText("Aun no se han agregado medicos");
+			taMedicos.setRows(10);
+		}
+		return taMedicos;
+	}
+
+	private Component getHorizontalStrut() {
+		if (horizontalStrut == null) {
+			horizontalStrut = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut;
+	}
+
+	private Component getHorizontalStrut_1() {
+		if (horizontalStrut_1 == null) {
+			horizontalStrut_1 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_1;
 	}
 }
