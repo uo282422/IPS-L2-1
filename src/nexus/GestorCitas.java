@@ -25,9 +25,8 @@ public class GestorCitas {
 		this.bd = bd;
 	}
 
-	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala,
-			boolean urg) {
-		Cita c = new Cita(idPaciente, nombre, fecha, horaE, horaS, sala, urg);
+	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala, boolean urg) {
+		Cita c=new Cita(idPaciente, fecha,horaE, horaS, sala, urg);
 		listaCitas.add(c);
 		
 		bd.crearCita(c, new ArrayList<Medico>(medicos));

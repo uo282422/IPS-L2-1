@@ -1,22 +1,24 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 
+import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JDialog;
 import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
@@ -28,10 +30,6 @@ import nexus.GestorCitas;
 import nexus.GestorMedico;
 import nexus.GestorPacientes;
 import util.DataBase;
-import javax.swing.JTextArea;
-import javax.swing.DropMode;
-import java.awt.Component;
-import javax.swing.Box;
 
 public class VentanaCrearCita extends JFrame {
 
