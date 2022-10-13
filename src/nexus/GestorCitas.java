@@ -22,7 +22,7 @@ public class GestorCitas {
 	}
 
 	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala, boolean urg) {
-		Cita c=new Cita(idPaciente, nombre, fecha,horaE, horaS, sala, urg);
+		Cita c=new Cita(idPaciente, fecha,horaE, horaS, sala, urg);
 		listaCitas.add(c);
 		if(urg)enviarCorreo(c);
 	}

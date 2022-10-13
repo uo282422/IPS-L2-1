@@ -62,6 +62,7 @@ public class VentanaCrearCita extends JFrame {
 	private JFormattedTextField tfHoraSalida;
 
 	private DataBase baseDatos;
+	private JPanel panel;
 	/**
 	 * Create the frame.
 	 */
@@ -115,6 +116,7 @@ public class VentanaCrearCita extends JFrame {
 			panelHoraEntrada.setLayout(new GridLayout(0, 3, 10, 0));
 			panelHoraEntrada.add(getLbHora_1());
 			panelHoraEntrada.add(getTfHoraEntrada());
+			panelHoraEntrada.add(getPanel());
 		}
 		return panelHoraEntrada;
 	}
@@ -406,5 +408,11 @@ public class VentanaCrearCita extends JFrame {
 			}
 		}
 		return tfHoraSalida;
+	}
+	private JPanel getPanel() {
+		if (panel == null) {
+			panel = new JPanel();
+		}
+		return panel;
 	}
 }
