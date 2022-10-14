@@ -10,13 +10,12 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.border.EmptyBorder;
-
-import nexus.GestorPacientes;
-import java.awt.GridLayout;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
+import javax.swing.border.EmptyBorder;
+
+import logic.Paciente;
+import nexus.GestorCitas;
 
 public class DialogoInfoContacto extends JDialog {
 
@@ -28,17 +27,15 @@ public class DialogoInfoContacto extends JDialog {
 	
 //	gP.actualizarContactoPaciente(idPaciente,str);
 //	textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
-	private GestorPacientes gP;
-	private int idPaciente;
+	private GestorCitas gC;
 	private JTextField tfCorreo;
 	private JTextField tfTlf;
 	private JTextPane tpOtros;
 	/**
 	 * Create the dialog.
 	 */
-	public DialogoInfoContacto(GestorPacientes gestorP, int id) {
-		idPaciente=id;
-		gP=gestorP;
+	public DialogoInfoContacto(GestorCitas gC, int id) {
+		this.gC=gC;
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		{
@@ -50,7 +47,7 @@ public class DialogoInfoContacto extends JDialog {
 				panelNorte.add(lbInfoContacto);
 			}
 			{
-				JLabel lbIdPaciente = new JLabel(String.valueOf(idPaciente));
+				JLabel lbIdPaciente = new JLabel(String.valueOf(id));
 				panelNorte.add(lbIdPaciente);
 			}
 		}
@@ -72,7 +69,7 @@ public class DialogoInfoContacto extends JDialog {
 				{
 					tfTlf = new JTextField();
 					tfTlf.setColumns(10);
-					tfTlf.setText(gP.getTelefonoPaciente(idPaciente));
+					tfTlf.setText(gC.getTlfProv()+"");
 					panelTelefono.add(tfTlf);
 				}
 			}
@@ -87,7 +84,7 @@ public class DialogoInfoContacto extends JDialog {
 				{
 					tfCorreo = new JTextField();
 					tfCorreo.setColumns(10);
-					tfCorreo.setText(gP.getCorreoPaciente(idPaciente));
+					tfCorreo.setText(gC.getCorreoProv());
 					panelCorreo.add(tfCorreo);
 				}
 			}
@@ -103,7 +100,7 @@ public class DialogoInfoContacto extends JDialog {
 			{
 				JTextPane tpOtros = new JTextPane();
 				this.tpOtros=tpOtros;
-				tpOtros.setText(gP.getOtrosContactosPaciente(id));
+				tpOtros.setText(gC.getOtrosProv());
 				panelOeste.add(tpOtros);
 			}
 		}
@@ -118,10 +115,12 @@ public class DialogoInfoContacto extends JDialog {
 						guardar();
 					}
 
-					private void guardar() {						
-						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
-						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
-						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());
+					private void guardar() {
+						
+						gC.añadirInfoContactoProv(Integer.parseInt(tfTlf.getText()),tfCorreo.getText(),tpOtros.getText());
+//						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
+//						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
+//						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());
 
 						
 					}

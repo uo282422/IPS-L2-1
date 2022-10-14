@@ -23,6 +23,14 @@ public class GestorPacientes {
 			}
 		}
 	}
+	public Paciente getPaciente(int id) {
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
+				return p;
+			}
+		}
+		return null;
+	}
 
 	public void actualizarCorreoPaciente(int id, String mail) {
 		for (Paciente p : listaPacientes) {

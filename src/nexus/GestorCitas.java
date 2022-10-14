@@ -12,6 +12,7 @@ import javax.mail.internet.MimeMessage;
 
 import logic.Cita;
 import logic.Medico;
+import logic.Paciente;
 import util.DataBase;
 
 public class GestorCitas {
@@ -20,20 +21,25 @@ public class GestorCitas {
 
 	private ArrayList<Cita> listaCitas = new ArrayList<>();
 	private ArrayList<Medico> medicos = new ArrayList<Medico>();
-
+	
+	private int tlfProv;
+	private String correoProv;
+	private String otrosProv;
 	public GestorCitas() {
 		this.bd = new DataBase();
 	}
 
-	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala,
+	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int salaId,
 			boolean urg) {
-		Cita c = new Cita(idPaciente, fecha, horaE, horaS, sala, urg);
+		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS, urg, salaId, tlfProv, correoProv, otrosProv, false, "");
 		listaCitas.add(c);
+		//System.out.println(c.getIdCita()+" "+c.getIdPaciente()+" "+fecha+" "+horaE+" "+horaS+" "+urg+" "+salaId+" "+tlfProv+" "+correoProv+" "+otrosProv+" "+false+" "+ "");
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos));
 
 		if (urg)
 			enviarCorreo(c);
+		
 	}
 
 	private void enviarCorreo(Cita c) {
@@ -91,5 +97,32 @@ public class GestorCitas {
 	public ArrayList<Medico> getMedicosAgregados() {
 		return new ArrayList<Medico>(medicos);
 	}
+
+	public void añadirInfoContactoProv(Paciente paciente) {
+		this.tlfProv=paciente.getTelefono();
+		this.correoProv=paciente.getCorreo();
+		this.otrosProv=paciente.getOtrosContactos();
+		
+	}
+	
+	public void añadirInfoContactoProv(int tlf, String corr, String otro) {
+		this.tlfProv=tlf;
+		this.correoProv=corr;
+		this.otrosProv=otro;
+		
+	}
+	
+	
+	public int getTlfProv(){
+		return tlfProv;
+	}
+	public String getCorreoProv() {
+		return correoProv;
+	}
+	public String getOtrosProv() {
+		return otrosProv;
+	}
+
+	
 
 }

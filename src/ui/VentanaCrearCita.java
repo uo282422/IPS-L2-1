@@ -370,18 +370,20 @@ public class VentanaCrearCita extends JFrame {
 
 	private void resetear() {
 		getCbPacientes().setSelectedIndex(0);
+		actualizarInfoProvisional();
 		getTfFecha().setText("");
 		getTfHoraEntrada().setText("");
 		getTfHoraSalida().setText("");
 		getTfSala().setText("");
 		getRbSi().setSelected(false);
 		getRbNo().setSelected(false);
+		
 
 	}
 
 	private void mostrarVentanaInfoContacto() {
 		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
-		dialContacto = new DialogoInfoContacto(gP, gP.buscarIdPaciente(nomApe[0], nomApe[1]));
+		dialContacto = new DialogoInfoContacto(gC, gP.buscarIdPaciente(nomApe[0], nomApe[1]));
 		dialContacto.setVisible(true);
 	}
 
@@ -409,9 +411,25 @@ public class VentanaCrearCita extends JFrame {
 	private JComboBox getCbPacientes() {
 		if (cbPacientes == null) {
 			cbPacientes = new JComboBox();
+			cbPacientes.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					actualizarInfoProvisional();
+				}
+			});
 			cargarComboPacientes();
+			actualizarInfoProvisional();
 		}
+		
+	
 		return cbPacientes;
+	}
+
+	private void actualizarInfoProvisional() {
+		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
+		String nombre = nomApe[0];
+		String apellido = nomApe[1];
+		int idPaciente = gP.buscarIdPaciente(nombre, apellido);//id del paciente seleccionado al inicio
+		gC.añadirInfoContactoProv(gP.getPaciente(idPaciente));
 	}
 
 	private void cargarComboPacientes() {

@@ -12,6 +12,12 @@ public class Cita {
 	private String horaS;
 	private boolean urgente;
 	private int sala;
+	private int telefonoCita;
+	
+	private String correoCita;
+	private String otrosCita;
+	private boolean acudio;
+	private String causaCita;
 	
 	public Cita(int id,  String f,String he, String hs, int s, boolean u) {
 		idCita=generarId();
@@ -22,6 +28,42 @@ public class Cita {
 		setSala(s);
 		setUrgente(u);
 		
+	}
+	
+	public int getIdCita() {
+		return idCita;
+	}
+
+	public int getIdPaciente() {
+		return idPaciente;
+	}
+
+	public String getFecha() {
+		return fecha;
+	}
+
+	public boolean isUrgente() {
+		return urgente;
+	}
+
+	public int getSala() {
+		return sala;
+	}
+
+	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
+			int telefono, String correo, String otros, boolean acudio, String causa) {
+		this.idCita = id;
+		setIdPaciente(pacienteId);
+		setFecha(fecha);
+		setHoraE(horaI);
+		setHoraS(horaF);
+		this.urgente = urgente;
+		this.sala = salaId;
+		this.telefonoCita = telefono;
+		this.correoCita = correo;
+		this.otrosCita = otros;
+		this.acudio = acudio;
+		this.causaCita = causa;
 	}
 
 	private void setHoraS(String hs) {
@@ -60,6 +102,46 @@ public class Cita {
 	}
 	public void setSala(int num) {
 		this.sala=num;
+	}
+	
+	public int getTelefonoCita() {
+		return telefonoCita;
+	}
+
+	public void setTelefonoCita(int telefonoCita) {
+		this.telefonoCita = telefonoCita;
+	}
+
+	public String getCorreoCita() {
+		return correoCita;
+	}
+
+	public void setCorreoCita(String correoCita) {
+		this.correoCita = correoCita;
+	}
+
+	public String getOtrosCita() {
+		return otrosCita;
+	}
+
+	public void setOtrosCita(String otrosCita) {
+		this.otrosCita = otrosCita;
+	}
+
+	public boolean isAcudio() {
+		return acudio;
+	}
+
+	public void setAcudio(boolean acudio) {
+		this.acudio = acudio;
+	}
+
+	public String getCausaCita() {
+		return causaCita;
+	}
+
+	public void setCausaCita(String causaCita) {
+		this.causaCita = causaCita;
 	}
 	
 	/*
