@@ -13,6 +13,7 @@ import logic.Cita;
 import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
+import logic.Sala;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";
@@ -44,6 +45,32 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 		return medicos;
+	}
+	
+	public List<Sala>cargarSalas(){
+		ArrayList<Sala> salas = new ArrayList<Sala>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery("select * from sala");
+				while (rs.next()) {
+					String id = rs.getString("sala_id");
+					String nombre = rs.getString("sala_nombre");
+					
+
+					salas.add(new Sala(Integer.parseInt(id), nombre));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return salas;
 	}
 
 	public ArrayList<Paciente> cargarPacientes() {

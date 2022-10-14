@@ -26,10 +26,11 @@ import javax.swing.text.MaskFormatter;
 
 import logic.Medico;
 import logic.Paciente;
+import logic.Sala;
 import nexus.GestorCitas;
 import nexus.GestorMedico;
 import nexus.GestorPacientes;
-import util.DataBase;
+import nexus.GestorSalas;
 
 public class VentanaCrearCita extends JFrame {
 
@@ -49,7 +50,6 @@ public class VentanaCrearCita extends JFrame {
 	private JLabel lbUrgente;
 	private JFormattedTextField tfHoraEntrada;
 	private JFormattedTextField tfFecha;
-	private JTextField tfSala;
 	private JPanel panelRb;
 	private JRadioButton rbSi;
 	private JRadioButton rbNo;
@@ -59,6 +59,7 @@ public class VentanaCrearCita extends JFrame {
 	private JButton btCrear;
 
 	private ButtonGroup bgUrgente;
+	private GestorSalas gS;
 	private GestorCitas gC;
 	private GestorPacientes gP;
 	private GestorMedico gM;
@@ -78,6 +79,7 @@ public class VentanaCrearCita extends JFrame {
 	private JTextArea taMedicos;
 	private Component horizontalStrut;
 	private Component horizontalStrut_1;
+	private JComboBox<Sala> cbSala;
 
 	/**
 	 * Create the frame.
@@ -86,6 +88,7 @@ public class VentanaCrearCita extends JFrame {
 		gP = new GestorPacientes();
 		gC = new GestorCitas();
 		gM = new GestorMedico();
+		gS=new GestorSalas();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 455, 408);
 		panelPrincipalCrearCita = new JPanel();
@@ -177,7 +180,7 @@ public class VentanaCrearCita extends JFrame {
 			panelSala = new JPanel();
 			panelSala.setLayout(new GridLayout(0, 3, 10, 0));
 			panelSala.add(getLbSala_1());
-			panelSala.add(getTfSala());
+			panelSala.add(getCbSala());
 		}
 		return panelSala;
 	}
@@ -186,7 +189,6 @@ public class VentanaCrearCita extends JFrame {
 		if (lbSala == null) {
 			lbSala = new JLabel("Sala :");
 			lbSala.setHorizontalAlignment(SwingConstants.RIGHT);
-			lbSala.setLabelFor(getTfSala());
 		}
 		return lbSala;
 	}
@@ -237,15 +239,6 @@ public class VentanaCrearCita extends JFrame {
 			}
 		}
 		return tfFecha;
-	}
-
-	private JTextField getTfSala() {
-		if (tfSala == null) {
-			tfSala = new JTextField();
-			tfSala.setHorizontalAlignment(SwingConstants.LEFT);
-			tfSala.setColumns(10);
-		}
-		return tfSala;
 	}
 
 	private JPanel getPanelRb() {
@@ -334,11 +327,10 @@ public class VentanaCrearCita extends JFrame {
 		} else
 			valido = false;
 
-		int sala = -1;
-		if (!getTfSala().getText().isBlank() && !getTfSala().getText().isEmpty() && !getTfSala().getText().equals("-1"))
-			sala = Integer.parseInt(getTfSala().getText());
-		else
-			valido = false;
+		
+		
+		int sala = ((Sala)getCbSala().getSelectedItem()).getSalaId();
+	
 		boolean urg;
 		if (getRbSi().isSelected()) {
 			urg = true;
@@ -374,7 +366,7 @@ public class VentanaCrearCita extends JFrame {
 		getTfFecha().setText("");
 		getTfHoraEntrada().setText("");
 		getTfHoraSalida().setText("");
-		getTfSala().setText("");
+		getCbSala().setSelectedIndex(0);
 		getRbSi().setSelected(false);
 		getRbNo().setSelected(false);
 		
@@ -564,5 +556,19 @@ public class VentanaCrearCita extends JFrame {
 			horizontalStrut_1 = Box.createHorizontalStrut(20);
 		}
 		return horizontalStrut_1;
+	}
+	private JComboBox<Sala> getCbSala() {
+		if (cbSala == null) {
+			cbSala = new JComboBox<Sala>();
+			cargarComboSalas();
+		}
+		return cbSala;
+	}
+
+	private void cargarComboSalas() {
+		for (Sala s : gS.getListaSalas()) {
+			getCbSala().addItem(s);
+		}
+		
 	}
 }
