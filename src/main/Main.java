@@ -2,7 +2,8 @@ package main;
 
 import java.awt.EventQueue;
 
-import logic.Cita;
+import ui.VentanaCrearCita;
+
 
 public class Main {
 
@@ -10,10 +11,10 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-//					DataBase bd=new DataBase();
+
 //					bd.cargarDatosDePrueba();
-//					VentanaCrearCita frame = new VentanaCrearCita(bd);
-//					frame.setVisible(true);
+					VentanaCrearCita frame = new VentanaCrearCita();
+					frame.setVisible(true);
 					
 					
 				} catch (Exception e) {

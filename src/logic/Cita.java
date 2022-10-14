@@ -7,9 +7,9 @@ public class Cita {
 
 	private int idCita;
 	private int idPaciente;
-	private Date fecha;
-	private Date horaE;
-	private Date horaS;
+	private String fecha;
+	private String horaE;
+	private String horaS;
 	private boolean urgente;
 	private int sala;
 	
@@ -24,13 +24,27 @@ public class Cita {
 		
 	}
 
-	public Date getDia() {
+	private void setHoraS(String hs) {
+		this.horaS=hs;
+		
+	}
+
+	private void setHoraE(String he) {
+		this.horaE=he;
+		
+	}
+
+	private void setFecha(String f) {
+		this.fecha=f;
+	}
+
+	public String getDia() {
 		return fecha;
 	}
-	public Date getHoraE() {
+	public String getHoraE() {
 		return horaE;
 	}
-	public Date getHoraS() {
+	public String getHoraS() {
 		return horaS;
 	}
 	private int generarId() {
@@ -54,7 +68,7 @@ public class Cita {
 	 * 		DD/MM/YYYY
 	 * 		0 1  2  
 	 */
-	public void setFecha(String fecha) {
+	public Date fechaToDate(String fecha) {
 		String[] sep=fecha.split("/");
 		Calendar c=Calendar.getInstance();
 		c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(sep[0]));
@@ -62,25 +76,21 @@ public class Cita {
 		c.set(Calendar.MONTH, Integer.parseInt(sep[1])-1);
 		c.set(Calendar.YEAR, Integer.parseInt(sep[2]));
 		
-		this.fecha=c.getTime();
+		Date f=c.getTime();
+		return f;
 	}
 	/*
 	 * 
 	 * HH:MM
 	 * 0  1
 	 */
-	public void setHoraE(String e) {
+	public Date stringToDate(String e) {
 		String[] sep=e.split(":");
 		Calendar c=Calendar.getInstance();
 		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));
 		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
-		this.horaE=c.getTime();
+		Date h=c.getTime();
+		return h;
 	}
-	public void setHoraS(String s) {
-		String[] sep=s.split(":");
-		Calendar c=Calendar.getInstance();
-		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));
-		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
-		this.horaS=c.getTime();
-	}
+	
 }

@@ -6,7 +6,9 @@ import logic.Paciente;
 import util.DataBase;
 
 public class GestorPacientes {
-	public GestorPacientes(DataBase bd) {
+	private DataBase bd;
+	public GestorPacientes() {
+		this.bd=new DataBase();
 		listaPacientes = bd.cargarPacientes();
 		// listaPacientes.add(new Paciente(12,"Juan","Iglesias", 999, "correito","otro
 		// contacto 1"));

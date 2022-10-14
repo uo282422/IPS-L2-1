@@ -82,10 +82,10 @@ public class VentanaCrearCita extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaCrearCita(DataBase bd) {
-		gP = new GestorPacientes(bd);
-		gC = new GestorCitas(bd);
-		gM = new GestorMedico(bd);
+	public VentanaCrearCita() {
+		gP = new GestorPacientes();
+		gC = new GestorCitas();
+		gM = new GestorMedico();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 455, 408);
 		panelPrincipalCrearCita = new JPanel();

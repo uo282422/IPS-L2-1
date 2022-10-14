@@ -6,10 +6,12 @@ import logic.Medico;
 import util.DataBase;
 
 public class GestorMedico {
-	
+
 	private ArrayList<Medico> medicos = new ArrayList<>();
-	
-	public GestorMedico(DataBase bd) {
+	private DataBase bd;
+
+	public GestorMedico() {
+		this.bd = new DataBase();
 		medicos = new ArrayList<Medico>(bd.cargarMedicos());
 //		medicos = new ArrayList<Medico>();
 //		medicos.add(new Medico("1","Nombre1","Apellido1","Email1"));

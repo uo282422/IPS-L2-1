@@ -15,22 +15,23 @@ import logic.Medico;
 import util.DataBase;
 
 public class GestorCitas {
-	
+
 	private DataBase bd = null;
 
 	private ArrayList<Cita> listaCitas = new ArrayList<>();
 	private ArrayList<Medico> medicos = new ArrayList<Medico>();
 
-	public GestorCitas(DataBase bd) {
-		this.bd = bd;
+	public GestorCitas() {
+		this.bd = new DataBase();
 	}
 
-	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala, boolean urg) {
-		Cita c=new Cita(idPaciente, fecha,horaE, horaS, sala, urg);
+	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala,
+			boolean urg) {
+		Cita c = new Cita(idPaciente, fecha, horaE, horaS, sala, urg);
 		listaCitas.add(c);
-		
+
 		bd.crearCita(c, new ArrayList<Medico>(medicos));
-		
+
 		if (urg)
 			enviarCorreo(c);
 	}
