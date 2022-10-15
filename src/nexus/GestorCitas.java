@@ -145,7 +145,7 @@ public class GestorCitas {
 //				System.out.println("fin de jornada"+fechaFinalJornada.toString());
 				if(fechaCandidato.after(fechaInicialJornada) && fechaCandidato.before(fechaFinalJornada)) {
 					//si la fecha candidato esta dentro de la jornada es valido de momento
-					
+//					System.out.println("Fecha en jornada");
 				}else valido=false;
 				
 				Date horaInicialJornada=horaToDate(j.getHoraComienzo());
@@ -157,12 +157,13 @@ public class GestorCitas {
 				if(horaECandidato.after(horaInicialJornada) && horaECandidato.before(horaFinalJornada)
 						&& horaSCandidato.after(horaInicialJornada) && horaSCandidato.before(horaFinalJornada)) {
 					//si la inicial candidato es despues de la inicial y antes de la final
-					
+//					System.out.println("Hora en jornada");
 					//si la final candidato es despues de la inicial y antes de la final
-					}else valido=false;
-				
+				}else valido=false;
+				if(valido)break;
 			}
 		}
+//		System.out.println(valido);
 		return valido;
 	}
 	
@@ -175,7 +176,7 @@ public class GestorCitas {
 			for(Cita c : citasDeMedico) {
 				Date horaInicialCitaPuesta=horaToDate(c.getHoraE());
 				Date horaFinalCitaPuesta=horaToDate(c.getHoraS());
-				if((horaECandidato.after(horaFinalCitaPuesta) || horaSCandidato.before(horaFinalCitaPuesta))==false)//si no se cumple
+				if((horaECandidato.after(horaFinalCitaPuesta) || horaSCandidato.before(horaInicialCitaPuesta))==false)//si no se cumple
 					valido=false;
 			}
 		}

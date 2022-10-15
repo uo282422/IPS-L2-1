@@ -324,11 +324,11 @@ public class VentanaCrearCita extends JFrame {
 		
 
 		String fecha = getTfFecha().getText();
-//		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
-//			System.out.println("NO");
-//			valido = false;
-//			new JOptionPane().showMessageDialog(this, "Error, la fecha y horas escritas no están en la jornada de los medicos seleccionados");
-//		}
+		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
+			
+			valido = false;
+			new JOptionPane().showMessageDialog(this, "Error, la fecha y horas escritas no están en la jornada de los medicos seleccionados");
+		}
 			
 		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false) {
 			valido=false;
