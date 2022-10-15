@@ -44,8 +44,8 @@ public class GestorJornada {
 	public void parse(String m, String hComienzo, String hFin, Date dInicio,
 			Date dFin, String dias) {
 		this.m = parseMedico(m);
-		this.hComienzo = parseHora(hComienzo);
-		this.hFin = parseHora(hFin);
+		this.hComienzo = hComienzo;
+		this.hFin = hFin;
 		this.dInicio = parseDate(dInicio);
 		this.dFin = parseDate(dFin);
 		this.dias = dias;
@@ -66,14 +66,14 @@ public class GestorJornada {
 		return new SimpleDateFormat("dd/MM/yyyy").format(d);
 	}
 
-	private String parseHora(String h) {
-		String[] hour = h.trim().split(":");
-		return hour[0];
-	}
+//	private String parseHora(String h) {
+//		String[] hour = h.trim().split(":");
+//		return hour[0];
+//	}
 
 	private Medico parseMedico(String m) {
 		for (Medico med : db.cargarMedicos()) {
-			if (med.getId().equals(m)) {
+			if (med.toString().equals(m)) {
 				return med;
 			}
 		}

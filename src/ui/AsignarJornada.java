@@ -91,7 +91,7 @@ public class AsignarJornada extends JDialog {
 		{
 			medCmb = new JComboBox<>();
 			medLb.setLabelFor(medCmb);
-			//medCmb.setModel(setUpComboModelMed(db.cargarMedicos()));
+			medCmb.setModel(setUpComboModelMed(db.cargarMedicos()));
 			medPn.add(medCmb);
 		}
 		{
@@ -165,6 +165,7 @@ public class AsignarJornada extends JDialog {
 			}
 			{
 				setCalendars();
+				calendarI = new JCalendar();
 				calendarI.getDayChooser().setAlwaysFireDayProperty(true);
 				calendarI.getDayChooser().addPropertyChangeListener("day",
 						new PropertyChangeListener() {
@@ -182,7 +183,7 @@ public class AsignarJornada extends JDialog {
 				pnCalendarios.add(diaFLb);
 			}
 			{
-				// calendarF = new JCalendar();
+				calendarF = new JCalendar();
 				diaFLb.setLabelFor(calendarF);
 				pnCalendarios.add(calendarF);
 			}
@@ -232,7 +233,7 @@ public class AsignarJornada extends JDialog {
 	private ComboBoxModel<String> setUpComboModelMed(List<Medico> meds) {
 		String[] array = new String[meds.size()];
 		for (int i = 0; i < array.length; i++) {
-			array[i] = meds.get(i).getId();
+			array[i] = meds.get(i).toString();
 		}
 		return new DefaultComboBoxModel<String>(array);
 	}
@@ -271,7 +272,7 @@ public class AsignarJornada extends JDialog {
 	 * selección por defecto.
 	 */
 	private void reset() {
-		// medCmb.setSelectedIndex(0);
+		medCmb.setSelectedIndex(0);
 		hInicioCmb.setSelectedIndex(0);
 		hFinCmb.setSelectedIndex(0);
 		for (Component c : semanaPn.getComponents()) {

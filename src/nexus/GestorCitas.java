@@ -228,4 +228,16 @@ public class GestorCitas {
 		return h;
 	}
 
+	public Cita getCita(String idCita) {
+		return bd.getCita(idCita);
+	}
+
+	public void guardarCita(Cita c) {
+		bd.guardarCita(c);
+	}
+
+	public void actualizarCita(Cita c) {
+		bd.actualizarCita(c);
+	}
+
 }

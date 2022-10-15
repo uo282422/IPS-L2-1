@@ -1,7 +1,5 @@
 package logic;
 
-import java.util.Random;
-
 public class Jornada {
 
 	private String id;
@@ -14,19 +12,23 @@ public class Jornada {
 	private String medicoId;
 
 	public Jornada() {
-		// Falta un sistema de creación de ids únicos
-		id = "" + Math.abs(new Random().nextInt());
+		id = generarId();
 	}
-	
-	
-	public Jornada(String id, String dias, String hI, String hF, String dI, String dF, String medid) {
-		this.id=id;
-		this.dias=dias;
-		this.horaComienzo=hI;
-		this.horaFinal=hF;
-		this.diaInicio=dI;
-		this.diaFinal=dF;
-		this.medicoId=medid;
+
+	private String generarId() {
+		int n = (int) (Math.random() * 1000 + 1);
+		return n + "";
+	}
+
+	public Jornada(String id, String dias, String hI, String hF, String dI,
+			String dF, String medid) {
+		this.id = id;
+		this.dias = dias;
+		this.horaComienzo = hI;
+		this.horaFinal = hF;
+		this.diaInicio = dI;
+		this.diaFinal = dF;
+		this.medicoId = medid;
 	}
 
 	public String getId() {

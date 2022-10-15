@@ -1,7 +1,6 @@
 package ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -13,8 +12,11 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import logic.Cita;
@@ -53,6 +55,7 @@ public class VentanaCita extends JFrame {
 	private JPanel pnCausas;
 	private JLabel lbCausas;
 	private JTextArea txtACausas;
+	private JScrollPane scrCausas;
 
 	/**
 	 * Launch the application.
@@ -74,7 +77,7 @@ public class VentanaCita extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaCita(String idCita) {
-//		this.c = gestor.getCita(idCita);
+		this.c = gestor.getCita(idCita);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 938, 621);
 		contentPane = new JPanel();
@@ -236,8 +239,22 @@ public class VentanaCita extends JFrame {
 	private JButton getBtAceptar() {
 		if (btAceptar == null) {
 			btAceptar = new JButton("Aceptar");
+			btAceptar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					guardarDatos();
+					JOptionPane.showConfirmDialog(null,
+							"La información de la cita se ha guaradado.");
+					dispose();
+				}
+			});
 		}
 		return btAceptar;
+	}
+
+	protected void guardarDatos() {
+		c.setAcudio(chbxAcude.isSelected());
+		c.setCausaCita(txtACausas.getText());
+		gestor.actualizarCita(c);
 	}
 
 	private JPanel getPnAcude() {
@@ -271,17 +288,18 @@ public class VentanaCita extends JFrame {
 	}
 
 	protected void activarCausas(boolean selected) {
-		for (Component c : pnCausas.getComponents()) {
-			c.setEnabled(selected);
-		}
+		lbCausas.setEnabled(selected);
+		txtACausas.setEnabled(selected);
 		txtACausas.setEditable(selected);
 	}
 
 	private JPanel getPnCausas() {
 		if (pnCausas == null) {
 			pnCausas = new JPanel();
+			pnCausas.setLayout(new BoxLayout(pnCausas, BoxLayout.Y_AXIS));
 			pnCausas.add(getLbCausas());
 			pnCausas.add(getTxtACausas());
+			pnCausas.add(getScrCausas());
 		}
 		return pnCausas;
 	}
@@ -289,6 +307,7 @@ public class VentanaCita extends JFrame {
 	private JLabel getLbCausas() {
 		if (lbCausas == null) {
 			lbCausas = new JLabel("Causas:");
+			lbCausas.setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		return lbCausas;
 	}
@@ -296,9 +315,16 @@ public class VentanaCita extends JFrame {
 	private JTextArea getTxtACausas() {
 		if (txtACausas == null) {
 			txtACausas = new JTextArea();
-			txtACausas.setColumns(55);
-			txtACausas.setRows(24);
+			txtACausas.setEnabled(false);
+			txtACausas.setEditable(false);
 		}
 		return txtACausas;
+	}
+
+	private JScrollPane getScrCausas() {
+		if (scrCausas == null) {
+			scrCausas = new JScrollPane(txtACausas);
+		}
+		return scrCausas;
 	}
 }
