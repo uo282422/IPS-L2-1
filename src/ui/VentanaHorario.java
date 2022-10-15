@@ -141,8 +141,10 @@ public class VentanaHorario extends JFrame {
 
 			String idMedico = ((Medico) getCbMedicos().getSelectedItem()).getId();
 			Date fecha = getCalFecha().getDate();
-			String fechaFormateada = String.format("%d/%d/%d", fecha.getDate(), fecha.getMonth(), fecha.getYear() );
-			
+			String fechaFormateada = String.format("%s/%s/%d",
+					String.format("%1$2s", fecha.getDate()).replace(' ', '0'),
+					String.format("%1$2s", fecha.getMonth() + 1).replace(' ', '0'), fecha.getYear() + 1900);
+
 			System.out.println(String.format("id=%s - fecha=%s", idMedico, fechaFormateada));
 
 			for (Cita c : gC.cargarCitasOrdenadas(idMedico, fechaFormateada)) {
@@ -206,7 +208,8 @@ public class VentanaHorario extends JFrame {
 					getSpHorario().remove(getPnHorario());
 					pnHorario = null;
 					getSpHorario().add(getPnHorario());
-					getPnHorario().repaint();
+					validate();
+					repaint();
 				}
 			});
 		}
