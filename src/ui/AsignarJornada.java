@@ -26,7 +26,6 @@ import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JCalendar;
 
-import logic.GestorJornada;
 import logic.Medico;
 import util.DataBase;
 
@@ -51,7 +50,6 @@ public class AsignarJornada extends JDialog {
 	private JCalendar calendarI = new JCalendar();
 	private JCalendar calendarF = new JCalendar();
 	private JPanel semanaPn;
-	private GestorJornada gestorJornada = new GestorJornada();
 	private DataBase db = new DataBase();
 
 	/**
@@ -198,7 +196,6 @@ public class AsignarJornada extends JDialog {
 						if (comprobarCampos()) {
 							if (JOptionPane.showConfirmDialog(null,
 									"¿Seguro que quiere crear la jornada?") == JOptionPane.YES_OPTION) {
-								guardarDatos();
 								JOptionPane.showMessageDialog(null,
 										"Se ha creado la jornada");
 								reset();
@@ -323,17 +320,6 @@ public class AsignarJornada extends JDialog {
 	private boolean compruebaDias() {
 		return calendarI.getDate() != null && calendarF.getDate() != null
 				&& calendarI.getDate().before(calendarF.getDate());
-	}
-
-	/**
-	 * Envía a la clase gestorJornada los datos seleccionados en la ventana
-	 */
-	private void guardarDatos() {
-		gestorJornada.parse(medCmb.getSelectedItem().toString(),
-				hInicioCmb.getSelectedItem().toString(),
-				hFinCmb.getSelectedItem().toString(), calendarI.getDate(),
-				calendarF.getDate(), getDays());
-		gestorJornada.guardarJornada();
 	}
 
 	/**
