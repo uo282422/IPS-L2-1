@@ -12,6 +12,8 @@ import java.util.List;
 import logic.Cita;
 import logic.Jornada;
 import logic.Medico;
+import logic.Paciente;
+import logic.Sala;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";
@@ -49,15 +51,16 @@ public class DataBase {
 		ArrayList<Cita> citas = new ArrayList<Cita>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = ? and c.cita_fecha = ?");
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = ? and c.cita_fecha = ?");
 			try {
 				pst.setString(1, idMedico);
 				pst.setString(2, fecha);
-				
+
 				ResultSet rs = pst.executeQuery();
-				
+
 				while (rs.next()) {
-					
+
 					int id = Integer.parseInt(rs.getString("CITA_ID"));
 					int pacienteId = Integer.parseInt(rs.getString("CITA_PACIENTE_ID"));
 					String horaI = rs.getString("CITA_HORA_INICIO");
@@ -85,6 +88,46 @@ public class DataBase {
 		}
 
 		return citas;
+	}
+
+	public Paciente cargarPacientePorId(int idPaciente) {
+
+		Paciente paciente = null;
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			
+			PreparedStatement pst = conn.prepareStatement("select * from paciente where paciente_id = ?");
+			
+			try {
+				
+				pst.setString(1, idPaciente + "");
+				ResultSet rs = pst.executeQuery();
+
+				if (rs.next()) {
+					
+					int id = Integer.parseInt(rs.getString("PACIENTE_ID"));
+					String nombre = rs.getString("PACIENTE_NOMBRE");
+					String apellido = rs.getString("PACIENTE_APELLIDO");
+					int telefono = Integer.parseInt(rs.getString("PACIENTE_TELEFONO"));
+					String correo = rs.getString("PACIENTE_CORREO");
+					String otros = rs.getString("PACIENTE_OTROS");
+					
+					paciente = new Paciente(id, nombre, apellido, telefono, correo, otros);
+				}
+
+				rs.close();
+				
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+
+		return paciente;
 	}
 
 	public void cargarDatosDePrueba() {
@@ -120,5 +163,41 @@ public class DataBase {
 		} catch (SQLException e) {
 			throw new Error("Problem", e);
 		}
+	}
+
+	public Sala cargarSalaPorId(int idSala) {
+
+		Sala sala = null;
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			
+			PreparedStatement pst = conn.prepareStatement("select * from sala where sala_id = ?");
+			
+			try {
+				
+				pst.setString(1, idSala + "");
+				ResultSet rs = pst.executeQuery();
+
+				if (rs.next()) {
+					
+					int id = Integer.parseInt(rs.getString("SALA_ID"));
+					String nombre = rs.getString("SALA_NOMBRE");
+					
+					sala = new Sala(id, nombre);
+				}
+
+				rs.close();
+				
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+
+		return sala;
 	}
 }

@@ -2,9 +2,7 @@ package nexus;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import logic.Cita;
 import util.DataBase;
@@ -32,14 +30,6 @@ public class GestorCitas {
 
 	}
 	
-	public Map<int[], Cita> cargarPosiciones(String idMedico, String fecha) {
-		
-		//Map<String, Cita> citas = cargarCitas(idMedico, fecha);
-	
-		return null;
-		
-	}
-
 	public List<Cita> cargarCitasOrdenadas(String idMedico, String fecha) {
 
 		List<Cita> citas = db.cargarCitasPorMedicoYFecha(idMedico, fecha);
@@ -50,6 +40,7 @@ public class GestorCitas {
 							Integer.parseInt(o1.getHoraInicio().split(":")[0]) - Integer.parseInt(o2.getHoraInicio().split(":")[0])
 				));
 		
+		// debug
 		for (Cita c : citas) {
 			System.out.println(c);
 		}
