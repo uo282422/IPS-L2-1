@@ -1,7 +1,9 @@
 package nexus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import logic.Cita;
@@ -13,8 +15,8 @@ public class GestorCitas {
 
 	private ArrayList<Cita> listaCitas = new ArrayList<>();
 
-	public GestorCitas(DataBase db) {
-		this.db = db;
+	public GestorCitas() {
+		this.db = new DataBase();
 	}
 
 	public void nuevaCita(int idPaciente, String nombre, String fecha, String hora, int sala, boolean urg) {
@@ -32,18 +34,24 @@ public class GestorCitas {
 	
 	public Map<int[], Cita> cargarPosiciones(String idMedico, String fecha) {
 		
-		Map<String, Cita> citas = cargarCitas(idMedico, fecha);
+		//Map<String, Cita> citas = cargarCitas(idMedico, fecha);
 	
 		return null;
 		
 	}
 
-	private Map<String, Cita> cargarCitas(String idMedico, String fecha) {
+	public List<Cita> cargarCitasOrdenadas(String idMedico, String fecha) {
 
-		Map<String, Cita> citas = new HashMap<String, Cita>();
-
-		for (Cita c : db.cargarCitasPorMedicoYFecha(idMedico, fecha)) {
-			citas.put(String.format("%s-%s", c.getHoraInicio(), c.getHoraFin()), c);
+		List<Cita> citas = db.cargarCitasPorMedicoYFecha(idMedico, fecha);
+		
+		Collections.sort(citas, (o1, o2) -> (
+				Integer.parseInt(o1.getHoraInicio().split(":")[0]) - Integer.parseInt(o2.getHoraInicio().split(":")[0]) == 0 ?
+						Integer.parseInt(o1.getHoraInicio().split(":")[1]) - Integer.parseInt(o2.getHoraInicio().split(":")[1]) :
+							Integer.parseInt(o1.getHoraInicio().split(":")[0]) - Integer.parseInt(o2.getHoraInicio().split(":")[0])
+				));
+		
+		for (Cita c : citas) {
+			System.out.println(c);
 		}
 
 		return citas;

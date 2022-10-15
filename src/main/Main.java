@@ -2,8 +2,7 @@ package main;
 
 import java.awt.EventQueue;
 
-import ui.VentanaCrearCita;
-import util.DataBase;
+import nexus.GestorCitas;
 
 public class Main {
 
@@ -12,8 +11,10 @@ public class Main {
 			public void run() {
 				try {
 //					new DataBase().cargarDatosDePrueba();
-					VentanaCrearCita frame = new VentanaCrearCita();
-					frame.setVisible(true);
+//					VentanaCrearCita frame = new VentanaCrearCita();
+//					frame.setVisible(true);
+					GestorCitas gC = new GestorCitas();
+					gC.cargarCitasOrdenadas("1", "29/12/2022");
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

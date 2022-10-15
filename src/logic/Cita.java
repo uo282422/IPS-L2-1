@@ -8,9 +8,9 @@ public class Cita {
 	private int idCita;
 	private int idPaciente;
 	private String nombrePaciente;
-	private Date fecha;
-	private Date horaInicio;
-	private Date horaFin;
+	private String fecha;
+	private String horaInicio;
+	private String horaFin;
 	private boolean urgente;
 	private int sala;
 	private String telefono;
@@ -23,8 +23,6 @@ public class Cita {
 		idCita = generarId();
 		setIdPaciente(id);
 		setNombre(n);
-		setFecha(f);
-		setHoraInicio(h);
 		setSala(s);
 		setUrgente(u);
 
@@ -34,9 +32,9 @@ public class Cita {
 			String telefono, String correo, String otros, boolean acudio, String causa) {
 		this.idCita = id;
 		this.idPaciente = pacienteId;
-		setFecha(fecha);
-		setHoraInicio(horaI);
-		setHoraFin(horaF);
+		this.fecha = fecha;
+		this.horaInicio = horaI;
+		this.horaFin = horaF;
 		this.urgente = urgente;
 		this.sala = salaId;
 		this.telefono = telefono;
@@ -66,42 +64,6 @@ public class Cita {
 
 	public void setSala(int num) {
 		this.sala = num;
-	}
-
-	/*
-	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato: DD/MM/YYYY
-	 * 0 1 2
-	 */
-	public void setFecha(String fecha) {
-		String[] sep = fecha.split("/");
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(sep[0]));
-		c.set(Calendar.MONTH, Integer.parseInt(sep[1]));
-		c.set(Calendar.YEAR, Integer.parseInt(sep[2]));
-
-		this.fecha = c.getTime();
-	}
-
-	/*
-	 * HH:MM 0 1
-	 */
-	public void setHoraInicio(String hora) {
-		String[] sep = hora.split(":");
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.HOUR, Integer.parseInt(sep[0]));
-		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
-		this.horaInicio = c.getTime();
-	}
-
-	/*
-	 * HH:MM 0 1
-	 */
-	public void setHoraFin(String hora) {
-		String[] sep = hora.split(":");
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.HOUR, Integer.parseInt(sep[0]));
-		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
-		this.horaFin = c.getTime();
 	}
 
 	public int getIdCita() {
@@ -172,15 +134,23 @@ public class Cita {
 		return sala;
 	}
 
-	public Date getFecha() {
+	public String getFecha() {
 		return fecha;
 	}
 
-	public Date getHoraInicio() {
+	public String getHoraInicio() {
 		return horaInicio;
 	}
 
-	public Date getHoraFin() {
+	public String getHoraFin() {
 		return horaFin;
+	}
+
+	@Override
+	public String toString() {
+		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente + ", nombrePaciente=" + nombrePaciente
+				+ ", fecha=" + fecha + ", horaInicio=" + horaInicio + ", horaFin=" + horaFin + ", urgente=" + urgente
+				+ ", sala=" + sala + ", telefono=" + telefono + ", correo=" + correo + ", otros=" + otros + ", acudio="
+				+ acudio + ", causa=" + causa + "]";
 	}
 }
