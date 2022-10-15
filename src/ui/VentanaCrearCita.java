@@ -7,6 +7,8 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -313,20 +315,15 @@ public class VentanaCrearCita extends JFrame {
 		int idPaciente = gP.buscarIdPaciente(nombre, apellido);
 		if (idPaciente == -1)
 			valido = false;
-		String horaE = "";
-		String horaS = "";
-		if (comprobarHoraDisponible(nomApe)) {
-			horaE = getTfHoraEntrada().getText();
-			horaS = getTfHoraSalida().getText();
-		} else
-			valido = false;
+		String horaE = getTfHoraEntrada().getText();;
+		String horaS = getTfHoraSalida().getText();
+		
 
-		String fecha = "";
-		if (comprobarFechaDisponible(nomApe)) {
-			fecha = getTfFecha().getText();
-		} else
+		String fecha = getTfFecha().getText();
+		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS, gM.getMedicos())==false)
 			valido = false;
-
+		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false)
+			valido=false;
 		
 		
 		int sala = ((Sala)getCbSala().getSelectedItem()).getSalaId();
@@ -342,15 +339,7 @@ public class VentanaCrearCita extends JFrame {
 
 	}
 
-	private boolean comprobarFechaDisponible(String[] nomApe) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	private boolean comprobarHoraDisponible(String[] nomApe) {
-		// TODO Auto-generated method stub
-		return true;
-	}
+	
 
 	private void crearCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala,
 			boolean urg) {

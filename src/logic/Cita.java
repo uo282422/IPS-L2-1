@@ -154,7 +154,6 @@ public class Cita {
 		String[] sep=fecha.split("/");
 		Calendar c=Calendar.getInstance();
 		c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(sep[0]));
-		
 		c.set(Calendar.MONTH, Integer.parseInt(sep[1])-1);
 		c.set(Calendar.YEAR, Integer.parseInt(sep[2]));
 		
@@ -166,7 +165,7 @@ public class Cita {
 	 * HH:MM
 	 * 0  1
 	 */
-	public Date stringToDate(String e) {
+	public Date horaToDate(String e) {
 		String[] sep=e.split(":");
 		Calendar c=Calendar.getInstance();
 		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));

@@ -1,6 +1,9 @@
 package nexus;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -11,6 +14,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import logic.Cita;
+import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import util.DataBase;
@@ -123,6 +127,72 @@ public class GestorCitas {
 		return otrosProv;
 	}
 
+	
+	public boolean comprobarCitaEnJornada(String fecha,String horaE, String horaS, List<Medico> medicos) {
+		boolean valido=true;
+		Date fechaCandidato=fechaToDate(fecha);
+		Date horaECandidato=horaToDate(horaE);
+		Date horaSCandidato=horaToDate(horaS);
+		for(Medico m:medicos) {
+			List<Jornada>jornadaDeMedico=bd.getJornadasDeMedico(m.getId());
+			for(Jornada j:jornadaDeMedico) {
+				Date fechaInicialJornada=fechaToDate(j.getDiaInicio());
+				Date fechaFinalJornada=fechaToDate(j.getDiaFinal());
+				if(fechaCandidato.compareTo(fechaInicialJornada)>0 && fechaCandidato.compareTo(fechaFinalJornada)>0) {
+					//si la fecha candidato esta dentro de la jornada es valido de momento
+				}else valido=false;
+				
+				Date horaInicialJornada=horaToDate(horaE);
+				Date horaFinalJornada=horaToDate(horaS);
+				if(horaECandidato.after(horaInicialJornada) && horaECandidato.before(horaFinalJornada)
+						&& horaSCandidato.after(horaInicialJornada) && horaSCandidato.before(horaFinalJornada)) {
+					//si la inicial candidato es despues de la inicial y antes de la final
+					//si la final candidato es despues de la inicial y antes de la final
+					}else valido=false;
+				
+			}
+		}
+		return valido;
+	}
+	
+	public boolean comprobarCitasEnHorario(String fecha, String horaE, String horaS, ArrayList<Medico> medicos2) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	
+	/*
+	 * Pasa del string guardado en bd a un objeto del tipo fecha
+	 * Formato:
+	 * 		DD/MM/YYYY
+	 * 		0 1  2  
+	 */
+	public Date fechaToDate(String fecha) {
+		String[] sep=fecha.split("/");
+		Calendar c=Calendar.getInstance();
+		c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(sep[0]));
+		c.set(Calendar.MONTH, Integer.parseInt(sep[1])-1);
+		c.set(Calendar.YEAR, Integer.parseInt(sep[2]));
+		
+		Date f=c.getTime();
+		return f;
+	}
+	
+	/*
+	 * 
+	 * HH:MM
+	 * 0  1
+	 */
+	public Date horaToDate(String e) {
+		String[] sep=e.split(":");
+		Calendar c=Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));
+		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
+		Date h=c.getTime();
+		return h;
+	}
+
+	
 	
 
 }

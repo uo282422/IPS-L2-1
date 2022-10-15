@@ -1,8 +1,10 @@
-package logic;
+package nexus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import logic.Jornada;
+import logic.Medico;
 import util.DataBase;
 
 public class GestorJornada {

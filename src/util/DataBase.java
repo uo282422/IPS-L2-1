@@ -47,6 +47,42 @@ public class DataBase {
 		return medicos;
 	}
 	
+	
+	public List<Jornada> getJornadasDeMedico(String medId) {
+		
+		ArrayList<Jornada> jornadas = new ArrayList<Jornada>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery("select * from jornada where jornada_medico_id='"+medId+"'");
+				while (rs.next()) {
+					String id = rs.getString("jornada_id");
+					String dias = rs.getString("jornada_dias");
+					String horaI = rs.getString("jornada_hora_inicio");
+					String horaF = rs.getString("jornada_hora_fin");
+					String diaI= rs.getString("jornada_dia_inicio");
+					String diaF= rs.getString("jornada_dia_fin");
+					
+					jornadas.add(new Jornada());
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar jornada", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para jornada", e);
+		}
+		return jornadas;
+	}
+	
+	
+	
+	
+	
+	
 	public List<Sala>cargarSalas(){
 		ArrayList<Sala> salas = new ArrayList<Sala>();
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
