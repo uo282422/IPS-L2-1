@@ -118,6 +118,7 @@ public class DialogoInfoContacto extends JDialog {
 					private void guardar() {
 						
 						gC.añadirInfoContactoProv(Integer.parseInt(tfTlf.getText()),tfCorreo.getText(),tpOtros.getText());
+						dispose();
 //						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
 //						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
 //						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());

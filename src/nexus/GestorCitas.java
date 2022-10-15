@@ -12,6 +12,7 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.swing.JOptionPane;
 
 import logic.Cita;
 import logic.Jornada;
@@ -138,15 +139,25 @@ public class GestorCitas {
 			for(Jornada j:jornadaDeMedico) {
 				Date fechaInicialJornada=fechaToDate(j.getDiaInicio());
 				Date fechaFinalJornada=fechaToDate(j.getDiaFinal());
-				if(fechaCandidato.compareTo(fechaInicialJornada)>0 && fechaCandidato.compareTo(fechaFinalJornada)>0) {
+//				System.out.println("id del medico"+m.getId());
+//				System.out.println("fecha a evaluar"+fechaCandidato.toString());
+//				System.out.println("inicio de jornada"+fechaInicialJornada.toString());
+//				System.out.println("fin de jornada"+fechaFinalJornada.toString());
+				if(fechaCandidato.after(fechaInicialJornada) && fechaCandidato.before(fechaFinalJornada)) {
 					//si la fecha candidato esta dentro de la jornada es valido de momento
+					
 				}else valido=false;
 				
-				Date horaInicialJornada=horaToDate(horaE);
-				Date horaFinalJornada=horaToDate(horaS);
+				Date horaInicialJornada=horaToDate(j.getHoraComienzo());
+				Date horaFinalJornada=horaToDate(j.getHoraFinal());
+//				System.out.println("hora inicial candidato"+horaECandidato);
+//				System.out.println("hora final candidato"+horaSCandidato);
+//				System.out.println("hora inicial jornada"+ horaInicialJornada);
+//				System.out.println("hora final jornada"+ horaFinalJornada);
 				if(horaECandidato.after(horaInicialJornada) && horaECandidato.before(horaFinalJornada)
 						&& horaSCandidato.after(horaInicialJornada) && horaSCandidato.before(horaFinalJornada)) {
 					//si la inicial candidato es despues de la inicial y antes de la final
+					
 					//si la final candidato es despues de la inicial y antes de la final
 					}else valido=false;
 				
@@ -155,9 +166,19 @@ public class GestorCitas {
 		return valido;
 	}
 	
-	public boolean comprobarCitasEnHorario(String fecha, String horaE, String horaS, ArrayList<Medico> medicos2) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean comprobarCitasEnHorario(String fecha, String horaE, String horaS, ArrayList<Medico> medicos) {
+//		Date horaECandidato=horaToDate(horaE);
+//		Date horaSCandidato=horaToDate(horaS);
+//		for(Medico m :medicos) {
+//			List<Cita>citasDeMedico=bd.getCitasPorMedicoYFecha(m.getId(), fecha);
+//			for(Cita c : citasDeMedico) {
+//				Date horaInicialCitaPuesta=horaToDate(c.getHoraE());
+//				Date horaFinalCitaPuesta=horaToDate(c.getHoraS());
+//				if()
+//			}
+//		}
+		return true;
+		
 	}
 	
 	

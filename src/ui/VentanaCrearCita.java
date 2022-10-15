@@ -309,6 +309,10 @@ public class VentanaCrearCita extends JFrame {
 
 	protected void comprobarYCrear() {
 		boolean valido = true;
+		if(gC.getMedicosAgregados().size()==0) {
+			valido=false;
+			new JOptionPane().showMessageDialog(this, "Error, No hay medicos agregados");
+		}
 		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
 		String nombre = nomApe[0];
 		String apellido = nomApe[1];
@@ -320,11 +324,15 @@ public class VentanaCrearCita extends JFrame {
 		
 
 		String fecha = getTfFecha().getText();
-		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS, gM.getMedicos())==false)
+		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
+			System.out.println("NO");
 			valido = false;
-		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false)
-			valido=false;
-		
+			new JOptionPane().showMessageDialog(this, "Error, la fecha y horas escritas no están en la jornada de los medicos seleccionados");
+		}
+			
+//		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false)
+//			valido=false;
+//		
 		
 		int sala = ((Sala)getCbSala().getSelectedItem()).getSalaId();
 	
