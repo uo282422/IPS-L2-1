@@ -167,17 +167,19 @@ public class GestorCitas {
 	}
 	
 	public boolean comprobarCitasEnHorario(String fecha, String horaE, String horaS, ArrayList<Medico> medicos) {
-//		Date horaECandidato=horaToDate(horaE);
-//		Date horaSCandidato=horaToDate(horaS);
-//		for(Medico m :medicos) {
-//			List<Cita>citasDeMedico=bd.getCitasPorMedicoYFecha(m.getId(), fecha);
-//			for(Cita c : citasDeMedico) {
-//				Date horaInicialCitaPuesta=horaToDate(c.getHoraE());
-//				Date horaFinalCitaPuesta=horaToDate(c.getHoraS());
-//				if()
-//			}
-//		}
-		return true;
+		boolean valido=true;
+		Date horaECandidato=horaToDate(horaE);
+		Date horaSCandidato=horaToDate(horaS);
+		for(Medico m :medicos) {
+			List<Cita>citasDeMedico=bd.getCitasPorMedicoYFecha(m.getId(), fecha);
+			for(Cita c : citasDeMedico) {
+				Date horaInicialCitaPuesta=horaToDate(c.getHoraE());
+				Date horaFinalCitaPuesta=horaToDate(c.getHoraS());
+				if((horaECandidato.after(horaFinalCitaPuesta) || horaSCandidato.before(horaFinalCitaPuesta))==false)//si no se cumple
+					valido=false;
+			}
+		}
+		return valido;
 		
 	}
 	

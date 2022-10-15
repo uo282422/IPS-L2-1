@@ -269,7 +269,7 @@ public class DataBase {
 			Statement s = conn.createStatement();
 			try {
 				ResultSet rs = s.executeQuery(String.format(
-						"select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = %s and c.cita_fecha = %",
+						"select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = %s and c.cita_fecha = %s",
 						idMedico, fecha));
 				while (rs.next()) {
 
