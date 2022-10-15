@@ -74,7 +74,7 @@ public class VentanaCita extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaCita(String idCita) {
-		this.c = gestor.getCita(idCita);
+//		this.c = gestor.getCita(idCita);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 938, 621);
 		contentPane = new JPanel();

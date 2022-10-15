@@ -26,8 +26,8 @@ import javax.swing.border.EmptyBorder;
 
 import com.toedter.calendar.JCalendar;
 
-import logic.GestorJornada;
 import logic.Medico;
+import nexus.GestorJornada;
 import util.DataBase;
 
 public class AsignarJornada extends JDialog {

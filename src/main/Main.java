@@ -3,7 +3,7 @@ package main;
 import java.awt.EventQueue;
 
 import ui.VentanaCrearCita;
-import util.DataBase;
+
 
 public class Main {
 
@@ -11,9 +11,12 @@ public class Main {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-//					new DataBase().cargarDatosDePrueba();
+
+//					bd.cargarDatosDePrueba();
 					VentanaCrearCita frame = new VentanaCrearCita();
 					frame.setVisible(true);
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
