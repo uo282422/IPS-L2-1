@@ -9,17 +9,20 @@ public class Cita {
 	private int idPaciente;
 	private String nombrePaciente;
 	private Date fecha;
-	private Date hora;
+	private Date horaE;
+	private Date horaS;
 	private boolean urgente;
 	private int sala;
 	private boolean acude;
 
-	public Cita(int id, String n, String f, String h, int s, boolean u) {
+	public Cita(int id, String n, String f, String he, String hs, int s,
+			boolean u) {
 		idCita = generarId();
 		setIdPaciente(id);
 		setNombre(n);
 		setFecha(f);
-		setHora(h);
+		setHoraE(he);
+		setHoraS(hs);
 		setSala(s);
 		setUrgente(u);
 
@@ -88,12 +91,20 @@ public class Cita {
 	/*
 	 * HH:MM 0 1
 	 */
-	public void setHora(String hora) {
-		String[] sep = hora.split(":");
+	public void setHoraE(String e) {
+		String[] sep = e.split(":");
 		Calendar c = Calendar.getInstance();
-		c.set(Calendar.HOUR, Integer.parseInt(sep[0]));
+		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));
 		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
-		this.hora = c.getTime();
+		this.horaE = c.getTime();
+	}
+
+	public void setHoraS(String s) {
+		String[] sep = s.split(":");
+		Calendar c = Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));
+		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
+		this.horaS = c.getTime();
 	}
 
 	public String getNombrePaciente() {
