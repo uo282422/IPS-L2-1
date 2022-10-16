@@ -27,6 +27,7 @@ import javax.swing.border.EmptyBorder;
 import com.toedter.calendar.JCalendar;
 
 import logic.Medico;
+import nexus.GestorJornada;
 import util.DataBase;
 
 public class VentanaCrearJornada extends JDialog {
@@ -50,32 +51,20 @@ public class VentanaCrearJornada extends JDialog {
 	private JCalendar calendarI = new JCalendar();
 	private JCalendar calendarF = new JCalendar();
 	private JPanel semanaPn;
+	private GestorJornada gestorJornada = new GestorJornada();
 	private DataBase db = new DataBase();
 
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		try {
-//			VentanaCrearJornada dialog = new VentanaCrearJornada();
-//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-//			dialog.setVisible(true);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
+	
 
 	/**
 	 * Create the dialog.
 	 */
 	public VentanaCrearJornada() {
-		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 952, 558);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
-		
 		{
 			medPn = new JPanel();
 		}
@@ -215,6 +204,7 @@ public class VentanaCrearJornada extends JDialog {
 						if (comprobarCampos()) {
 							if (JOptionPane.showConfirmDialog(null,
 									"¿Seguro que quiere crear la jornada?") == JOptionPane.YES_OPTION) {
+								guardarDatos();
 								JOptionPane.showMessageDialog(null,
 										"Se ha creado la jornada");
 								reset();
@@ -351,6 +341,17 @@ public class VentanaCrearJornada extends JDialog {
 	}
 
 	/**
+	 * Envía a la clase gestorJornada los datos seleccionados en la ventana
+	 */
+	private void guardarDatos() {
+		gestorJornada.parse(medCmb.getSelectedItem().toString(),
+				hInicioCmb.getSelectedItem().toString(),
+				hFinCmb.getSelectedItem().toString(), calendarI.getDate(),
+				calendarF.getDate(), getDays());
+		gestorJornada.guardarJornada();
+	}
+
+	/**
 	 * Método que elabora un String con los días de la togglebuttos de los dias
 	 * de la semana activos
 	 */
@@ -364,3 +365,4 @@ public class VentanaCrearJornada extends JDialog {
 		return semana;
 	}
 }
+

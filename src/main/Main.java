@@ -3,7 +3,7 @@ package main;
 import java.awt.EventQueue;
 
 import ui.VentanaLogin;
-import ui.VentanaCrearCita;
+import util.DataBase;
 
 
 public class Main {
@@ -14,8 +14,6 @@ public class Main {
 				try {
 					VentanaLogin frame = new VentanaLogin();
 					frame.setVisible(true);
-					
-					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
