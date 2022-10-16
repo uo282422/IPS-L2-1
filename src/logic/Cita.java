@@ -1,50 +1,68 @@
 package logic;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class Cita {
 
 	private int idCita;
 	private int idPaciente;
+
 	private String nombrePaciente;
 	private String fecha;
-	private String horaInicio;
-	private String horaFin;
+	private String horaE;
+	private String horaS;
 	private boolean urgente;
 	private int sala;
-	private String telefono;
-	private String correo;
-	private String otros;
 	private boolean acudio;
-	private String causa;
 
-	public Cita(int id, String n, String f, String h, int s, boolean u) {
-		idCita = generarId();
-		setIdPaciente(id);
-		setNombre(n);
-		setSala(s);
-		setUrgente(u);
-
-	}
+	private int telefonoCita;
+	private String correoCita;
+	private String otrosCita;
+	private String causaCita;
 
 	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
-			String telefono, String correo, String otros, boolean acudio, String causa) {
+			int telefono, String correo, String otros, boolean acudio, String causa) {
 		this.idCita = id;
-		this.idPaciente = pacienteId;
-		this.fecha = fecha;
-		this.horaInicio = horaI;
-		this.horaFin = horaF;
+		setIdPaciente(pacienteId);
+		setFecha(fecha);
+		setHoraE(horaI);
+		setHoraS(horaF);
 		this.urgente = urgente;
 		this.sala = salaId;
-		this.telefono = telefono;
-		this.correo = correo;
-		this.otros = otros;
+		this.telefonoCita = telefono;
+		this.correoCita = correo;
+		this.otrosCita = otros;
 		this.acudio = acudio;
-		this.causa = causa;
+		this.causaCita = causa;
 	}
 
-	private int generarId() {
-		int n = (int) (Math.random() * 1000 + 1);
-		return n;
+	private void setHoraS(String hs) {
+		this.horaS = hs;
+
 	}
+
+	private void setHoraE(String he) {
+		this.horaE = he;
+
+	}
+
+	private void setFecha(String f) {
+		this.fecha = f;
+	}
+
+	public String getDia() {
+		return fecha;
+	}
+
+	public String getHoraE() {
+		return horaE;
+	}
+
+	public String getHoraS() {
+		return horaS;
+	}
+
 
 	public void setNombre(String str) {
 		nombrePaciente = str;
@@ -67,6 +85,55 @@ public class Cita {
 		return idCita;
 	}
 
+	public int getTelefonoCita() {
+		return telefonoCita;
+	}
+
+	public void setTelefonoCita(int telefonoCita) {
+		this.telefonoCita = telefonoCita;
+	}
+
+	public String getCorreoCita() {
+		return correoCita;
+	}
+
+	public void setCorreoCita(String correoCita) {
+		this.correoCita = correoCita;
+	}
+
+	public String getOtrosCita() {
+		return otrosCita;
+	}
+
+	public void setOtrosCita(String otrosCita) {
+		this.otrosCita = otrosCita;
+	}
+
+
+
+	public String getCausaCita() {
+		return causaCita;
+	}
+
+	public void setCausaCita(String causaCita) {
+		this.causaCita = causaCita;
+	}
+
+	/*
+	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato: DD/MM/YYYY
+	 * 0 1 2
+	 */
+	public Date fechaToDate(String fecha) {
+		String[] sep=fecha.split("/");
+		Calendar c=Calendar.getInstance();
+		c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(sep[0]));
+		c.set(Calendar.MONTH, Integer.parseInt(sep[1])-1);
+		c.set(Calendar.YEAR, Integer.parseInt(sep[2]));
+		
+		Date f=c.getTime();
+		return f;
+	}
+	
 	public void setIdCita(int idCita) {
 		this.idCita = idCita;
 	}
@@ -79,29 +146,6 @@ public class Cita {
 		this.nombrePaciente = nombrePaciente;
 	}
 
-	public String getTelefono() {
-		return telefono;
-	}
-
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
-	}
-
-	public String getCorreo() {
-		return correo;
-	}
-
-	public void setCorreo(String correo) {
-		this.correo = correo;
-	}
-
-	public String getOtros() {
-		return otros;
-	}
-
-	public void setOtros(String otros) {
-		this.otros = otros;
-	}
 
 	public boolean isAcudio() {
 		return acudio;
@@ -109,14 +153,6 @@ public class Cita {
 
 	public void setAcudio(boolean acudio) {
 		this.acudio = acudio;
-	}
-
-	public String getCausa() {
-		return causa;
-	}
-
-	public void setCausa(String causa) {
-		this.causa = causa;
 	}
 
 	public int getIdPaciente() {
@@ -134,20 +170,28 @@ public class Cita {
 	public String getFecha() {
 		return fecha;
 	}
-
-	public String getHoraInicio() {
-		return horaInicio;
-	}
-
-	public String getHoraFin() {
-		return horaFin;
-	}
+	
 
 	@Override
 	public String toString() {
 		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente + ", nombrePaciente=" + nombrePaciente
-				+ ", fecha=" + fecha + ", horaInicio=" + horaInicio + ", horaFin=" + horaFin + ", urgente=" + urgente
-				+ ", sala=" + sala + ", telefono=" + telefono + ", correo=" + correo + ", otros=" + otros + ", acudio="
-				+ acudio + ", causa=" + causa + "]";
+				+ ", fecha=" + fecha + ", horaE=" + horaE + ", horaS=" + horaS + ", urgente=" + urgente + ", sala="
+				+ sala + ", acudio=" + acudio + ", telefonoCita=" + telefonoCita + ", correoCita=" + correoCita
+				+ ", otrosCita=" + otrosCita + ", causaCita=" + causaCita + "]";
 	}
+
+	/*
+	 * 
+	 * HH:MM
+	 * 0  1
+	 */
+	public Date horaToDate(String e) {
+		String[] sep=e.split(":");
+		Calendar c=Calendar.getInstance();
+		c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(sep[0]));
+		c.set(Calendar.MINUTE, Integer.parseInt(sep[1]));
+		Date h=c.getTime();
+		return h;
+	}
+
 }

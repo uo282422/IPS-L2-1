@@ -163,7 +163,7 @@ public class VentanaHorario extends JFrame {
 		Paciente p = gP.getPaciente(c.getIdPaciente());
 		Sala s = gS.cargarSala(c.getSala());
 		panelBasicInfo.setLayout(new GridLayout(5, 0));
-		panelBasicInfo.add(new Label(String.format("%s - %s", c.getHoraInicio(), c.getHoraFin())));
+		panelBasicInfo.add(new Label(String.format("%s - %s", c.getHoraE(), c.getHoraS())));
 		panelBasicInfo.add(new Label("    "));
 		panelBasicInfo.add(new Label(String.format("PACIENTE: %s %s", p.getNombre(), p.getApellido())));
 		panelBasicInfo.add(new Label("    "));

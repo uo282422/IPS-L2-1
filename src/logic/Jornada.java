@@ -11,10 +11,22 @@ public class Jornada {
 	private String horaFinal;
 	private String diaInicio;
 	private String diaFinal;
+	private String medicoId;
 
 	public Jornada() {
 		// Falta un sistema de creación de ids únicos
 		id = "" + Math.abs(new Random().nextInt());
+	}
+	
+	
+	public Jornada(String id, String dias, String hI, String hF, String dI, String dF, String medid) {
+		this.id=id;
+		this.dias=dias;
+		this.horaComienzo=hI;
+		this.horaFinal=hF;
+		this.diaInicio=dI;
+		this.diaFinal=dF;
+		this.medicoId=medid;
 	}
 
 	public String getId() {

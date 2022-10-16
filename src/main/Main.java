@@ -2,6 +2,9 @@ package main;
 
 import java.awt.EventQueue;
 
+import ui.VentanaCrearCita;
+
+
 public class Main {
 
 	public static void main(String[] args) {
@@ -11,6 +14,12 @@ public class Main {
 //					new DataBase().cargarDatosDePrueba();
 //					VentanaCrearCita frame = new VentanaCrearCita();
 //					frame.setVisible(true);
+
+//					bd.cargarDatosDePrueba();
+					VentanaCrearCita frame = new VentanaCrearCita();
+					frame.setVisible(true);
+					
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

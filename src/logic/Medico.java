@@ -6,7 +6,7 @@ public class Medico {
 	private String nombre;
 	private String apellido;
 	private String email;
-
+	
 	public Medico(String id, String nombre, String apellido, String email) {
 		this.id = id;
 		this.nombre = nombre;
@@ -49,5 +49,4 @@ public class Medico {
 	public String toString() {
 		return String.format("%s %s", getNombre(), getApellido());
 	}
-
 }

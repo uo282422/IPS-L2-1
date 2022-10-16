@@ -6,28 +6,22 @@ public class Paciente {
 	private String apellido;
 	private int telefono;
 	private String correo;
-	private String otros;
+	private String otrosContactos;
 
-	public Paciente(int id, String nombre, String apellido, int telefono, String correo, String otros) {
+	public Paciente(int id, String name, String surname, int telefono, String correo, String otros) {
 		this.id = id;
-		this.nombre = nombre;
-		this.apellido = apellido;
 		this.telefono = telefono;
 		this.correo = correo;
-		this.otros = otros;
+		this.otrosContactos = otros;
+		this.nombre = name;
+		this.apellido = surname;
 	}
 
-	public String getNombre() {
-		return nombre;
-	}
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
 	}
 
-	public String getApellido() {
-		return apellido;
-	}
 
 	public void setApellido(String apellido) {
 		this.apellido = apellido;
@@ -41,6 +35,15 @@ public class Paciente {
 		System.out.println(correo);
 	}
 
+
+	public String getApellido() {
+		return apellido;
+	}
+
+	public String getNombre() {
+		return this.nombre;
+	}
+
 	public int getId() {
 		return id;
 	}
@@ -49,15 +52,24 @@ public class Paciente {
 		return telefono;
 	}
 
+	public String getOtrosContactos() {
+		return otrosContactos;
+	}
+
 	public String getCorreo() {
 		return correo;
 	}
 
-	public String getOtros() {
-		return otros;
+
+	public void setOtrosContactos(String str) {
+		this.otrosContactos = str;
 	}
 
-	public void setOtros(String otros) {
-		this.otros = otros;
+	public void setTelefono(int n) {
+		this.telefono = n;
+	}
+
+	public void setCorreo(String str) {
+		this.correo=str;
 	}
 }

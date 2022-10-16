@@ -1,18 +1,23 @@
 package nexus;
 
+import java.util.List;
+
 import logic.Sala;
 import util.DataBase;
 
 public class GestorSalas {
-	
-	DataBase db;
-	
+	private List<Sala>listaSalas;
+	private DataBase bd;
 	public GestorSalas() {
-		this.db = new DataBase();
+		this.bd=new DataBase();
+		listaSalas=bd.cargarSalas();
 	}
 	
 	public Sala cargarSala(int id) {
-		return db.cargarSalaPorId(id);
+        return bd.cargarSalaPorId(id);
+    }
+	
+	public List<Sala> getListaSalas(){
+		return listaSalas;
 	}
-
 }

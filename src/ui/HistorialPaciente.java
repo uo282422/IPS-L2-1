@@ -150,7 +150,7 @@ public class HistorialPaciente extends JFrame {
 			taGeneral.setEditable(false);
 			taGeneral.setText(String.format("\nNOMBRE:\t%s\nAPELLIDO:\t%s\nCONTACTO:\t%d - %s\nOTROS DATOS:\t%s\n",
 					paciente.getNombre(), paciente.getApellido(), paciente.getTelefono(), paciente.getCorreo(),
-					paciente.getOtros()));
+					paciente.getOtrosContactos()));
 		}
 		return taGeneral;
 	}
@@ -176,15 +176,15 @@ public class HistorialPaciente extends JFrame {
 			taCitas.setEditable(false);
 			String text = "";
 			for (Cita c : gC.cargarCitasOrdenadas(paciente.getId())) {
-				text += String.format("\nNº CITA:\t%d\nFECHA:\t%s, %s - %s\nMEDICOS:", c.getIdCita(), c.getFecha(), c.getHoraInicio(), c.getHoraFin());
+				text += String.format("\nNº CITA:\t%d\nFECHA:\t%s, %s - %s\nMEDICOS:", c.getIdCita(), c.getFecha(), c.getHoraE(), c.getHoraS());
 				for (Medico m : gC.cargarMedicos(c.getIdCita())) {
 					text += String.format("\t%s %s\n", m.getNombre(), m.getEmail());
 				}
 				text += c.isUrgente() ? "URGENTE" : "NO URGENTE";
 				text += String.format("\nSALA:\t%s", gS.cargarSala(c.getSala()));
-				text += String.format("\nCONTACTO:\t%s - %s\n", c.getTelefono(), c.getCorreo());
+				text += String.format("\nCONTACTO:\t%s - %s\n", c.getTelefonoCita(), c.getCorreoCita());
 				text += c.isAcudio() ? "ACUDIO" : "NO ACUDIO";
-				text += String.format("\nCAUSA:\t%s", c.getCausa());
+				text += String.format("\nCAUSA:\t%s", c.getCausaCita());
 				text += "\n----------\n";
 			}
 			taCitas.setText(text);

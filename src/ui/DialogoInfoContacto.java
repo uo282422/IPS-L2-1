@@ -10,25 +10,32 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
-import nexus.GestorPacientes;
+import logic.Paciente;
+import nexus.GestorCitas;
 
 public class DialogoInfoContacto extends JDialog {
 
 	private final JPanel panelDialogoPrincipal = new JPanel();
 
-
-	private GestorPacientes gP;
-	private JTextArea textAreaPrincipal;
-	private int idPaciente;
+//	gP.getContactoPaciente(idPaciente)
+	
+	
+	
+//	gP.actualizarContactoPaciente(idPaciente,str);
+//	textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
+	private GestorCitas gC;
+	private JTextField tfCorreo;
+	private JTextField tfTlf;
+	private JTextPane tpOtros;
 	/**
 	 * Create the dialog.
 	 */
-	public DialogoInfoContacto(GestorPacientes gestorP, int id) {
-		idPaciente=id;
-		gP=gestorP;
+	public DialogoInfoContacto(GestorCitas gC, int id) {
+		this.gC=gC;
 		setBounds(100, 100, 450, 300);
 		getContentPane().setLayout(new BorderLayout());
 		{
@@ -40,7 +47,7 @@ public class DialogoInfoContacto extends JDialog {
 				panelNorte.add(lbInfoContacto);
 			}
 			{
-				JLabel lbIdPaciente = new JLabel(String.valueOf(idPaciente));
+				JLabel lbIdPaciente = new JLabel(String.valueOf(id));
 				panelNorte.add(lbIdPaciente);
 			}
 		}
@@ -48,10 +55,54 @@ public class DialogoInfoContacto extends JDialog {
 		getContentPane().add(panelDialogoPrincipal, BorderLayout.CENTER);
 		panelDialogoPrincipal.setLayout(new BorderLayout(0, 0));
 		{
-			textAreaPrincipal = new JTextArea();
-			textAreaPrincipal.setEditable(true);
-			textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
-			panelDialogoPrincipal.add(textAreaPrincipal, BorderLayout.CENTER);
+			JPanel panelNorte = new JPanel();
+			FlowLayout fl_panelNorte = (FlowLayout) panelNorte.getLayout();
+			fl_panelNorte.setAlignment(FlowLayout.LEFT);
+			panelDialogoPrincipal.add(panelNorte, BorderLayout.NORTH);
+			{
+				JPanel panelTelefono = new JPanel();
+				panelNorte.add(panelTelefono);
+				{
+					JLabel lblTelfono = new JLabel("Teléfono");
+					panelTelefono.add(lblTelfono);
+				}
+				{
+					tfTlf = new JTextField();
+					tfTlf.setColumns(10);
+					tfTlf.setText(gC.getTlfProv()+"");
+					panelTelefono.add(tfTlf);
+				}
+			}
+			{
+				JPanel panelCorreo = new JPanel();
+				panelNorte.add(panelCorreo);
+				{
+					JLabel lblCorreo = new JLabel("Correo");
+					
+					panelCorreo.add(lblCorreo);
+				}
+				{
+					tfCorreo = new JTextField();
+					tfCorreo.setColumns(10);
+					tfCorreo.setText(gC.getCorreoProv());
+					panelCorreo.add(tfCorreo);
+				}
+			}
+		}
+		{
+			JPanel panelOeste = new JPanel();
+			panelDialogoPrincipal.add(panelOeste, BorderLayout.WEST);
+			panelOeste.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lbOtros = new JLabel("Otra información de contacto:");
+				panelOeste.add(lbOtros, BorderLayout.NORTH);
+			}
+			{
+				JTextPane tpOtros = new JTextPane();
+				this.tpOtros=tpOtros;
+				tpOtros.setText(gC.getOtrosProv());
+				panelOeste.add(tpOtros);
+			}
 		}
 		{
 			JPanel panelBotones = new JPanel();
@@ -65,11 +116,14 @@ public class DialogoInfoContacto extends JDialog {
 					}
 
 					private void guardar() {
-						textAreaPrincipal.setEditable(false);
-						String str=textAreaPrincipal.getText();
 						
-						gP.actualizarContactoPaciente(idPaciente,str);
-						textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
+						gC.añadirInfoContactoProv(Integer.parseInt(tfTlf.getText()),tfCorreo.getText(),tpOtros.getText());
+						dispose();
+//						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
+//						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
+//						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());
+
+						
 					}
 				});
 				panelBotones.add(btGuardar);

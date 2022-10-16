@@ -6,7 +6,6 @@ public class Sala {
 	private String nombre;
 
 	public Sala(int id, String nombre) {
-		super();
 		this.id = id;
 		this.nombre = nombre;
 	}
@@ -32,3 +31,4 @@ public class Sala {
 	}
 
 }
+
