@@ -12,7 +12,11 @@ public class GestorSalas {
 		this.bd=new DataBase();
 		listaSalas=bd.cargarSalas();
 	}
-
+	
+	public Sala cargarSala(int id) {
+        return bd.cargarSalaPorId(id);
+    }
+	
 	public List<Sala> getListaSalas(){
 		return listaSalas;
 	}

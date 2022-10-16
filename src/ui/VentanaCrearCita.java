@@ -7,8 +7,6 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.Box;
 import javax.swing.ButtonGroup;
@@ -30,7 +28,7 @@ import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
 import nexus.GestorCitas;
-import nexus.GestorMedico;
+import nexus.GestorMedicos;
 import nexus.GestorPacientes;
 import nexus.GestorSalas;
 
@@ -64,7 +62,7 @@ public class VentanaCrearCita extends JFrame {
 	private GestorSalas gS;
 	private GestorCitas gC;
 	private GestorPacientes gP;
-	private GestorMedico gM;
+	private GestorMedicos gM;
 	private DialogoInfoContacto dialContacto;
 	private JPanel panelContacto;
 	private JButton btContacto;
@@ -89,7 +87,7 @@ public class VentanaCrearCita extends JFrame {
 	public VentanaCrearCita() {
 		gP = new GestorPacientes();
 		gC = new GestorCitas();
-		gM = new GestorMedico();
+		gM = new GestorMedicos();
 		gS=new GestorSalas();
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 455, 408);
@@ -325,16 +323,20 @@ public class VentanaCrearCita extends JFrame {
 
 		String fecha = getTfFecha().getText();
 		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
-			System.out.println("NO");
+			
 			valido = false;
 			new JOptionPane().showMessageDialog(this, "Error, la fecha y horas escritas no están en la jornada de los medicos seleccionados");
 		}
 			
-//		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false)
-//			valido=false;
-//		
+		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false) {
+			valido=false;
+			new JOptionPane().showMessageDialog(this, "Error, alguno de los medicos asignados ya tienen citas asignadas para el perido establecido");
+
+		}
+			
 		
-		int sala = ((Sala)getCbSala().getSelectedItem()).getSalaId();
+		
+		int sala = ((Sala)getCbSala().getSelectedItem()).getId();
 	
 		boolean urg;
 		if (getRbSi().isSelected()) {

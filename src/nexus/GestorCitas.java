@@ -2,6 +2,7 @@ package nexus;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Properties;
@@ -34,14 +35,11 @@ public class GestorCitas {
 		this.bd = new DataBase();
 	}
 
-	public void nuevaCita(int idPaciente, String nombre, String fecha,
-			String horaE, String horaS, int salaId, boolean urg) {
-		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS,
-				urg, salaId, tlfProv, correoProv, otrosProv, false, "");
+	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int salaId,
+			boolean urg) {
+		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS, urg, salaId, tlfProv, correoProv,
+				otrosProv, false, "");
 		listaCitas.add(c);
-		// System.out.println(c.getIdCita()+" "+c.getIdPaciente()+" "+fecha+"
-		// "+horaE+" "+horaS+" "+urg+" "+salaId+" "+tlfProv+" "+correoProv+"
-		// "+otrosProv+" "+false+" "+ "");
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos));
 
@@ -79,14 +77,12 @@ public class GestorCitas {
 		MimeMessage m = new MimeMessage(sesion);
 		try {
 			m.setFrom(new InternetAddress(remitente));
-			m.addRecipient(Message.RecipientType.TO,
-					new InternetAddress(destinatario));
+			m.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
 			m.setSubject("Prueba n1");
 			m.setText("Texto");
 
 			Transport t = sesion.getTransport("smtp");
-			t.connect((String) prop.get("mail.smtp.host"),
-					(String) prop.get("mail.smtp.user"),
+			t.connect((String) prop.get("mail.smtp.host"), (String) prop.get("mail.smtp.user"),
 					(String) prop.get("mail.smtp.clave"));
 			t.sendMessage(m, m.getAllRecipients());
 			t.close();
@@ -126,6 +122,59 @@ public class GestorCitas {
 
 	}
 
+	public List<Cita> cargarCitasOrdenadas(String idMedico, String fecha) {
+
+		List<Cita> citas = bd.getCitasPorMedicoYFecha(idMedico, fecha);
+
+		Collections.sort(citas,
+				(o1, o2) -> (Integer.parseInt(o1.getHoraE().split(":")[0])
+						- Integer.parseInt(o2.getHoraE().split(":")[0]) == 0
+								? Integer.parseInt(o1.getHoraE().split(":")[1])
+										- Integer.parseInt(o2.getHoraE().split(":")[1])
+								: Integer.parseInt(o1.getHoraE().split(":")[0])
+										- Integer.parseInt(o2.getHoraE().split(":")[0])));
+
+		// debug
+		for (Cita c : citas) {
+			System.out.println(c);
+		}
+
+		return citas;
+	}
+
+	public List<Cita> cargarCitasOrdenadas(int idPaciente) {
+		List<Cita> citas = bd.cargarCitasPorPaciente(idPaciente);
+
+		Collections.sort(citas, (o1, o2) -> (Integer.parseInt(o1.getFecha().split("/")[2]) - Integer.parseInt(o2
+				.getFecha().split("/")[2]) == 0 ? (Integer.parseInt(o1.getFecha().split("/")[1])
+						- Integer.parseInt(o2.getFecha().split("/")[1]) == 0
+								? (Integer.parseInt(o1.getFecha().split("/")[0])
+										- Integer.parseInt(o2.getFecha().split("/")[0]) == 0
+												? (Integer.parseInt(o1.getHoraE().split(":")[0])
+														- Integer.parseInt(o2.getHoraE().split(":")[0]) == 0
+																? Integer.parseInt(o1.getHoraE().split(":")[1])
+																		- Integer.parseInt(o2.getHoraE().split(":")[1])
+																: Integer.parseInt(o1.getHoraE().split(":")[0])
+																		- Integer.parseInt(o2.getHoraE().split(":")[0]))
+												: Integer.parseInt(o1.getFecha().split("/")[0])
+														- Integer.parseInt(o2.getFecha().split("/")[0]))
+								: Integer.parseInt(o1.getFecha().split("/")[1])
+										- Integer.parseInt(o2.getFecha().split("/")[1]))
+						: Integer.parseInt(o1.getFecha().split("/")[2])
+								- Integer.parseInt(o2.getFecha().split("/")[2])));
+
+		// debug
+		for (Cita c : citas) {
+			System.out.println(c);
+		}
+
+		return citas;
+	}
+
+	public List<Medico> cargarMedicos(int idCita) {
+		return bd.cargarMedicosPorCita(idCita);
+	}
+
 	public int getTlfProv() {
 		return tlfProv;
 	}
@@ -138,8 +187,7 @@ public class GestorCitas {
 		return otrosProv;
 	}
 
-	public boolean comprobarCitaEnJornada(String fecha, String horaE,
-			String horaS, List<Medico> medicos) {
+	public boolean comprobarCitaEnJornada(String fecha, String horaE, String horaS, List<Medico> medicos) {
 		boolean valido = true;
 		Date fechaCandidato = fechaToDate(fecha);
 		Date horaECandidato = horaToDate(horaE);
@@ -153,11 +201,10 @@ public class GestorCitas {
 //				System.out.println("fecha a evaluar"+fechaCandidato.toString());
 //				System.out.println("inicio de jornada"+fechaInicialJornada.toString());
 //				System.out.println("fin de jornada"+fechaFinalJornada.toString());
-				if (fechaCandidato.after(fechaInicialJornada)
-						&& fechaCandidato.before(fechaFinalJornada)) {
-					// si la fecha candidato esta dentro de la jornada es valido
-					// de momento
 
+				if (fechaCandidato.after(fechaInicialJornada) && fechaCandidato.before(fechaFinalJornada)) {
+					// si la fecha candidato esta dentro de la jornada es valido de momento
+//					System.out.println("Fecha en jornada");
 				} else
 					valido = false;
 
@@ -167,10 +214,8 @@ public class GestorCitas {
 //				System.out.println("hora final candidato"+horaSCandidato);
 //				System.out.println("hora inicial jornada"+ horaInicialJornada);
 //				System.out.println("hora final jornada"+ horaFinalJornada);
-				if (horaECandidato.after(horaInicialJornada)
-						&& horaECandidato.before(horaFinalJornada)
-						&& horaSCandidato.after(horaInicialJornada)
-						&& horaSCandidato.before(horaFinalJornada)) {
+				if (horaECandidato.after(horaInicialJornada) && horaECandidato.before(horaFinalJornada)
+						&& horaSCandidato.after(horaInicialJornada) && horaSCandidato.before(horaFinalJornada)) {
 					// si la inicial candidato es despues de la inicial y antes
 					// de la final
 
@@ -179,30 +224,37 @@ public class GestorCitas {
 				} else
 					valido = false;
 
+				if (valido)
+					break;
 			}
+
 		}
+//		System.out.println(valido);
 		return valido;
 	}
 
-	public boolean comprobarCitasEnHorario(String fecha, String horaE,
-			String horaS, ArrayList<Medico> medicos) {
-//		Date horaECandidato=horaToDate(horaE);
-//		Date horaSCandidato=horaToDate(horaS);
-//		for(Medico m :medicos) {
-//			List<Cita>citasDeMedico=bd.getCitasPorMedicoYFecha(m.getId(), fecha);
-//			for(Cita c : citasDeMedico) {
-//				Date horaInicialCitaPuesta=horaToDate(c.getHoraE());
-//				Date horaFinalCitaPuesta=horaToDate(c.getHoraS());
-//				if()
-//			}
-//		}
-		return true;
+	public boolean comprobarCitasEnHorario(String fecha, String horaE, String horaS, ArrayList<Medico> medicos) {
+		boolean valido = true;
+		Date horaECandidato = horaToDate(horaE);
+		Date horaSCandidato = horaToDate(horaS);
+		for (Medico m : medicos) {
+			List<Cita> citasDeMedico = bd.getCitasPorMedicoYFecha(m.getId(), fecha);
+			for (Cita c : citasDeMedico) {
+				Date horaInicialCitaPuesta = horaToDate(c.getHoraE());
+				Date horaFinalCitaPuesta = horaToDate(c.getHoraS());
+				if ((horaECandidato.after(horaFinalCitaPuesta)
+						|| horaSCandidato.before(horaInicialCitaPuesta)) == false)// si no se cumple
+					valido = false;
+			}
+		}
+		return valido;
 
 	}
 
 	/*
-	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato:
-	 * DD/MM/YYYY 0 1 2
+	 * <<<<<<< HEAD Pasa del string guardado en bd a un objeto del tipo fecha
+	 * Formato: DD/MM/YYYY 0 1 2 ======= Pasa del string guardado en bd a un objeto
+	 * del tipo fecha Formato: DD/MM/YYYY 0 1 2 >>>>>>> refs/remotes/origin/master
 	 */
 	public Date fechaToDate(String fecha) {
 		String[] sep = fecha.split("/");

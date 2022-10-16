@@ -1,14 +1,20 @@
 package nexus;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import logic.Enfermedad;
 import logic.Paciente;
+import logic.Vacuna;
 import util.DataBase;
 
 public class GestorPacientes {
+	
+	
 	private DataBase bd;
 	public GestorPacientes() {
-		this.bd=new DataBase();
+		this.bd = new DataBase();
+		//listaPacientes.add(new Paciente(12, 999, "correito"));
 		listaPacientes = bd.cargarPacientes();
 		// listaPacientes.add(new Paciente(12,"Juan","Iglesias", 999, "correito","otro
 		// contacto 1"));
@@ -16,6 +22,13 @@ public class GestorPacientes {
 
 	private ArrayList<Paciente> listaPacientes = new ArrayList<>();
 
+	public void actualizarContactoPaciente(int id, String contacto) {
+		for (Paciente p : listaPacientes) {
+			if (p.getId() == id) {
+				p.actualizarDatos(contacto);
+			}
+		}
+	}
 	public void actualizarTelefonoPaciente(int id, int num) {
 		for (Paciente p : listaPacientes) {
 			if (p.getId() == id) {
@@ -23,14 +36,24 @@ public class GestorPacientes {
 			}
 		}
 	}
-	public Paciente getPaciente(int id) {
+
+	public String getContactoPaciente(int id) {
+		String str = "";
 		for (Paciente p : listaPacientes) {
 			if (p.getId() == id) {
-				return p;
+				str = p.getTelefono() + "\n" + p.getCorreo();
 			}
 		}
-		return null;
+		return str;
 	}
+//	public Paciente getPaciente(int id) {
+//		for (Paciente p : listaPacientes) {
+//			if (p.getId() == id) {
+//				return p;
+//			}
+//		}
+//		return null;
+//	}
 
 	public void actualizarCorreoPaciente(int id, String mail) {
 		for (Paciente p : listaPacientes) {
@@ -58,6 +81,17 @@ public class GestorPacientes {
 		return str;
 	}
 
+	public Paciente getPaciente(int idPaciente) {
+		return bd.cargarPacientePorId(idPaciente);
+	}
+
+	public List<Enfermedad> cargarEnfermedades(int idPaciente) {
+		return bd.cargarEnfermedadesPorPaciente(idPaciente);
+	}
+
+	public List<Vacuna> cargarVacunas(int idPaciente) {
+		return bd.cargarVacunasPorPaciente(idPaciente);
+	}
 	public String getOtrosContactosPaciente(int id) {
 		String str = "";
 		for (Paciente p : listaPacientes) {
