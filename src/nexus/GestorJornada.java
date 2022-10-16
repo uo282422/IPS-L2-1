@@ -51,6 +51,9 @@ public class GestorJornada {
 		this.dias = dias;
 	}
 
+	/**
+	 * Crea la jornada y la guarda en la base de datos.
+	 */
 	public void guardarJornada() {
 		jornada = new Jornada();
 		setId(generarId());
@@ -67,13 +70,24 @@ public class GestorJornada {
 		jornada.setId(id);
 	}
 
+	/**
+	 * Llama a la base de datos y recoge el último id generado en una jornada
+	 * para crear un id 1+
+	 * 
+	 * @return String conteniendo dicho id.
+	 */
 	private String generarId() {
-		DataBase db = new DataBase();
 		int id = Integer.parseInt(
 				db.cargarJornadaId().get(db.cargarJornadaId().size() - 1)) + 1;
 		return id + "";
 	}
 
+	/**
+	 * Recoge la fecha en Date y la devuelve en String en el formato deseado.
+	 * 
+	 * @param d Date conteniendo la fecha.
+	 * @return String con el objeto Date a String correctamente formateado.
+	 */
 	private String parseDate(Date d) {
 		return new SimpleDateFormat("dd/MM/yyyy").format(d);
 	}
@@ -83,6 +97,13 @@ public class GestorJornada {
 //		return hour[0];
 //	}
 
+	/**
+	 * Dado el toString de un medico devuelve el médico correspondiente a este
+	 * toString.
+	 * 
+	 * @param m String conteniendo el médico a devolver.
+	 * @return Medico cuyo toString corresponde con el parámetro pasado.
+	 */
 	private Medico parseMedico(String m) {
 		for (Medico med : db.cargarMedicos()) {
 			if (med.toString().equals(m)) {

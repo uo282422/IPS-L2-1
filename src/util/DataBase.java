@@ -28,6 +28,11 @@ public class DataBase {
 	private static final String ACTUALIZAR_CITA_CAUSAS = "UPDATE cita SET cita_causa = '%s' WHERE cita_id = '%d'";
 	private static final String QUERY_ID_JORNADA = "SELECT jornada_id FROM jornada";
 
+	/**
+	 * Realiza una consulta a la base de datos para obtener todos los médicos.
+	 * 
+	 * @return List<Medico> conteniendo todos los médicos en la base de datos.
+	 */
 	public List<Medico> cargarMedicos() {
 		ArrayList<Medico> medicos = new ArrayList<Medico>();
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -207,23 +212,28 @@ public class DataBase {
 		}
 	}
 
-	public void cargarDatosDePrueba() {
-		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			Statement s = conn.createStatement();
-			try {
-				// DATOS A INSERTAR
-				s.executeUpdate("commit");
-			} catch (SQLException e) {
-				throw new Error("Problem", e);
-			} finally {
-				s.close();
-				conn.close();
-			}
-		} catch (SQLException e) {
-			throw new Error("Problem", e);
-		}
-	}
+//	public void cargarDatosDePrueba() {
+//		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+//			Statement s = conn.createStatement();
+//			try {
+//				// DATOS A INSERTAR
+//				s.executeUpdate("commit");
+//			} catch (SQLException e) {
+//				throw new Error("Problem", e);
+//			} finally {
+//				s.close();
+//				conn.close();
+//			}
+//		} catch (SQLException e) {
+//			throw new Error("Problem", e);
+//		}
+//	}
 
+	/**
+	 * Guarda la jornada en base de datos.
+	 * 
+	 * @param j Jornada conteniendo la jornada a guardar.
+	 */
 	public void guardarJornada(Jornada j) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			Statement s = conn.createStatement();
@@ -243,6 +253,12 @@ public class DataBase {
 		}
 	}
 
+	/**
+	 * Dado el id de una cita devuelve el objeto Cita de la misma.
+	 * 
+	 * @param id String conteniendo el id a consultar.
+	 * @return Cita con la cita conveniente.
+	 */
 	public Cita getCita(String id) {
 		Cita c = null;
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -286,6 +302,12 @@ public class DataBase {
 		return c;
 	}
 
+	/**
+	 * Devuelve el nombre de un paciente dado su id
+	 * 
+	 * @param id int conteniendo el id a consultar.
+	 * @return String con el nombre a devolver.
+	 */
 	private String getNombrePaciente(int id) {
 		String nombrePaciente = "";
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -375,6 +397,11 @@ public class DataBase {
 		return citas;
 	}
 
+	/**
+	 * Dado un objeto Cita, lo guarda en base de datos.
+	 * 
+	 * @param c Cita conteniendo el objeto a guardar.
+	 */
 	public void guardarCita(Cita c) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			Statement s = conn.createStatement();
@@ -396,6 +423,12 @@ public class DataBase {
 		}
 	}
 
+	/**
+	 * Método llamado para hacer set de las causas y si el paciente acudió a la
+	 * cita.
+	 * 
+	 * @param c Cita que se quiere actualizar.
+	 */
 	public void actualizarCita(Cita c) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			Statement s = conn.createStatement();
@@ -415,6 +448,11 @@ public class DataBase {
 		}
 	}
 
+	/**
+	 * Método que devuelve todos los ids de cada jornada en la base de datos.
+	 * 
+	 * @return List<String> con dichos ids.
+	 */
 	public List<String> cargarJornadaId() {
 		ArrayList<String> ids = new ArrayList<>();
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {

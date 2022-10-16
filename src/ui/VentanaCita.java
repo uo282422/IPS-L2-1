@@ -251,6 +251,9 @@ public class VentanaCita extends JFrame {
 		return btAceptar;
 	}
 
+	/**
+	 * Llama al gestor para actualizar la cita.
+	 */
 	protected void guardarDatos() {
 		c.setAcudio(chbxAcude.isSelected());
 		c.setCausaCita(txtACausas.getText());
@@ -287,6 +290,12 @@ public class VentanaCita extends JFrame {
 		return chbxAcude;
 	}
 
+	/**
+	 * Si se marca la checkbox de que el paciente acudio a la cita, se
+	 * desbloquea el txtArea de causas.
+	 * 
+	 * @param selected boolean conteniendo el estado de la checkbox
+	 */
 	protected void activarCausas(boolean selected) {
 		lbCausas.setEnabled(selected);
 		txtACausas.setEnabled(selected);

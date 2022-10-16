@@ -165,10 +165,18 @@ public class AsignarJornada extends JDialog {
 			}
 			{
 				setCalendars();
-				calendarI = new JCalendar();
 				calendarI.getDayChooser().setAlwaysFireDayProperty(true);
 				calendarI.getDayChooser().addPropertyChangeListener("day",
 						new PropertyChangeListener() {
+							/**
+							 * Cada vez que se selecciona un día del calendario
+							 * de día de inicio se actualiza el calendario de
+							 * día de fin, bloqueando todos los días previos al
+							 * día seleccionado en el día de inicio de la
+							 * jornada.
+							 * 
+							 * @param evt
+							 */
 							public void propertyChange(
 									PropertyChangeEvent evt) {
 								setCalendars();
@@ -183,7 +191,6 @@ public class AsignarJornada extends JDialog {
 				pnCalendarios.add(diaFLb);
 			}
 			{
-				calendarF = new JCalendar();
 				diaFLb.setLabelFor(calendarF);
 				pnCalendarios.add(calendarF);
 			}
@@ -195,6 +202,14 @@ public class AsignarJornada extends JDialog {
 			{
 				JButton confirmarBtn = new JButton("Confirmar");
 				confirmarBtn.addActionListener(new ActionListener() {
+					/**
+					 * Se ha de comprobar que la jornada se puede crear sin
+					 * complicaciones. Una vez comprobado se realiza una
+					 * pregunta de confirmación y en caso de aceptarse se crea
+					 * dicha jornada.
+					 * 
+					 * @param e
+					 */
 					public void actionPerformed(ActionEvent e) {
 						if (comprobarCampos()) {
 							if (JOptionPane.showConfirmDialog(null,
@@ -221,7 +236,9 @@ public class AsignarJornada extends JDialog {
 				JButton cancelarBtn = new JButton("Cancelar");
 				cancelarBtn.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
-						dispose();
+						if (JOptionPane.showConfirmDialog(null,
+								"Se cerrará la ventana, ¿seguro que desea cancelar?") == JOptionPane.YES_OPTION)
+							dispose();
 					}
 				});
 				cancelarBtn.setActionCommand("Cancel");
@@ -230,6 +247,13 @@ public class AsignarJornada extends JDialog {
 		}
 	}
 
+	/**
+	 * Genera el ComboBoxModel adecuado para mostrar en la medCombo.
+	 * 
+	 * @param meds conteniendo la lista de médicos de la que se busca sacar un
+	 *             ComboBoxModel.
+	 * @return ComboBoxModel<String> con los toString de cada médico.
+	 */
 	private ComboBoxModel<String> setUpComboModelMed(List<Medico> meds) {
 		String[] array = new String[meds.size()];
 		for (int i = 0; i < array.length; i++) {

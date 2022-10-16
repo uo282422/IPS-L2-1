@@ -236,6 +236,12 @@ public class GestorCitas {
 		bd.guardarCita(c);
 	}
 
+	/**
+	 * Método que llama a la base de datos para actualizar las causas y si el
+	 * paciente acudió de una cita.
+	 * 
+	 * @param c Cita que se quiere actualizar.
+	 */
 	public void actualizarCita(Cita c) {
 		bd.actualizarCita(c);
 	}
