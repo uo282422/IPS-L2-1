@@ -22,7 +22,6 @@ import util.DataBase;
 
 public class GestorCitas {
 
-	private DataBase db;
 
 	private DataBase bd = null;
 
@@ -120,7 +119,7 @@ public class GestorCitas {
 
 	public List<Cita> cargarCitasOrdenadas(String idMedico, String fecha) {
 
-		List<Cita> citas = db.getCitasPorMedicoYFecha(idMedico, fecha);
+		List<Cita> citas = bd.getCitasPorMedicoYFecha(idMedico, fecha);
 
 		Collections.sort(citas,
 				(o1, o2) -> (Integer.parseInt(o1.getHoraE().split(":")[0])
@@ -139,7 +138,7 @@ public class GestorCitas {
 	}
 
 	public List<Cita> cargarCitasOrdenadas(int idPaciente) {
-		List<Cita> citas = db.cargarCitasPorPaciente(idPaciente);
+		List<Cita> citas = bd.cargarCitasPorPaciente(idPaciente);
 
 		Collections.sort(citas, (o1, o2) -> (Integer.parseInt(o1.getFecha().split("/")[2]) - Integer.parseInt(o2
 				.getFecha().split("/")[2]) == 0 ? (Integer.parseInt(o1.getFecha().split("/")[1])
@@ -170,7 +169,7 @@ public class GestorCitas {
 	}
 
 	public List<Medico> cargarMedicos(int idCita) {
-		return db.cargarMedicosPorCita(idCita);
+		return bd.cargarMedicosPorCita(idCita);
 	}
 
 	public void añadirInfoContactoProv(int tlf, String corr, String otro) {

@@ -149,7 +149,10 @@ public class VentanaHorario extends JFrame {
 
 			for (Cita c : gC.cargarCitasOrdenadas(idMedico, fechaFormateada)) {
 				pnHorario.add(crearPanelCita(c));
+				pnHorario.validate();
+				pnHorario.repaint();
 			}
+			
 		}
 		return pnHorario;
 	}
@@ -205,11 +208,10 @@ public class VentanaHorario extends JFrame {
 			btnVerHorario = new JButton("Ver Horario");
 			btnVerHorario.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					getSpHorario().remove(getPnHorario());
 					pnHorario = null;
-					getSpHorario().add(getPnHorario());
-					validate();
-					repaint();
+					getPnResizeContainer().add(getPnHorario());
+					spHorario.validate();
+					spHorario.repaint();
 				}
 			});
 		}

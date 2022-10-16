@@ -10,11 +10,10 @@ import util.DataBase;
 
 public class GestorPacientes {
 	
-	DataBase db;
 	
 	private DataBase bd;
 	public GestorPacientes() {
-		this.db = new DataBase();
+		this.bd = new DataBase();
 		//listaPacientes.add(new Paciente(12, 999, "correito"));
 		listaPacientes = bd.cargarPacientes();
 		// listaPacientes.add(new Paciente(12,"Juan","Iglesias", 999, "correito","otro
@@ -83,15 +82,15 @@ public class GestorPacientes {
 	}
 
 	public Paciente getPaciente(int idPaciente) {
-		return db.cargarPacientePorId(idPaciente);
+		return bd.cargarPacientePorId(idPaciente);
 	}
 
 	public List<Enfermedad> cargarEnfermedades(int idPaciente) {
-		return db.cargarEnfermedadesPorPaciente(idPaciente);
+		return bd.cargarEnfermedadesPorPaciente(idPaciente);
 	}
 
 	public List<Vacuna> cargarVacunas(int idPaciente) {
-		return db.cargarVacunasPorPaciente(idPaciente);
+		return bd.cargarVacunasPorPaciente(idPaciente);
 	}
 	public String getOtrosContactosPaciente(int id) {
 		String str = "";

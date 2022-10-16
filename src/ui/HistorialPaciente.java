@@ -105,6 +105,7 @@ public class HistorialPaciente extends JFrame {
 		if (spMain == null) {
 			spMain = new JScrollPane();
 			spMain.setViewportView(getPnMain());
+			spMain.getVerticalScrollBar().setUnitIncrement(10);
 		}
 		return spMain;
 	}
