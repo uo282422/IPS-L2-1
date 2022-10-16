@@ -79,7 +79,7 @@ public class VentanaCita extends JFrame {
 	 */
 	public VentanaCita(String idCita) {
 		this.c = gestor.getCita(idCita);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 938, 621);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -243,7 +243,7 @@ public class VentanaCita extends JFrame {
 			btAceptar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					guardarDatos();
-					JOptionPane.showConfirmDialog(null,
+					JOptionPane.showMessageDialog(null,
 							"La información de la cita se ha guaradado.");
 					dispose();
 				}
