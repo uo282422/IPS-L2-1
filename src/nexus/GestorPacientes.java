@@ -1,8 +1,11 @@
 package nexus;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import logic.Enfermedad;
 import logic.Paciente;
+import logic.Vacuna;
 import util.DataBase;
 
 public class GestorPacientes {
@@ -36,5 +39,13 @@ public class GestorPacientes {
 
 	public Paciente getPaciente(int idPaciente) {
 		return db.cargarPacientePorId(idPaciente);
+	}
+
+	public List<Enfermedad> cargarEnfermedades(int idPaciente) {
+		return db.cargarEnfermedadesPorPaciente(idPaciente);
+	}
+
+	public List<Vacuna> cargarVacunas(int idPaciente) {
+		return db.cargarVacunasPorPaciente(idPaciente);
 	}
 }

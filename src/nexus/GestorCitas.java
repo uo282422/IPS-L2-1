@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import logic.Cita;
+import logic.Medico;
 import util.DataBase;
 
 public class GestorCitas {
@@ -29,23 +30,70 @@ public class GestorCitas {
 		// pr pantalla por email
 
 	}
-	
+
 	public List<Cita> cargarCitasOrdenadas(String idMedico, String fecha) {
 
 		List<Cita> citas = db.cargarCitasPorMedicoYFecha(idMedico, fecha);
-		
-		Collections.sort(citas, (o1, o2) -> (
-				Integer.parseInt(o1.getHoraInicio().split(":")[0]) - Integer.parseInt(o2.getHoraInicio().split(":")[0]) == 0 ?
-						Integer.parseInt(o1.getHoraInicio().split(":")[1]) - Integer.parseInt(o2.getHoraInicio().split(":")[1]) :
-							Integer.parseInt(o1.getHoraInicio().split(":")[0]) - Integer.parseInt(o2.getHoraInicio().split(":")[0])
-				));
-		
+
+		Collections.sort(citas,
+				(o1, o2) -> (Integer.parseInt(o1.getHoraInicio().split(":")[0])
+						- Integer.parseInt(o2.getHoraInicio().split(":")[0]) == 0
+								? Integer.parseInt(o1.getHoraInicio().split(":")[1])
+										- Integer.parseInt(o2.getHoraInicio().split(":")[1])
+								: Integer.parseInt(o1.getHoraInicio().split(":")[0])
+										- Integer.parseInt(o2.getHoraInicio().split(":")[0])));
+
 		// debug
 		for (Cita c : citas) {
 			System.out.println(c);
 		}
 
 		return citas;
+	}
+
+	public List<Cita> cargarCitasOrdenadas(int idPaciente) {
+		List<Cita> citas = db.cargarCitasPorPaciente(idPaciente);
+
+		Collections.sort(citas,
+				(o1, o2) -> (
+						Integer.parseInt(o1.getFecha().split("/")[2])
+						- Integer.parseInt(o2.getFecha().split("/")[2]) == 0 ?
+						(
+								Integer.parseInt(o1.getFecha().split("/")[1])
+								- Integer.parseInt(o2.getFecha().split("/")[1]) == 0 ?
+								(
+										Integer.parseInt(o1.getFecha().split("/")[0])
+										- Integer.parseInt(o2.getFecha().split("/")[0]) == 0 ?
+										(
+												Integer.parseInt(o1.getHoraInicio().split(":")[0])
+												- Integer.parseInt(o2.getHoraInicio().split(":")[0]) == 0
+														? Integer.parseInt(o1.getHoraInicio().split(":")[1])
+																- Integer.parseInt(o2.getHoraInicio().split(":")[1])
+														: Integer.parseInt(o1.getHoraInicio().split(":")[0])
+																- Integer.parseInt(o2.getHoraInicio().split(":")[0])
+										)
+										:
+										Integer.parseInt(o1.getFecha().split("/")[0])
+										- Integer.parseInt(o2.getFecha().split("/")[0])
+								)
+								:
+								Integer.parseInt(o1.getFecha().split("/")[1])
+								- Integer.parseInt(o2.getFecha().split("/")[1])
+						)
+						:
+						Integer.parseInt(o1.getFecha().split("/")[2])
+						- Integer.parseInt(o2.getFecha().split("/")[2])));
+
+		// debug
+		for (Cita c : citas) {
+			System.out.println(c);
+		}
+
+		return citas;
+	}
+
+	public List<Medico> cargarMedicos(int idCita) {
+		return db.cargarMedicosPorCita(idCita);
 	}
 
 }
