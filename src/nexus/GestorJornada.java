@@ -53,6 +53,7 @@ public class GestorJornada {
 
 	public void guardarJornada() {
 		jornada = new Jornada();
+		setId(generarId());
 		setMedicoJornada();
 		setHoraComienzoJornada();
 		setHoraFinJornada();
@@ -60,6 +61,17 @@ public class GestorJornada {
 		setDiaFinJornada();
 		setDiasJornada();
 		db.guardarJornada(jornada);
+	}
+
+	private void setId(String id) {
+		jornada.setId(id);
+	}
+
+	private String generarId() {
+		DataBase db = new DataBase();
+		int id = Integer.parseInt(
+				db.cargarJornadaId().get(db.cargarJornadaId().size() - 1)) + 1;
+		return id + "";
 	}
 
 	private String parseDate(Date d) {

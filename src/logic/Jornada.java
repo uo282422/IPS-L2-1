@@ -1,5 +1,7 @@
 package logic;
 
+import util.DataBase;
+
 public class Jornada {
 
 	private String id;
@@ -16,8 +18,14 @@ public class Jornada {
 	}
 
 	private String generarId() {
-		int n = (int) (Math.random() * 1000 + 1);
-		return n + "";
+		DataBase db = new DataBase();
+		int id = Integer.parseInt(
+				db.cargarJornadaId().get(db.cargarJornadaId().size() - 1)) + 1;
+		return id + "";
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public Jornada(String id, String dias, String hI, String hF, String dI,

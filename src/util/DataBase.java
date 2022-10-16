@@ -26,6 +26,7 @@ public class DataBase {
 	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')";
 	private static final String ACTUALIZAR_CITA_ACUDE = "UPDATE cita SET cita_acudio = '%d' WHERE cita_id = '%d'";
 	private static final String ACTUALIZAR_CITA_CAUSAS = "UPDATE cita SET cita_causa = '%s' WHERE cita_id = '%d'";
+	private static final String QUERY_ID_JORNADA = "SELECT jornada_id FROM jornada";
 
 	public List<Medico> cargarMedicos() {
 		ArrayList<Medico> medicos = new ArrayList<Medico>();
@@ -412,6 +413,28 @@ public class DataBase {
 		} catch (SQLException e) {
 			throw new Error("Problem", e);
 		}
+	}
+
+	public List<String> cargarJornadaId() {
+		ArrayList<String> ids = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery(QUERY_ID_JORNADA);
+				while (rs.next()) {
+					ids.add(rs.getString("jornada_id"));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return ids;
 	}
 
 	private int boolToBit(boolean b) {
