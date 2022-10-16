@@ -106,11 +106,6 @@ public class Cita {
 		return horaS;
 	}
 
-	private int generarId() {
-		int n = (int) (Math.random() * 1000 + 1);
-		return n;
-	}
-
 	public void setNombre(String str) {
 		nombrePaciente = str;
 
