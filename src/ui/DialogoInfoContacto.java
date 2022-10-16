@@ -37,6 +37,8 @@ public class DialogoInfoContacto extends JDialog {
 	public DialogoInfoContacto(GestorCitas gC, int id) {
 		this.gC=gC;
 		setBounds(100, 100, 450, 300);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
 		getContentPane().setLayout(new BorderLayout());
 		{
 			JPanel panelNorte = new JPanel();

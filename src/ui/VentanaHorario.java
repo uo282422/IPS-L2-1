@@ -54,21 +54,21 @@ public class VentanaHorario extends JFrame {
 	private Component horizontalStrut_3;
 	private JPanel pnCbMedicos;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaHorario frame = new VentanaHorario();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					VentanaHorario frame = new VentanaHorario();
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -81,7 +81,7 @@ public class VentanaHorario extends JFrame {
 		this.gM = new GestorMedicos();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 671, 454);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -89,6 +89,7 @@ public class VentanaHorario extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		contentPane.add(getPnHeader(), BorderLayout.PAGE_START);
 		contentPane.add(getSpHorario(), BorderLayout.CENTER);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 	}
 
 	private JPanel getPnHeader() {
@@ -250,5 +251,7 @@ public class VentanaHorario extends JFrame {
 
 	private void abrirDetallesCita(int idCita) {
 		// Abrir la ventana de ManuH
+		VentanaCita vC=new VentanaCita(idCita+"");
+		vC.show();
 	}
 }

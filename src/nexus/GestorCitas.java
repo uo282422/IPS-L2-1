@@ -31,6 +31,7 @@ public class GestorCitas {
 	private String correoProv;
 	private String otrosProv;
 
+	private GestorPacientes gP=new GestorPacientes();
 	public GestorCitas() {
 		this.bd = new DataBase();
 	}
@@ -78,8 +79,9 @@ public class GestorCitas {
 		try {
 			m.setFrom(new InternetAddress(remitente));
 			m.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
-			m.setSubject("Prueba n1");
-			m.setText("Texto");
+			m.setSubject(String.format("Cita urgente %s. Dia %s", gP.getPaciente(c.getIdPaciente()).getNombre(), c.getFecha()));
+			m.setText(String.format("Se ha creado una nueva cita urgente para el paciente %s el dia %s \n"
+					+"La cita se realizará en la sala %s a las %s \n", gP.getPaciente(c.getIdPaciente()).getNombre(), c.getFecha(), c.getSala(), c.getHoraE()));
 
 			Transport t = sesion.getTransport("smtp");
 			t.connect((String) prop.get("mail.smtp.host"), (String) prop.get("mail.smtp.user"),

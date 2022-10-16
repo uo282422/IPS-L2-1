@@ -199,9 +199,7 @@ public class Cita {
 		return urgente;
 	}
 
-	public String getHora() {
-		return horaE.toString();
-	}
+	
 
 //	/*
 //	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato:

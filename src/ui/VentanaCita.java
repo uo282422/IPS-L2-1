@@ -56,22 +56,23 @@ public class VentanaCita extends JFrame {
 	private JLabel lbCausas;
 	private JTextArea txtACausas;
 	private JScrollPane scrCausas;
+	private JButton btVerHistorial;
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					VentanaCita frame = new VentanaCita("401");
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		EventQueue.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					VentanaCita frame = new VentanaCita("401");
+//					frame.setVisible(true);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//			}
+//		});
+//	}
 
 	/**
 	 * Create the frame.
@@ -151,7 +152,7 @@ public class VentanaCita extends JFrame {
 	private JLabel getLbMuestraHora() {
 		if (lbMuestraHora == null) {
 			lbMuestraHora = new JLabel("00:00");
-			lbMuestraHora.setText(c.getHora());
+			lbMuestraHora.setText(c.getHoraE());
 		}
 		return lbMuestraHora;
 	}
@@ -266,6 +267,7 @@ public class VentanaCita extends JFrame {
 			pnAcude.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			pnAcude.add(getLbAcude());
 			pnAcude.add(getChbxAcude());
+			pnAcude.add(getBtVerHistorial());
 		}
 		return pnAcude;
 	}
@@ -335,5 +337,21 @@ public class VentanaCita extends JFrame {
 			scrCausas = new JScrollPane(txtACausas);
 		}
 		return scrCausas;
+	}
+	private JButton getBtVerHistorial() {
+		if (btVerHistorial == null) {
+			btVerHistorial = new JButton("Ver historial");
+			btVerHistorial.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					verHistorial();
+				}
+			});
+		}
+		return btVerHistorial;
+	}
+
+	protected void verHistorial() {
+		HistorialPaciente hP=new HistorialPaciente(c.getIdPaciente());
+		hP.show();
 	}
 }

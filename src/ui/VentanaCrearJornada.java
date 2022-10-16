@@ -29,7 +29,7 @@ import com.toedter.calendar.JCalendar;
 import logic.Medico;
 import util.DataBase;
 
-public class AsignarJornada extends JDialog {
+public class VentanaCrearJornada extends JDialog {
 
 	/**
 	 * 
@@ -52,27 +52,30 @@ public class AsignarJornada extends JDialog {
 	private JPanel semanaPn;
 	private DataBase db = new DataBase();
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		try {
-			AsignarJornada dialog = new AsignarJornada();
-			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-			dialog.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+//	/**
+//	 * Launch the application.
+//	 */
+//	public static void main(String[] args) {
+//		try {
+//			VentanaCrearJornada dialog = new VentanaCrearJornada();
+//			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+//			dialog.setVisible(true);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//	}
 
 	/**
 	 * Create the dialog.
 	 */
-	public AsignarJornada() {
+	public VentanaCrearJornada() {
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
 		setBounds(100, 100, 952, 558);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		
 		{
 			medPn = new JPanel();
 		}

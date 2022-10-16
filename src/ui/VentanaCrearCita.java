@@ -89,8 +89,9 @@ public class VentanaCrearCita extends JFrame {
 		gC = new GestorCitas();
 		gM = new GestorMedicos();
 		gS=new GestorSalas();
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 455, 408);
+		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+
+		setBounds(100, 100, 715, 508);
 		panelPrincipalCrearCita = new JPanel();
 		panelPrincipalCrearCita.setBorder(new EmptyBorder(5, 5, 5, 5));
 		bgUrgente = new ButtonGroup();
