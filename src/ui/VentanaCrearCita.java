@@ -91,7 +91,7 @@ public class VentanaCrearCita extends JFrame {
 		gS=new GestorSalas();
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
-		setBounds(100, 100, 715, 508);
+		setBounds(100, 100, 715, 600);
 		panelPrincipalCrearCita = new JPanel();
 		panelPrincipalCrearCita.setBorder(new EmptyBorder(5, 5, 5, 5));
 		bgUrgente = new ButtonGroup();
