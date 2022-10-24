@@ -14,10 +14,11 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import logic.Cita;
 import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
+import logic.cita.Cita;
+import logic.cita.Enum_acudio;
 import util.DataBase;
 
 public class GestorCitas {
@@ -38,7 +39,7 @@ public class GestorCitas {
 	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int salaId,
 			boolean urg) {
 		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS, urg, salaId, tlfProv, correoProv,
-				otrosProv, false, "");
+				otrosProv, Enum_acudio.NO_FIGURA, "");
 		listaCitas.add(c);
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos));

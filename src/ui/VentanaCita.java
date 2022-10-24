@@ -8,6 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -19,8 +20,9 @@ import javax.swing.JTextArea;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
-import logic.Cita;
+import logic.cita.Cita;
 import nexus.GestorCitas;
+import javax.swing.JRadioButton;
 
 public class VentanaCita extends JFrame {
 
@@ -51,11 +53,15 @@ public class VentanaCita extends JFrame {
 	private JButton btAceptar;
 	private JPanel pnAcude;
 	private JLabel lbAcude;
-	private JCheckBox chbxAcude;
 	private JPanel pnCausas;
 	private JLabel lbCausas;
 	private JTextArea txtACausas;
 	private JScrollPane scrCausas;
+	private JPanel pnRBtAcude;
+	private ButtonGroup rdBtsAcude = new ButtonGroup();
+	private JRadioButton rdBtSiAcude;
+	private JRadioButton rdBtNoAcude;
+	private JRadioButton rdBtNoFiguraAcude;
 
 	/**
 	 * Launch the application.
@@ -255,7 +261,7 @@ public class VentanaCita extends JFrame {
 	 * Llama al gestor para actualizar la cita.
 	 */
 	protected void guardarDatos() {
-		c.setAcudio(chbxAcude.isSelected());
+		//c.setAcudio(chbxAcude.isSelected());
 		c.setCausaCita(txtACausas.getText());
 		gestor.actualizarCita(c);
 	}
@@ -265,7 +271,7 @@ public class VentanaCita extends JFrame {
 			pnAcude = new JPanel();
 			pnAcude.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 			pnAcude.add(getLbAcude());
-			pnAcude.add(getChbxAcude());
+			pnAcude.add(getPnRBtAcude());
 		}
 		return pnAcude;
 	}
@@ -273,33 +279,8 @@ public class VentanaCita extends JFrame {
 	private JLabel getLbAcude() {
 		if (lbAcude == null) {
 			lbAcude = new JLabel("Acude:");
-			lbAcude.setLabelFor(getChbxAcude());
 		}
 		return lbAcude;
-	}
-
-	private JCheckBox getChbxAcude() {
-		if (chbxAcude == null) {
-			chbxAcude = new JCheckBox("");
-			chbxAcude.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					activarCausas(chbxAcude.isSelected());
-				}
-			});
-		}
-		return chbxAcude;
-	}
-
-	/**
-	 * Si se marca la checkbox de que el paciente acudio a la cita, se
-	 * desbloquea el txtArea de causas.
-	 * 
-	 * @param selected boolean conteniendo el estado de la checkbox
-	 */
-	protected void activarCausas(boolean selected) {
-		lbCausas.setEnabled(selected);
-		txtACausas.setEnabled(selected);
-		txtACausas.setEditable(selected);
 	}
 
 	private JPanel getPnCausas() {
@@ -324,8 +305,6 @@ public class VentanaCita extends JFrame {
 	private JTextArea getTxtACausas() {
 		if (txtACausas == null) {
 			txtACausas = new JTextArea();
-			txtACausas.setEnabled(false);
-			txtACausas.setEditable(false);
 		}
 		return txtACausas;
 	}
@@ -335,5 +314,36 @@ public class VentanaCita extends JFrame {
 			scrCausas = new JScrollPane(txtACausas);
 		}
 		return scrCausas;
+	}
+	private JPanel getPnRBtAcude() {
+		if (pnRBtAcude == null) {
+			pnRBtAcude = new JPanel();
+			pnRBtAcude.add(getRdBtNoFiguraAcude());
+			pnRBtAcude.add(getRdBtSiAcude());
+			pnRBtAcude.add(getRdBtNoAcude());
+		}
+		return pnRBtAcude;
+	}
+	private JRadioButton getRdBtSiAcude() {
+		if (rdBtSiAcude == null) {
+			rdBtSiAcude = new JRadioButton("Sí");
+			rdBtsAcude.add(rdBtSiAcude);
+		}
+		return rdBtSiAcude;
+	}
+	private JRadioButton getRdBtNoAcude() {
+		if (rdBtNoAcude == null) {
+			rdBtNoAcude = new JRadioButton("No");
+			rdBtsAcude.add(rdBtNoAcude);
+		}
+		return rdBtNoAcude;
+	}
+	private JRadioButton getRdBtNoFiguraAcude() {
+		if (rdBtNoFiguraAcude == null) {
+			rdBtNoFiguraAcude = new JRadioButton("No figura");
+			rdBtNoFiguraAcude.setSelected(true);
+			rdBtsAcude.add(rdBtNoFiguraAcude);
+		}
+		return rdBtNoFiguraAcude;
 	}
 }

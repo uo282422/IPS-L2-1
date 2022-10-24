@@ -22,10 +22,10 @@ import javax.swing.border.LineBorder;
 
 import com.toedter.calendar.JCalendar;
 
-import logic.Cita;
 import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
+import logic.cita.Cita;
 import nexus.GestorCitas;
 import nexus.GestorMedicos;
 import nexus.GestorPacientes;

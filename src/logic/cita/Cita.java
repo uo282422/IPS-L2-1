@@ -1,11 +1,9 @@
-package logic;
+package logic.cita;
 
 import java.util.Calendar;
 import java.util.Date;
 
 public class Cita {
-
-	
 
 	private int idCita;
 	private int idPaciente;
@@ -15,7 +13,7 @@ public class Cita {
 	private String horaS;
 	private boolean urgente;
 	private int sala;
-	private boolean acudio;
+	private Enum_acudio acudio;
 
 	private int telefonoCita;
 	private String correoCita;
@@ -23,7 +21,7 @@ public class Cita {
 	private String causaCita;
 
 	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
-			int telefono, String correo, String otros, boolean acudio, String causa) {
+			int telefono, String correo, String otros, Enum_acudio acudio, String causa) {
 		this.idCita = id;
 		setIdPaciente(pacienteId);
 		setFecha(fecha);
@@ -136,11 +134,11 @@ public class Cita {
 		return nombrePaciente;
 	}
 
-	public boolean isAcudio() {
+	public Enum_acudio isAcudio() {
 		return acudio;
 	}
 
-	public void setAcudio(boolean acudio) {
+	public void setAcudio(Enum_acudio acudio) {
 		this.acudio = acudio;
 	}
 
@@ -189,10 +187,6 @@ public class Cita {
 
 	public void setSala(int num) {
 		this.sala = num;
-	}
-
-	public void acudio(boolean acudio) {
-		this.acudio = acudio;
 	}
 
 	public boolean urgente() {
