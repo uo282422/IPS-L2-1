@@ -6,22 +6,27 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.SwingConstants;
+import javax.swing.JRadioButton;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.EmptyBorder;
 
 import logic.cita.Cita;
+import logic.cita.Enum_acudio;
 import nexus.GestorCitas;
-import javax.swing.JRadioButton;
 
 public class VentanaCita extends JFrame {
 
@@ -52,33 +57,38 @@ public class VentanaCita extends JFrame {
 	private JButton btAceptar;
 	private JPanel pnAcude;
 	private JLabel lbAcude;
-	private JPanel pnCausas;
-	private JLabel lbCausas;
-	private JTextArea txtACausas;
-	private JScrollPane scrCausas;
 	private JButton btVerHistorial;
 	private JPanel pnRBtAcude;
 	private ButtonGroup rdBtsAcude = new ButtonGroup();
 	private JRadioButton rdBtSiAcude;
 	private JRadioButton rdBtNoAcude;
 	private JRadioButton rdBtNoFiguraAcude;
+	private JPanel pnCausas;
+	private JPanel pnCausasSuperior;
+	private JLabel lbCausas;
+	private JComboBox<String> cmbCausas;
+	private JButton btAñadirCausas;
+	private JButton btEliminarCausas;
+	private JButton btNuevaCausa;
+	private JPanel pnCausasInferior;
+	private JList<String> listCausasAñadidas;
+	private JLabel lbCausasAñadidas;
 
-
-//	/**
-//	 * Launch the application.
-//	 */
-//	public static void main(String[] args) {
-//		EventQueue.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					VentanaCita frame = new VentanaCita("401");
-//					frame.setVisible(true);
-//				} catch (Exception e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		});
-//	}
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					VentanaCita frame = new VentanaCita("401");
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
 	/**
 	 * Create the frame.
@@ -248,6 +258,7 @@ public class VentanaCita extends JFrame {
 			btAceptar = new JButton("Aceptar");
 			btAceptar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					c.setAcudio(acudio());
 					guardarDatos();
 					JOptionPane.showMessageDialog(null,
 							"La información de la cita se ha guaradado.");
@@ -258,12 +269,18 @@ public class VentanaCita extends JFrame {
 		return btAceptar;
 	}
 
+	protected Enum_acudio acudio() {
+		if (rdBtSiAcude.isSelected())
+			return Enum_acudio.ACUDE;
+		else if (rdBtNoAcude.isSelected())
+			return Enum_acudio.NO_ACUDE;
+		return Enum_acudio.NO_FIGURA;
+	}
+
 	/**
 	 * Llama al gestor para actualizar la cita.
 	 */
 	protected void guardarDatos() {
-		//c.setAcudio(chbxAcude.isSelected());
-		c.setCausaCita(txtACausas.getText());
 		gestor.actualizarCita(c);
 	}
 
@@ -285,38 +302,6 @@ public class VentanaCita extends JFrame {
 		return lbAcude;
 	}
 
-	private JPanel getPnCausas() {
-		if (pnCausas == null) {
-			pnCausas = new JPanel();
-			pnCausas.setLayout(new BoxLayout(pnCausas, BoxLayout.Y_AXIS));
-			pnCausas.add(getLbCausas());
-			pnCausas.add(getTxtACausas());
-			pnCausas.add(getScrCausas());
-		}
-		return pnCausas;
-	}
-
-	private JLabel getLbCausas() {
-		if (lbCausas == null) {
-			lbCausas = new JLabel("Causas:");
-			lbCausas.setHorizontalAlignment(SwingConstants.CENTER);
-		}
-		return lbCausas;
-	}
-
-	private JTextArea getTxtACausas() {
-		if (txtACausas == null) {
-			txtACausas = new JTextArea();
-		}
-		return txtACausas;
-	}
-
-	private JScrollPane getScrCausas() {
-		if (scrCausas == null) {
-			scrCausas = new JScrollPane(txtACausas);
-		}
-		return scrCausas;
-	}
 	private JButton getBtVerHistorial() {
 		if (btVerHistorial == null) {
 			btVerHistorial = new JButton("Ver historial");
@@ -330,9 +315,9 @@ public class VentanaCita extends JFrame {
 	}
 
 	protected void verHistorial() {
-		HistorialPaciente hP=new HistorialPaciente(c.getIdPaciente());
+		HistorialPaciente hP = new HistorialPaciente(c.getIdPaciente());
 		hP.show();
-		}
+	}
 
 	private JPanel getPnRBtAcude() {
 		if (pnRBtAcude == null) {
@@ -343,6 +328,7 @@ public class VentanaCita extends JFrame {
 		}
 		return pnRBtAcude;
 	}
+
 	private JRadioButton getRdBtSiAcude() {
 		if (rdBtSiAcude == null) {
 			rdBtSiAcude = new JRadioButton("Sí");
@@ -350,6 +336,7 @@ public class VentanaCita extends JFrame {
 		}
 		return rdBtSiAcude;
 	}
+
 	private JRadioButton getRdBtNoAcude() {
 		if (rdBtNoAcude == null) {
 			rdBtNoAcude = new JRadioButton("No");
@@ -357,6 +344,7 @@ public class VentanaCita extends JFrame {
 		}
 		return rdBtNoAcude;
 	}
+
 	private JRadioButton getRdBtNoFiguraAcude() {
 		if (rdBtNoFiguraAcude == null) {
 			rdBtNoFiguraAcude = new JRadioButton("No figura");
@@ -364,5 +352,139 @@ public class VentanaCita extends JFrame {
 			rdBtsAcude.add(rdBtNoFiguraAcude);
 		}
 		return rdBtNoFiguraAcude;
+	}
+
+	private JPanel getPnCausas() {
+		if (pnCausas == null) {
+			pnCausas = new JPanel();
+			pnCausas.setLayout(new GridLayout(2, 6, 0, 0));
+			pnCausas.add(getPnCausasSuperior());
+			pnCausas.add(getPnCausasInferior());
+		}
+		return pnCausas;
+	}
+
+	/**
+	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la
+	 * lista recibida.
+	 * 
+	 * @param l List<String> con la que se quiere generar el modelo de combo
+	 * @return DefaultComboBoxModel<String> conteniendo la lista recibida.
+	 */
+	private DefaultComboBoxModel<String> setUpComboModel(List<String> l) {
+		String[] array = l.toArray(new String[l.size()]);
+		return new DefaultComboBoxModel<String>(array);
+	}
+
+	private JPanel getPnCausasSuperior() {
+		if (pnCausasSuperior == null) {
+			pnCausasSuperior = new JPanel();
+			pnCausasSuperior.add(getLbCausas());
+			pnCausasSuperior.add(getCmbCausas());
+			pnCausasSuperior.add(getBtAñadirCausas());
+			pnCausasSuperior.add(getBtEliminarCausas());
+			pnCausasSuperior.add(getBtNuevaCausa());
+		}
+		return pnCausasSuperior;
+	}
+
+	private JLabel getLbCausas() {
+		if (lbCausas == null) {
+			lbCausas = new JLabel("Causas");
+		}
+		return lbCausas;
+	}
+
+	private JComboBox<String> getCmbCausas() {
+		if (cmbCausas == null) {
+			cmbCausas = new JComboBox<String>();
+			cmbCausas.setModel(setUpComboModel(gestor.cargarTodasCausas()));
+		}
+		return cmbCausas;
+	}
+
+	private JButton getBtAñadirCausas() {
+		if (btAñadirCausas == null) {
+			btAñadirCausas = new JButton("Añadir");
+			btAñadirCausas.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					addCausa();
+				}
+			});
+		}
+		return btAñadirCausas;
+	}
+
+	protected void addCausa() {
+		c.addCausa((String) cmbCausas.getSelectedItem());
+		updateListaCausas();
+	}
+
+	private void updateListaCausas() {
+		listCausasAñadidas.setModel(toListModel(c.getCausas()));
+	}
+
+	private ListModel<String> toListModel(List<String> l) {
+		DefaultListModel<String> model = new DefaultListModel<>();
+		for (String c : l)
+			model.addElement(c);
+		return model;
+	}
+
+	private JButton getBtEliminarCausas() {
+		if (btEliminarCausas == null) {
+			btEliminarCausas = new JButton("Eliminar");
+			btEliminarCausas.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					deleteCausa();
+				}
+			});
+		}
+		return btEliminarCausas;
+	}
+
+	protected void deleteCausa() {
+		c.deleteCausa((String) cmbCausas.getSelectedItem());
+		updateListaCausas();
+	}
+
+	private JButton getBtNuevaCausa() {
+		if (btNuevaCausa == null) {
+			btNuevaCausa = new JButton("Nueva Causa");
+			btNuevaCausa.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gestor.nuevaCausa(JOptionPane
+							.showInputDialog("Introduzca la nueva causa"));
+				}
+			});
+		}
+		return btNuevaCausa;
+	}
+
+	private JPanel getPnCausasInferior() {
+		if (pnCausasInferior == null) {
+			pnCausasInferior = new JPanel();
+			pnCausasInferior.setLayout(new BorderLayout(0, 0));
+			pnCausasInferior.add(getListCausasAñadidas());
+			pnCausasInferior.add(getLbCausasAñadidas(), BorderLayout.NORTH);
+		}
+		return pnCausasInferior;
+	}
+
+	private JList getListCausasAñadidas() {
+		if (listCausasAñadidas == null) {
+			listCausasAñadidas = new JList<String>();
+			listCausasAñadidas
+					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listCausasAñadidas.setEnabled(false);
+		}
+		return listCausasAñadidas;
+	}
+
+	private JLabel getLbCausasAñadidas() {
+		if (lbCausasAñadidas == null) {
+			lbCausasAñadidas = new JLabel("Causas añadidas:");
+		}
+		return lbCausasAñadidas;
 	}
 }

@@ -2,7 +2,6 @@ package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -82,7 +81,6 @@ public class HistorialPaciente extends JFrame {
 		this.gC = new GestorCitas();
 		this.gS = new GestorSalas();
 
-		
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 802, 919);
 		contentPane = new JPanel();
@@ -97,7 +95,8 @@ public class HistorialPaciente extends JFrame {
 
 	private JLabel getLblTitulo() {
 		if (lblTitulo == null) {
-			lblTitulo = new JLabel(String.format("Historial de %s %s", paciente.getNombre(), paciente.getApellido()));
+			lblTitulo = new JLabel(String.format("Historial de %s %s",
+					paciente.getNombre(), paciente.getApellido()));
 			lblTitulo.setFont(new Font("Cantarell", Font.BOLD, 26));
 		}
 		return lblTitulo;
@@ -151,8 +150,10 @@ public class HistorialPaciente extends JFrame {
 		if (taGeneral == null) {
 			taGeneral = new JTextArea();
 			taGeneral.setEditable(false);
-			taGeneral.setText(String.format("\nNOMBRE:\t%s\nAPELLIDO:\t%s\nCONTACTO:\t%d - %s\nOTROS DATOS:\t%s\n",
-					paciente.getNombre(), paciente.getApellido(), paciente.getTelefono(), paciente.getCorreo(),
+			taGeneral.setText(String.format(
+					"\nNOMBRE:\t%s\nAPELLIDO:\t%s\nCONTACTO:\t%d - %s\nOTROS DATOS:\t%s\n",
+					paciente.getNombre(), paciente.getApellido(),
+					paciente.getTelefono(), paciente.getCorreo(),
 					paciente.getOtrosContactos()));
 		}
 		return taGeneral;
@@ -179,15 +180,20 @@ public class HistorialPaciente extends JFrame {
 			taCitas.setEditable(false);
 			String text = "";
 			for (Cita c : gC.cargarCitasOrdenadas(paciente.getId())) {
-				text += String.format("\nNº CITA:\t%d\nFECHA:\t%s, %s - %s\nMEDICOS:", c.getIdCita(), c.getFecha(), c.getHoraE(), c.getHoraS());
+				text += String.format(
+						"\nNº CITA:\t%d\nFECHA:\t%s, %s - %s\nMEDICOS:",
+						c.getIdCita(), c.getFecha(), c.getHoraE(),
+						c.getHoraS());
 				for (Medico m : gC.cargarMedicos(c.getIdCita())) {
-					text += String.format("\t%s %s\n", m.getNombre(), m.getEmail());
+					text += String.format("\t%s %s\n", m.getNombre(),
+							m.getEmail());
 				}
 				text += c.isUrgente() ? "URGENTE" : "NO URGENTE";
-				text += String.format("\nSALA:\t%s", gS.cargarSala(c.getSala()));
-				text += String.format("\nCONTACTO:\t%s - %s\n", c.getTelefonoCita(), c.getCorreoCita());
+				text += String.format("\nSALA:\t%s",
+						gS.cargarSala(c.getSala()));
+				text += String.format("\nCONTACTO:\t%s - %s\n",
+						c.getTelefonoCita(), c.getCorreoCita());
 				text += c.isAcudio();
-				text += String.format("\nCAUSA:\t%s", c.getCausaCita());
 				text += "\n----------\n";
 			}
 			taCitas.setText(text);
@@ -216,8 +222,10 @@ public class HistorialPaciente extends JFrame {
 			taEnfermedades.setEditable(false);
 			String text = "";
 			for (Enfermedad e : gP.cargarEnfermedades(paciente.getId())) {
-				text += String.format("\nNOMBRE:\t%s\nDESCRIPCION:\t%s\n", e.getNombre(), e.getDescripcion());
-				text += e.isEnCita() ? String.format("CITA:\t%d", e.getIdCita()) : "CITA:\tfuera de cita";
+				text += String.format("\nNOMBRE:\t%s\nDESCRIPCION:\t%s\n",
+						e.getNombre(), e.getDescripcion());
+				text += e.isEnCita() ? String.format("CITA:\t%d", e.getIdCita())
+						: "CITA:\tfuera de cita";
 				text += "\n----------\n";
 			}
 			taEnfermedades.setText(text);
@@ -246,8 +254,10 @@ public class HistorialPaciente extends JFrame {
 			taVacunas.setEditable(false);
 			String text = "";
 			for (Vacuna v : gP.cargarVacunas(paciente.getId())) {
-				text += String.format("\nNOMBRE:\t%s\nDESCRIPCION:\t%s\n", v.getNombre(), v.getDescripcion());
-				text += v.isEnCita() ? String.format("CITA:\t%d", v.getIdCita()) : "CITA:\tfuera de cita";
+				text += String.format("\nNOMBRE:\t%s\nDESCRIPCION:\t%s\n",
+						v.getNombre(), v.getDescripcion());
+				text += v.isEnCita() ? String.format("CITA:\t%d", v.getIdCita())
+						: "CITA:\tfuera de cita";
 				text += "\n----------\n";
 			}
 			taVacunas.setText(text);

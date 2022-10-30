@@ -32,15 +32,17 @@ public class GestorCitas {
 	private String correoProv;
 	private String otrosProv;
 
-	private GestorPacientes gP=new GestorPacientes();
+	private GestorPacientes gP = new GestorPacientes();
+
 	public GestorCitas() {
 		this.bd = new DataBase();
 	}
 
-	public void nuevaCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int salaId,
-			boolean urg) {
-		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS, urg, salaId, tlfProv, correoProv,
-				otrosProv, Enum_acudio.NO_FIGURA, "");
+	public void nuevaCita(int idPaciente, String nombre, String fecha,
+			String horaE, String horaS, int salaId, boolean urg) {
+		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS,
+				urg, salaId, tlfProv, correoProv, otrosProv,
+				Enum_acudio.NO_FIGURA, new ArrayList<String>());
 		listaCitas.add(c);
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos));
@@ -79,13 +81,20 @@ public class GestorCitas {
 		MimeMessage m = new MimeMessage(sesion);
 		try {
 			m.setFrom(new InternetAddress(remitente));
-			m.addRecipient(Message.RecipientType.TO, new InternetAddress(destinatario));
-			m.setSubject(String.format("Cita urgente %s. Dia %s", gP.getPaciente(c.getIdPaciente()).getNombre(), c.getFecha()));
-			m.setText(String.format("Se ha creado una nueva cita urgente para el paciente %s el dia %s \n"
-					+"La cita se realizará en la sala %s a las %s \n", gP.getPaciente(c.getIdPaciente()).getNombre(), c.getFecha(), c.getSala(), c.getHoraE()));
+			m.addRecipient(Message.RecipientType.TO,
+					new InternetAddress(destinatario));
+			m.setSubject(String.format("Cita urgente %s. Dia %s",
+					gP.getPaciente(c.getIdPaciente()).getNombre(),
+					c.getFecha()));
+			m.setText(String.format(
+					"Se ha creado una nueva cita urgente para el paciente %s el dia %s \n"
+							+ "La cita se realizará en la sala %s a las %s \n",
+					gP.getPaciente(c.getIdPaciente()).getNombre(), c.getFecha(),
+					c.getSala(), c.getHoraE()));
 
 			Transport t = sesion.getTransport("smtp");
-			t.connect((String) prop.get("mail.smtp.host"), (String) prop.get("mail.smtp.user"),
+			t.connect((String) prop.get("mail.smtp.host"),
+					(String) prop.get("mail.smtp.user"),
 					(String) prop.get("mail.smtp.clave"));
 			t.sendMessage(m, m.getAllRecipients());
 			t.close();
@@ -133,9 +142,11 @@ public class GestorCitas {
 				(o1, o2) -> (Integer.parseInt(o1.getHoraE().split(":")[0])
 						- Integer.parseInt(o2.getHoraE().split(":")[0]) == 0
 								? Integer.parseInt(o1.getHoraE().split(":")[1])
-										- Integer.parseInt(o2.getHoraE().split(":")[1])
+										- Integer.parseInt(
+												o2.getHoraE().split(":")[1])
 								: Integer.parseInt(o1.getHoraE().split(":")[0])
-										- Integer.parseInt(o2.getHoraE().split(":")[0])));
+										- Integer.parseInt(
+												o2.getHoraE().split(":")[0])));
 
 		// debug
 		for (Cita c : citas) {
@@ -148,23 +159,59 @@ public class GestorCitas {
 	public List<Cita> cargarCitasOrdenadas(int idPaciente) {
 		List<Cita> citas = bd.cargarCitasPorPaciente(idPaciente);
 
-		Collections.sort(citas, (o1, o2) -> (Integer.parseInt(o1.getFecha().split("/")[2]) - Integer.parseInt(o2
-				.getFecha().split("/")[2]) == 0 ? (Integer.parseInt(o1.getFecha().split("/")[1])
-						- Integer.parseInt(o2.getFecha().split("/")[1]) == 0
-								? (Integer.parseInt(o1.getFecha().split("/")[0])
-										- Integer.parseInt(o2.getFecha().split("/")[0]) == 0
-												? (Integer.parseInt(o1.getHoraE().split(":")[0])
-														- Integer.parseInt(o2.getHoraE().split(":")[0]) == 0
-																? Integer.parseInt(o1.getHoraE().split(":")[1])
-																		- Integer.parseInt(o2.getHoraE().split(":")[1])
-																: Integer.parseInt(o1.getHoraE().split(":")[0])
-																		- Integer.parseInt(o2.getHoraE().split(":")[0]))
-												: Integer.parseInt(o1.getFecha().split("/")[0])
-														- Integer.parseInt(o2.getFecha().split("/")[0]))
-								: Integer.parseInt(o1.getFecha().split("/")[1])
-										- Integer.parseInt(o2.getFecha().split("/")[1]))
+		Collections.sort(citas, (o1, o2) -> (Integer
+				.parseInt(o1.getFecha().split("/")[2])
+				- Integer.parseInt(o2.getFecha().split("/")[2]) == 0
+						? (Integer.parseInt(o1.getFecha().split("/")[1])
+								- Integer.parseInt(
+										o2.getFecha().split("/")[1]) == 0
+												? (Integer
+														.parseInt(o1.getFecha()
+																.split("/")[0])
+														- Integer.parseInt(o2
+																.getFecha()
+																.split("/")[0]) == 0
+																		? (Integer
+																				.parseInt(
+																						o1.getHoraE()
+																								.split(":")[0])
+																				- Integer
+																						.parseInt(
+																								o2.getHoraE()
+																										.split(":")[0]) == 0
+																												? Integer
+																														.parseInt(
+																																o1.getHoraE()
+																																		.split(":")[1])
+																														- Integer
+																																.parseInt(
+																																		o2.getHoraE()
+																																				.split(":")[1])
+																												: Integer
+																														.parseInt(
+																																o1.getHoraE()
+																																		.split(":")[0])
+																														- Integer
+																																.parseInt(
+																																		o2.getHoraE()
+																																				.split(":")[0]))
+																		: Integer
+																				.parseInt(
+																						o1.getFecha()
+																								.split("/")[0])
+																				- Integer
+																						.parseInt(
+																								o2.getFecha()
+																										.split("/")[0]))
+												: Integer
+														.parseInt(o1.getFecha()
+																.split("/")[1])
+														- Integer.parseInt(o2
+																.getFecha()
+																.split("/")[1]))
 						: Integer.parseInt(o1.getFecha().split("/")[2])
-								- Integer.parseInt(o2.getFecha().split("/")[2])));
+								- Integer.parseInt(
+										o2.getFecha().split("/")[2])));
 
 		// debug
 		for (Cita c : citas) {
@@ -190,7 +237,8 @@ public class GestorCitas {
 		return otrosProv;
 	}
 
-	public boolean comprobarCitaEnJornada(String fecha, String horaE, String horaS, List<Medico> medicos) {
+	public boolean comprobarCitaEnJornada(String fecha, String horaE,
+			String horaS, List<Medico> medicos) {
 		boolean valido = true;
 		Date fechaCandidato = fechaToDate(fecha);
 		Date horaECandidato = horaToDate(horaE);
@@ -205,8 +253,10 @@ public class GestorCitas {
 //				System.out.println("inicio de jornada"+fechaInicialJornada.toString());
 //				System.out.println("fin de jornada"+fechaFinalJornada.toString());
 
-				if (fechaCandidato.after(fechaInicialJornada) && fechaCandidato.before(fechaFinalJornada)) {
-					// si la fecha candidato esta dentro de la jornada es valido de momento
+				if (fechaCandidato.after(fechaInicialJornada)
+						&& fechaCandidato.before(fechaFinalJornada)) {
+					// si la fecha candidato esta dentro de la jornada es valido
+					// de momento
 //					System.out.println("Fecha en jornada");
 				} else
 					valido = false;
@@ -217,8 +267,10 @@ public class GestorCitas {
 //				System.out.println("hora final candidato"+horaSCandidato);
 //				System.out.println("hora inicial jornada"+ horaInicialJornada);
 //				System.out.println("hora final jornada"+ horaFinalJornada);
-				if (horaECandidato.after(horaInicialJornada) && horaECandidato.before(horaFinalJornada)
-						&& horaSCandidato.after(horaInicialJornada) && horaSCandidato.before(horaFinalJornada)) {
+				if (horaECandidato.after(horaInicialJornada)
+						&& horaECandidato.before(horaFinalJornada)
+						&& horaSCandidato.after(horaInicialJornada)
+						&& horaSCandidato.before(horaFinalJornada)) {
 					// si la inicial candidato es despues de la inicial y antes
 					// de la final
 
@@ -236,17 +288,20 @@ public class GestorCitas {
 		return valido;
 	}
 
-	public boolean comprobarCitasEnHorario(String fecha, String horaE, String horaS, ArrayList<Medico> medicos) {
+	public boolean comprobarCitasEnHorario(String fecha, String horaE,
+			String horaS, ArrayList<Medico> medicos) {
 		boolean valido = true;
 		Date horaECandidato = horaToDate(horaE);
 		Date horaSCandidato = horaToDate(horaS);
 		for (Medico m : medicos) {
-			List<Cita> citasDeMedico = bd.getCitasPorMedicoYFecha(m.getId(), fecha);
+			List<Cita> citasDeMedico = bd.getCitasPorMedicoYFecha(m.getId(),
+					fecha);
 			for (Cita c : citasDeMedico) {
 				Date horaInicialCitaPuesta = horaToDate(c.getHoraE());
 				Date horaFinalCitaPuesta = horaToDate(c.getHoraS());
-				if ((horaECandidato.after(horaFinalCitaPuesta)
-						|| horaSCandidato.before(horaInicialCitaPuesta)) == false)// si no se cumple
+				if ((horaECandidato.after(horaFinalCitaPuesta) || horaSCandidato
+						.before(horaInicialCitaPuesta)) == false)// si no se
+																	// cumple
 					valido = false;
 			}
 		}
@@ -256,8 +311,9 @@ public class GestorCitas {
 
 	/*
 	 * <<<<<<< HEAD Pasa del string guardado en bd a un objeto del tipo fecha
-	 * Formato: DD/MM/YYYY 0 1 2 ======= Pasa del string guardado en bd a un objeto
-	 * del tipo fecha Formato: DD/MM/YYYY 0 1 2 >>>>>>> refs/remotes/origin/master
+	 * Formato: DD/MM/YYYY 0 1 2 ======= Pasa del string guardado en bd a un
+	 * objeto del tipo fecha Formato: DD/MM/YYYY 0 1 2 >>>>>>>
+	 * refs/remotes/origin/master
 	 */
 	public Date fechaToDate(String fecha) {
 		String[] sep = fecha.split("/");
@@ -299,6 +355,16 @@ public class GestorCitas {
 	 */
 	public void actualizarCita(Cita c) {
 		bd.actualizarCita(c);
+	}
+
+	public List<String> cargarTodasCausas() {
+		// TODO Auto-generated method stub
+		return bd.cargarTodasCausas();
+	}
+
+	public void nuevaCausa(String causa) {
+		bd.nuevaCausa(causa);
+
 	}
 
 }
