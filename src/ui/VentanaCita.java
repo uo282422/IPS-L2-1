@@ -325,7 +325,7 @@ public class VentanaCita extends JFrame {
 
 	private JTextArea getTxtACausas() {
 		if (txtACausas == null) {
-			txtACausas = new JTextArea();
+			txtACausas = new JTextArea();//
 			txtACausas.setEnabled(false);
 			txtACausas.setEditable(false);
 		}

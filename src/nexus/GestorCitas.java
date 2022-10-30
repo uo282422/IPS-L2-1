@@ -43,6 +43,7 @@ public class GestorCitas {
 		listaCitas.add(c);
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos));
+		
 
 		if (urg)
 			enviarCorreo(c);
@@ -97,18 +98,15 @@ public class GestorCitas {
 
 	}
 
-	public boolean agregarMedico(Medico medicoNuevo) {
-		for (Medico m : medicos) {
-			if (m.getId().equals(medicoNuevo.getId()))
-				return true;
-		}
+	public void agregarMedico(Medico medicoNuevo) {
+		
 		medicos.add(medicoNuevo);
-		return false;
 	}
 
 	public ArrayList<Medico> getMedicosAgregados() {
 		return new ArrayList<Medico>(medicos);
 	}
+	
 
 	public void añadirInfoContactoProv(Paciente paciente) {
 		this.tlfProv = paciente.getTelefono();
@@ -299,5 +297,6 @@ public class GestorCitas {
 	public void actualizarCita(Cita c) {
 		bd.actualizarCita(c);
 	}
+
 
 }

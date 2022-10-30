@@ -1,14 +1,14 @@
 package ui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.util.ArrayList;
 
-import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -71,15 +71,18 @@ public class VentanaCrearCita extends JFrame {
 	private JLabel lbHoraSalida;
 	private JFormattedTextField tfHoraSalida;
 	private JPanel panelMedicos;
-	private JLabel lblMedico;
 	private JComboBox<Medico> cbMedicos;
 	private JPanel panelAdd;
 	private JButton btAdd;
+	private JComboBox<Sala> cbSala;
+	private JButton btMotivos;
+	private JPanel panelAgregarMedicos;
+	private JButton btAñadirMedicos;
 	private JPanel panelMedicosAgregados;
 	private JTextArea taMedicos;
-	private Component horizontalStrut;
-	private Component horizontalStrut_1;
-	private JComboBox<Sala> cbSala;
+	private JLabel ln0;
+	
+	private ArrayList<Medico>medicosAgregados;
 
 	/**
 	 * Create the frame.
@@ -90,7 +93,7 @@ public class VentanaCrearCita extends JFrame {
 		gM = new GestorMedicos();
 		gS=new GestorSalas();
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-
+		medicosAgregados=new ArrayList<>();
 		setBounds(100, 100, 715, 600);
 		panelPrincipalCrearCita = new JPanel();
 		panelPrincipalCrearCita.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -105,13 +108,13 @@ public class VentanaCrearCita extends JFrame {
 		if (panelCampos == null) {
 			panelCampos = new JPanel();
 			panelCampos.setLayout(new GridLayout(0, 1, 10, 10));
-			panelCampos.add(getPanelMedicos());
-			panelCampos.add(getPanelMedicosAgregados());
 			panelCampos.add(getPanelPaciente());
 			panelCampos.add(getPanelHoraEntrada());
 			panelCampos.add(getPanelHoraSalida());
 			panelCampos.add(getPanelFecha());
 			panelCampos.add(getPanelSala());
+			panelCampos.add(getPanelAgregarMedicos1());
+			panelCampos.add(getPanelMedicosAgregados_1());
 			panelCampos.add(getPanelUrgente());
 			panelCampos.add(getPanelBotonCrear());
 		}
@@ -249,6 +252,7 @@ public class VentanaCrearCita extends JFrame {
 			bgUrgente.add(getRbNo());
 			panelRb.add(getRbSi());
 			panelRb.add(getRbNo());
+			
 
 		}
 		return panelRb;
@@ -264,6 +268,7 @@ public class VentanaCrearCita extends JFrame {
 	private JRadioButton getRbNo() {
 		if (rbNo == null) {
 			rbNo = new JRadioButton("No");
+			rbNo.setSelected(true);
 		}
 		return rbNo;
 	}
@@ -287,6 +292,7 @@ public class VentanaCrearCita extends JFrame {
 	private JPanel getPanelBotonCrear() {
 		if (panelBotonCrear == null) {
 			panelBotonCrear = new JPanel();
+			panelBotonCrear.add(getBtMotivos());
 			panelBotonCrear.add(getBtCrear());
 		}
 		return panelBotonCrear;
@@ -308,6 +314,7 @@ public class VentanaCrearCita extends JFrame {
 
 	protected void comprobarYCrear() {
 		boolean valido = true;
+		
 		if(gC.getMedicosAgregados().size()==0) {
 			valido=false;
 			new JOptionPane().showMessageDialog(this, "Error, No hay medicos agregados");
@@ -329,7 +336,7 @@ public class VentanaCrearCita extends JFrame {
 			new JOptionPane().showMessageDialog(this, "Error, la fecha y horas escritas no están en la jornada de los medicos seleccionados");
 		}
 			
-		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, gM.getMedicos())==false) {
+		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, getgM().getMedicos())==false) {
 			valido=false;
 			new JOptionPane().showMessageDialog(this, "Error, alguno de los medicos asignados ya tienen citas asignadas para el perido establecido");
 
@@ -369,6 +376,7 @@ public class VentanaCrearCita extends JFrame {
 		getCbSala().setSelectedIndex(0);
 		getRbSi().setSelected(false);
 		getRbNo().setSelected(false);
+		getTaMedicos().setText("");
 		
 
 	}
@@ -463,100 +471,6 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return tfHoraSalida;
 	}
-
-	private JPanel getPanelMedicos() {
-		if (panelMedicos == null) {
-			panelMedicos = new JPanel();
-			panelMedicos.setLayout(new GridLayout(0, 3, 10, 0));
-			panelMedicos.add(getLblMedico());
-			panelMedicos.add(getCbMedicos());
-			panelMedicos.add(getPanelAdd());
-		}
-		return panelMedicos;
-	}
-
-	private JLabel getLblMedico() {
-		if (lblMedico == null) {
-			lblMedico = new JLabel("Medicos:");
-			lblMedico.setHorizontalAlignment(SwingConstants.RIGHT);
-		}
-		return lblMedico;
-	}
-
-	private JComboBox<Medico> getCbMedicos() {
-		if (cbMedicos == null) {
-			cbMedicos = new JComboBox<Medico>();
-			for (Medico m : gM.getMedicos()) {
-				cbMedicos.addItem(m);
-			}
-		}
-		return cbMedicos;
-	}
-
-	private JPanel getPanelAdd() {
-		if (panelAdd == null) {
-			panelAdd = new JPanel();
-			panelAdd.add(getBtAdd());
-		}
-		return panelAdd;
-	}
-
-	private JButton getBtAdd() {
-		if (btAdd == null) {
-			btAdd = new JButton("Agregar");
-			btAdd.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					moverMedicoATxtArea();
-				}
-			});
-		}
-		return btAdd;
-	}
-
-	private void moverMedicoATxtArea() {
-		if (gC.agregarMedico((Medico) getCbMedicos().getSelectedItem())) {
-			JOptionPane.showMessageDialog(this, "Este medico ya se ha agregado");
-		}
-		StringBuilder sb = new StringBuilder("");
-		for (Medico m : gC.getMedicosAgregados()) {
-			sb.append(m + "\n");
-		}
-		getTaMedicos().setText(sb.toString());
-	}
-
-	private JPanel getPanelMedicosAgregados() {
-		if (panelMedicosAgregados == null) {
-			panelMedicosAgregados = new JPanel();
-			panelMedicosAgregados.setLayout(new GridLayout(0, 3, 0, 0));
-			panelMedicosAgregados.add(getHorizontalStrut());
-			panelMedicosAgregados.add(getTaMedicos());
-			panelMedicosAgregados.add(getHorizontalStrut_1());
-		}
-		return panelMedicosAgregados;
-	}
-
-	private JTextArea getTaMedicos() {
-		if (taMedicos == null) {
-			taMedicos = new JTextArea();
-			taMedicos.setText("Aun no se han agregado medicos");
-			taMedicos.setRows(10);
-		}
-		return taMedicos;
-	}
-
-	private Component getHorizontalStrut() {
-		if (horizontalStrut == null) {
-			horizontalStrut = Box.createHorizontalStrut(20);
-		}
-		return horizontalStrut;
-	}
-
-	private Component getHorizontalStrut_1() {
-		if (horizontalStrut_1 == null) {
-			horizontalStrut_1 = Box.createHorizontalStrut(20);
-		}
-		return horizontalStrut_1;
-	}
 	private JComboBox<Sala> getCbSala() {
 		if (cbSala == null) {
 			cbSala = new JComboBox<Sala>();
@@ -571,4 +485,84 @@ public class VentanaCrearCita extends JFrame {
 		}
 		
 	}
+	private JButton getBtMotivos() {
+		if (btMotivos == null) {
+			btMotivos = new JButton("Añadir Motivos Cita");
+		}
+		return btMotivos;
+	}
+
+	protected void abrirVentanaMedicos() {
+		VentanaAñadirMedicos vam=new VentanaAñadirMedicos(this);
+		vam.setVisible(true);
+		
+	}
+
+	public GestorMedicos getgM() {
+		return gM;
+	}
+
+	public ArrayList<String> getEspecialidades() {
+		return gM.getListaEspecialidades();
+	}
+	private JPanel getPanelAgregarMedicos1() {
+		if (panelAgregarMedicos == null) {
+			panelAgregarMedicos = new JPanel();
+			FlowLayout flowLayout = (FlowLayout) panelAgregarMedicos.getLayout();
+			panelAgregarMedicos.add(getBtAñadirMedicos());
+		}
+		return panelAgregarMedicos;
+	}
+	private JButton getBtAñadirMedicos() {
+		if (btAñadirMedicos == null) {
+			btAñadirMedicos = new JButton("Añadir médicos");
+			btAñadirMedicos.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaCrearMedicos();
+				}
+			});
+		}
+		return btAñadirMedicos;
+	}
+	protected void abrirVentanaCrearMedicos() {
+		VentanaAñadirMedicos vam=new VentanaAñadirMedicos(this);
+		vam.setVisible(true);
+		
+	}
+
+	private JPanel getPanelMedicosAgregados_1() {
+		if (panelMedicosAgregados == null) {
+			panelMedicosAgregados = new JPanel();
+			panelMedicosAgregados.setBorder(null);
+			panelMedicosAgregados.setLayout(new GridLayout(0, 3, 0, 0));
+			panelMedicosAgregados.add(getLn0());
+			panelMedicosAgregados.add(getTaMedicos());
+		}
+		return panelMedicosAgregados;
+	}
+	public JTextArea getTaMedicos() {
+		if (taMedicos == null) {
+			taMedicos = new JTextArea();
+			taMedicos.setAutoscrolls(false);
+		}
+		return taMedicos;
+	}
+	private JLabel getLn0() {
+		if (ln0 == null) {
+			ln0 = new JLabel("");
+		}
+		return ln0;
+	}
+
+	public void agregarMedico(String id) {
+		for(Medico m:gM.getMedicos()) {
+			if(m.getId()==id) {//si el str es un medico se le asocia a la cita
+				gC.agregarMedico(m);
+			}
+			
+		}
+		
+		
+	}
+
 }

@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import logic.Cita;
@@ -46,8 +47,9 @@ public class DataBase {
 					String nombre = rs.getString("medico_nombre");
 					String apellido = rs.getString("medico_apellido");
 					String email = rs.getString("medico_email");
+					String esp = rs.getString("medico_especialidad");
 
-					medicos.add(new Medico(id, nombre, apellido, email));
+					medicos.add(new Medico(id, nombre, apellido, email, esp));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -196,6 +198,8 @@ public class DataBase {
 					pst.setString(2, cita.getIdCita() + "");
 					pst.execute();
 				}
+				
+				
 
 			} catch (SQLException e) {
 				throw new Error("Error al linkear medico-cita", e);
@@ -458,8 +462,10 @@ public class DataBase {
 					String nombre = rs.getString("MEDICO_NOMBRE");
 					String apellido = rs.getString("MEDICO_APELLIDO");
 					String email = rs.getString("MEDICO_EMAIL");
+					String esp = rs.getString("MEDICO_ESPECIALIDAD");
 
-					medicos.add(new Medico(id, nombre, apellido, email));
+
+					medicos.add(new Medico(id, nombre, apellido, email, esp));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -683,5 +689,35 @@ public class DataBase {
 
 	private int boolToBit(boolean b) {
 		return b ? 1 : 0;
+	}
+
+	public List<String> cargarEspecialidades() {
+		ArrayList<String> especialidades = new ArrayList<String>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement pst = conn.prepareStatement(
+					"select distinct medico_especialidad from medico");
+			try {
+				
+
+				ResultSet rs = pst.executeQuery();
+
+				while (rs.next()) {
+					if(!especialidades.contains(rs.getString("medico_especialidad"))) {
+						especialidades.add(rs.getString("medico_especialidad"));
+					}
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+
+		return especialidades;
 	}
 }
