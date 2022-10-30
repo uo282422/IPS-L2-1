@@ -9,13 +9,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import logic.Cita;
 import logic.Enfermedad;
 import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
 import logic.Vacuna;
+import logic.cita.Cita;
+import logic.cita.Enum_acudio;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";
@@ -180,7 +181,7 @@ public class DataBase {
 				pst.setString(8, cita.getTelefonoCita() + "");
 				pst.setString(9, cita.getCorreoCita());
 				pst.setString(10, cita.getOtrosCita());
-				pst.setBoolean(11, cita.isAcudio());
+				pst.setInt(11, serializeAcudio(cita.isAcudio()));
 				pst.setString(12, cita.getCausaCita());
 				pst.execute();
 
@@ -206,6 +207,17 @@ public class DataBase {
 
 		} catch (SQLException e) {
 			throw new Error("Problem", e);
+		}
+	}
+
+	private int serializeAcudio(Enum_acudio acudio) {
+		switch (acudio) {
+		case ACUDE:
+			return 1;
+		case NO_ACUDE:
+			return 2;
+		default:
+			return 0;
 		}
 	}
 
@@ -313,10 +325,10 @@ public class DataBase {
 					int telefonoCita = Integer.parseInt(rs.getString("cita_telefono"));
 					String correoCita = rs.getString("cita_correo");
 					String otrosCita = rs.getString("cita_otros");
-					boolean acudio = rs.getBoolean("cita_acudio");
+					int acudio = rs.getInt("cita_acudio");
 					String causa = rs.getString("cita_causa");
 					c = new Cita(idI, idPaciente, fecha, hora_inicio, hora_fin, urgente, sala, telefonoCita, correoCita,
-							otrosCita, acudio, causa);
+							otrosCita, parseAcudio(acudio), causa);
 					c.setNombrePaciente(nombrePaciente);
 					c.setIdCita(Integer.parseInt(id));
 				}
@@ -332,6 +344,14 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 		return c;
+	}
+
+	private Enum_acudio parseAcudio(int acudio) {
+		switch (acudio) {
+		case 1: return Enum_acudio.ACUDE;
+		case 2: return Enum_acudio.NO_ACUDE;
+		default: return Enum_acudio.NO_FIGURA;
+		}
 	}
 
 	/**
@@ -421,11 +441,11 @@ public class DataBase {
 					String telefono = rs.getString("CITA_TELEFONO");
 					String correo = rs.getString("CITA_CORREO");
 					String otros = rs.getString("CITA_OTROS");
-					boolean acudio = rs.getBoolean("CITA_ACUDIO");
+					int acudio = rs.getInt("CITA_ACUDIO");
 					String causa = rs.getString("CITA_CAUSA");
 
 					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, acudio, causa));
+							correo, otros, parseAcudio(acudio), causa));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -588,11 +608,11 @@ public class DataBase {
 					String telefono = rs.getString("CITA_TELEFONO");
 					String correo = rs.getString("CITA_CORREO");
 					String otros = rs.getString("CITA_OTROS");
-					boolean acudio = rs.getBoolean("CITA_ACUDIO");
+					int acudio = rs.getInt("CITA_ACUDIO");
 					String causa = rs.getString("CITA_CAUSA");
 
 					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, acudio, causa));
+							correo, otros, parseAcudio(acudio), causa));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -619,7 +639,7 @@ public class DataBase {
 			try {
 				s.executeUpdate(String.format(GUARDAR_CITA, c.getIdCita(), c.getIdPaciente(), c.getFecha(),
 						c.getHoraE(), c.getHoraS(), boolToBit(c.isUrgente()), c.getSala(), c.getTelefonoCita(),
-						c.getCorreoCita(), c.getOtrosCita(), boolToBit(c.isAcudio()), c.getCausaCita()));
+						c.getCorreoCita(), c.getOtrosCita(), serializeAcudio(c.isAcudio()), c.getCausaCita()));
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {
@@ -641,7 +661,7 @@ public class DataBase {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			Statement s = conn.createStatement();
 			try {
-				s.executeUpdate(String.format(ACTUALIZAR_CITA_ACUDE, boolToBit(c.isAcudio()), c.getIdCita()));
+				s.executeUpdate(String.format(ACTUALIZAR_CITA_ACUDE, serializeAcudio(c.isAcudio()), c.getIdCita()));
 				s.executeUpdate(String.format(ACTUALIZAR_CITA_CAUSAS, c.getCausaCita(), c.getIdCita()));
 			} catch (SQLException e) {
 				throw new Error("Problem", e);

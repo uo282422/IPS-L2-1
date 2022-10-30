@@ -17,11 +17,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
-import logic.Cita;
 import logic.Enfermedad;
 import logic.Medico;
 import logic.Paciente;
 import logic.Vacuna;
+import logic.cita.Cita;
 import nexus.GestorCitas;
 import nexus.GestorPacientes;
 import nexus.GestorSalas;
@@ -186,7 +186,7 @@ public class HistorialPaciente extends JFrame {
 				text += c.isUrgente() ? "URGENTE" : "NO URGENTE";
 				text += String.format("\nSALA:\t%s", gS.cargarSala(c.getSala()));
 				text += String.format("\nCONTACTO:\t%s - %s\n", c.getTelefonoCita(), c.getCorreoCita());
-				text += c.isAcudio() ? "ACUDIO" : "NO ACUDIO";
+				text += c.isAcudio();
 				text += String.format("\nCAUSA:\t%s", c.getCausaCita());
 				text += "\n----------\n";
 			}
