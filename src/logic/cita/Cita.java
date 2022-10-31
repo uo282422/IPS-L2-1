@@ -1,11 +1,11 @@
-package logic;
+package logic.cita;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class Cita {
-
-	
 
 	private int idCita;
 	private int idPaciente;
@@ -15,15 +15,17 @@ public class Cita {
 	private String horaS;
 	private boolean urgente;
 	private int sala;
-	private boolean acudio;
+	private Enum_acudio acudio;
+	private List<String> causas;
 
 	private int telefonoCita;
 	private String correoCita;
 	private String otrosCita;
-	private String causaCita;
 
-	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
-			int telefono, String correo, String otros, boolean acudio, String causa) {
+	public Cita(int id, int pacienteId, String fecha, String horaI,
+			String horaF, boolean urgente, int salaId, int telefono,
+			String correo, String otros, Enum_acudio acudio,
+			List<String> causas) {
 		this.idCita = id;
 		setIdPaciente(pacienteId);
 		setFecha(fecha);
@@ -34,10 +36,8 @@ public class Cita {
 		this.telefonoCita = telefono;
 		this.correoCita = correo;
 		this.otrosCita = otros;
-		this.acudio = acudio;
-		this.causaCita = causa;
+		this.causas = causas;
 	}
-	
 
 	private void setHoraS(String hs) {
 		this.horaS = hs;
@@ -56,6 +56,7 @@ public class Cita {
 	public String getDia() {
 		return fecha;
 	}
+
 	public int getSala() {
 		return sala;
 	}
@@ -101,21 +102,13 @@ public class Cita {
 		this.otrosCita = otrosCita;
 	}
 
-	public String getCausaCita() {
-		return causaCita;
-	}
-
-	public void setCausaCita(String causaCita) {
-		this.causaCita = causaCita;
-	}
-
 	public void setNombrePaciente(String nombrePaciente) {
 		this.nombrePaciente = nombrePaciente;
 	}
 
 	/*
-	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato: DD/MM/YYYY
-	 * 0 1 2
+	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato:
+	 * DD/MM/YYYY 0 1 2
 	 */
 	public Date fechaToDate(String fecha) {
 		String[] sep = fecha.split("/");
@@ -136,11 +129,11 @@ public class Cita {
 		return nombrePaciente;
 	}
 
-	public boolean isAcudio() {
+	public Enum_acudio isAcudio() {
 		return acudio;
 	}
 
-	public void setAcudio(boolean acudio) {
+	public void setAcudio(Enum_acudio acudio) {
 		this.acudio = acudio;
 	}
 
@@ -150,10 +143,13 @@ public class Cita {
 
 	@Override
 	public String toString() {
-		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente + ", nombrePaciente=" + nombrePaciente
-				+ ", fecha=" + fecha + ", horaE=" + horaE + ", horaS=" + horaS + ", urgente=" + urgente + ", sala="
-				+ sala + ", acudio=" + acudio + ", telefonoCita=" + telefonoCita + ", correoCita=" + correoCita
-				+ ", otrosCita=" + otrosCita + ", causaCita=" + causaCita + "]";
+		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente
+				+ ", nombrePaciente=" + nombrePaciente + ", fecha=" + fecha
+				+ ", horaE=" + horaE + ", horaS=" + horaS + ", urgente="
+				+ urgente + ", sala=" + sala + ", acudio=" + acudio
+				+ ", telefonoCita=" + telefonoCita + ", correoCita="
+				+ correoCita + ", otrosCita=" + otrosCita + ", causaCita="
+				+ causas + "]";
 	}
 
 	/*
@@ -181,8 +177,6 @@ public class Cita {
 		return urgente;
 	}
 
-	
-
 	public void setUrgente(boolean u) {
 		urgente = u;
 	}
@@ -191,15 +185,13 @@ public class Cita {
 		this.sala = num;
 	}
 
-	public void acudio(boolean acudio) {
-		this.acudio = acudio;
-	}
-
 	public boolean urgente() {
 		return urgente;
 	}
 
-	
+	public String getHora() {
+		return horaE.toString();
+	}
 
 //	/*
 //	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato:
@@ -236,6 +228,22 @@ public class Cita {
 
 	public String parseFecha() {
 		return fecha.toString();
+	}
+
+	public List<String> getCausas() {
+		return new ArrayList<String>(causas);
+	}
+
+	public void setCausas(List<String> causas) {
+		this.causas = causas;
+	}
+
+	public void addCausa(String c) {
+		causas.add(c);
+	}
+
+	public void deleteCausa(String c) {
+		causas.remove(c);
 	}
 
 }

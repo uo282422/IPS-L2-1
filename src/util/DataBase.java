@@ -10,13 +10,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import logic.Cita;
 import logic.Enfermedad;
 import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
 import logic.Vacuna;
+import logic.cita.Cita;
+import logic.cita.Enum_acudio;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";
@@ -25,11 +26,14 @@ public class DataBase {
 
 	private static final String QUERY_CITA_CON_ID = "SELECT * FROM cita WHERE cita_id = ?";
 	private static final String QUERY_NOMBRE_PACIENTE_CON_ID = "SELECT paciente_nombre FROM paciente WHERE paciente_id = ?";
-	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES ('%d', '%d', '%s', '%s', '%s', '%d', '%d', '%d', '%s', '%s', '%d', '%s')";
-	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')";
-	private static final String ACTUALIZAR_CITA_ACUDE = "UPDATE cita SET cita_acudio = '%d' WHERE cita_id = '%d'";
-	private static final String ACTUALIZAR_CITA_CAUSAS = "UPDATE cita SET cita_causa = '%s' WHERE cita_id = '%d'";
+	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES (?, ?, ?, ?, ?, ?, ?)";
+	private static final String ACTUALIZAR_CITA_ACUDE = "UPDATE cita SET cita_acudio = ? WHERE cita_id = ?";
 	private static final String QUERY_ID_JORNADA = "SELECT jornada_id FROM jornada";
+	private static final String QUERY_CAUSAS = "SELECT causa FROM causacita WHERE cita_id = ?";
+	private static final String ACTUALIZAR_CAUSAS = "INSERT INTO causacita (cita_id, causa) VALUES(?,?)";
+	private static final String QUERY_ALL_CAUSAS = "SELECT causa FROM causa";
+	private static final String NUEVA_CAUSA = "INSERT INTO causa VALUES(?)";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -70,7 +74,9 @@ public class DataBase {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			Statement s = conn.createStatement();
 			try {
-				ResultSet rs = s.executeQuery("select * from jornada where jornada_medico_id='" + medId + "'");
+				ResultSet rs = s.executeQuery(
+						"select * from jornada where jornada_medico_id='"
+								+ medId + "'");
 				while (rs.next()) {
 					String id = rs.getString("jornada_id");
 					String dias = rs.getString("jornada_dias");
@@ -79,7 +85,8 @@ public class DataBase {
 					String diaI = rs.getString("jornada_dia_inicio");
 					String diaF = rs.getString("jornada_dia_fin");
 
-					jornadas.add(new Jornada(id, dias, horaI, horaF, diaI, diaF, medId));
+					jornadas.add(new Jornada(id, dias, horaI, horaF, diaI, diaF,
+							medId));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -151,8 +158,9 @@ public class DataBase {
 					// correo + otros);
 
 					if (valido)
-						pacientes.add(new Paciente(Integer.parseInt(id), nombre, apellido, Integer.parseInt(telefono),
-								correo, otros));
+						pacientes.add(new Paciente(Integer.parseInt(id), nombre,
+								apellido, Integer.parseInt(telefono), correo,
+								otros));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -170,7 +178,8 @@ public class DataBase {
 	public void crearCita(Cita cita, ArrayList<Medico> medicos) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
+			PreparedStatement pst = conn.prepareStatement(
+					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
 			try {
 				pst.setString(1, cita.getIdCita() + "");
 				pst.setString(2, cita.getIdPaciente() + "");
@@ -182,8 +191,8 @@ public class DataBase {
 				pst.setString(8, cita.getTelefonoCita() + "");
 				pst.setString(9, cita.getCorreoCita());
 				pst.setString(10, cita.getOtrosCita());
-				pst.setBoolean(11, cita.isAcudio());
-				pst.setString(12, cita.getCausaCita());
+				pst.setInt(11, serializeAcudio(cita.isAcudio()));
+				setCausas(cita.getIdCita(), cita.getCausas());
 				pst.execute();
 
 			} catch (SQLException e) {
@@ -213,13 +222,44 @@ public class DataBase {
 		}
 	}
 
+	private void setCausas(int idCita, List<String> causas) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement pst = conn.prepareStatement(ACTUALIZAR_CAUSAS);
+			for (String c : causas) {
+				try {
+					pst.setString(1, idCita + "");
+					pst.setString(2, c);
+					pst.execute();
+
+				} catch (SQLException e) {
+					throw new Error("Error al meter la cita", e);
+				}
+			}
+
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	private int serializeAcudio(Enum_acudio acudio) {
+		switch (acudio) {
+		case ACUDE:
+			return 1;
+		case NO_ACUDE:
+			return 2;
+		default:
+			return 0;
+		}
+	}
+
 	public Paciente cargarPacientePorId(int idPaciente) {
 
 		Paciente paciente = null;
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
-			PreparedStatement pst = conn.prepareStatement("select * from paciente where paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from paciente where paciente_id = ?");
 
 			try {
 
@@ -231,11 +271,13 @@ public class DataBase {
 					int id = Integer.parseInt(rs.getString("PACIENTE_ID"));
 					String nombre = rs.getString("PACIENTE_NOMBRE");
 					String apellido = rs.getString("PACIENTE_APELLIDO");
-					int telefono = Integer.parseInt(rs.getString("PACIENTE_TELEFONO"));
+					int telefono = Integer
+							.parseInt(rs.getString("PACIENTE_TELEFONO"));
 					String correo = rs.getString("PACIENTE_CORREO");
 					String otros = rs.getString("PACIENTE_OTROS");
 
-					paciente = new Paciente(id, nombre, apellido, telefono, correo, otros);
+					paciente = new Paciente(id, nombre, apellido, telefono,
+							correo, otros);
 				}
 
 				rs.close();
@@ -277,10 +319,16 @@ public class DataBase {
 	 */
 	public void guardarJornada(Jornada j) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			Statement s = conn.createStatement();
+			PreparedStatement s = conn.prepareStatement(GUARDAR_JORNADA);
 			try {
-				s.executeUpdate(String.format(GUARDAR_JORNADA, j.getId(), j.getDias(), j.getHoraComienzo(),
-						j.getHoraFinal(), j.getDiaInicio(), j.getDiaFinal(), j.getMedico().getId()));
+				s.setString(1, j.getId());
+				s.setString(2, j.getDias());
+				s.setString(3, j.getHoraComienzo());
+				s.setString(4, j.getHoraFinal());
+				s.setString(5, j.getDiaInicio());
+				s.setString(6, j.getDiaFinal());
+				s.setString(7, j.getMedico().getId());
+				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {
@@ -307,20 +355,23 @@ public class DataBase {
 				ResultSet rs = ps.executeQuery();
 				while (rs.next()) {
 					int idI = Integer.parseInt(id);
-					int idPaciente = Integer.parseInt(rs.getString("cita_paciente_id"));
+					int idPaciente = Integer
+							.parseInt(rs.getString("cita_paciente_id"));
 					String fecha = rs.getString("cita_fecha");
 					String hora_inicio = rs.getString("cita_hora_inicio");
 					String hora_fin = rs.getString("cita_hora_fin");
 					boolean urgente = rs.getBoolean("cita_urgente");
 					int sala = Integer.parseInt(rs.getString("cita_sala_id"));
 					String nombrePaciente = getNombrePaciente(idPaciente);
-					int telefonoCita = Integer.parseInt(rs.getString("cita_telefono"));
+					int telefonoCita = Integer
+							.parseInt(rs.getString("cita_telefono"));
 					String correoCita = rs.getString("cita_correo");
 					String otrosCita = rs.getString("cita_otros");
-					boolean acudio = rs.getBoolean("cita_acudio");
-					String causa = rs.getString("cita_causa");
-					c = new Cita(idI, idPaciente, fecha, hora_inicio, hora_fin, urgente, sala, telefonoCita, correoCita,
-							otrosCita, acudio, causa);
+					int acudio = rs.getInt("cita_acudio");
+					List<String> causas = getCausas(id);
+					c = new Cita(idI, idPaciente, fecha, hora_inicio, hora_fin,
+							urgente, sala, telefonoCita, correoCita, otrosCita,
+							parseAcudio(acudio), causas);
 					c.setNombrePaciente(nombrePaciente);
 					c.setIdCita(Integer.parseInt(id));
 				}
@@ -338,6 +389,41 @@ public class DataBase {
 		return c;
 	}
 
+	private List<String> getCausas(String id) {
+		List<String> causas = new ArrayList<String>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = conn.prepareStatement(QUERY_CAUSAS);
+			try {
+				ps.setString(1, id);
+				ResultSet rs = ps.executeQuery();
+				while (rs.next()) {
+					causas.add(rs.getString("causa"));
+				}
+
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return causas;
+	}
+
+	private Enum_acudio parseAcudio(int acudio) {
+		switch (acudio) {
+		case 1:
+			return Enum_acudio.ACUDE;
+		case 2:
+			return Enum_acudio.NO_ACUDE;
+		default:
+			return Enum_acudio.NO_FIGURA;
+		}
+	}
+
 	/**
 	 * Devuelve el nombre de un paciente dado su id
 	 * 
@@ -347,7 +433,8 @@ public class DataBase {
 	private String getNombrePaciente(int id) {
 		String nombrePaciente = "";
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement ps = conn.prepareStatement(QUERY_NOMBRE_PACIENTE_CON_ID);
+			PreparedStatement ps = conn
+					.prepareStatement(QUERY_NOMBRE_PACIENTE_CON_ID);
 			try {
 				ps.setString(1, "" + id);
 				ResultSet rs = ps.executeQuery();
@@ -373,7 +460,8 @@ public class DataBase {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
-			PreparedStatement pst = conn.prepareStatement("select * from sala where sala_id = ?");
+			PreparedStatement pst = conn
+					.prepareStatement("select * from sala where sala_id = ?");
 
 			try {
 
@@ -407,7 +495,8 @@ public class DataBase {
 		ArrayList<Cita> citas = new ArrayList<Cita>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("select * from cita c where c.cita_paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from cita c where c.cita_paciente_id = ?");
 			try {
 				pst.setString(1, idPaciente + "");
 
@@ -416,7 +505,8 @@ public class DataBase {
 				while (rs.next()) {
 
 					int id = Integer.parseInt(rs.getString("CITA_ID"));
-					int pacienteId = Integer.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					int pacienteId = Integer
+							.parseInt(rs.getString("CITA_PACIENTE_ID"));
 					String fecha = rs.getString("CITA_FECHA");
 					String horaI = rs.getString("CITA_HORA_INICIO");
 					String horaF = rs.getString("CITA_HORA_FIN");
@@ -425,11 +515,12 @@ public class DataBase {
 					String telefono = rs.getString("CITA_TELEFONO");
 					String correo = rs.getString("CITA_CORREO");
 					String otros = rs.getString("CITA_OTROS");
-					boolean acudio = rs.getBoolean("CITA_ACUDIO");
-					String causa = rs.getString("CITA_CAUSA");
+					int acudio = rs.getInt("CITA_ACUDIO");
+					List<String> causas = getCausas(rs.getString("cita_id"));
 
-					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, acudio, causa));
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -485,7 +576,8 @@ public class DataBase {
 		ArrayList<Enfermedad> enfermedades = new ArrayList<Enfermedad>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("select * from enfermedad where enfermedad_paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from enfermedad where enfermedad_paciente_id = ?");
 			try {
 				pst.setString(1, idPaciente + "");
 
@@ -497,9 +589,13 @@ public class DataBase {
 					String nombre = rs.getString("ENFERMEDAD_NOMBRE");
 					String descripcion = rs.getString("ENFERMEDAD_DESCRIPCION");
 					boolean enCita = rs.getBoolean("ENFERMEDAD_EN_CITA");
-					int idCita = enCita ? Integer.parseInt(rs.getString("ENFERMEDAD_CITA_ID")) : 0;
+					int idCita = enCita
+							? Integer.parseInt(
+									rs.getString("ENFERMEDAD_CITA_ID"))
+							: 0;
 
-					enfermedades.add(new Enfermedad(id, nombre, descripcion, idPaciente, enCita, idCita));
+					enfermedades.add(new Enfermedad(id, nombre, descripcion,
+							idPaciente, enCita, idCita));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -519,7 +615,8 @@ public class DataBase {
 		ArrayList<Vacuna> vacunas = new ArrayList<Vacuna>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("select * from vacuna where vacuna_paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from vacuna where vacuna_paciente_id = ?");
 			try {
 				pst.setString(1, idPaciente + "");
 
@@ -531,9 +628,12 @@ public class DataBase {
 					String nombre = rs.getString("VACUNA_NOMBRE");
 					String descripcion = rs.getString("VACUNA_DESCRIPCION");
 					boolean enCita = rs.getBoolean("VACUNA_EN_CITA");
-					int idCita = enCita ? Integer.parseInt(rs.getString("VACUNA_CITA_ID")) : 0;
+					int idCita = enCita
+							? Integer.parseInt(rs.getString("VACUNA_CITA_ID"))
+							: 0;
 
-					vacunas.add(new Vacuna(id, nombre, descripcion, idPaciente, enCita, idCita));
+					vacunas.add(new Vacuna(id, nombre, descripcion, idPaciente,
+							enCita, idCita));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -586,7 +686,8 @@ public class DataBase {
 				while (rs.next()) {
 
 					int id = Integer.parseInt(rs.getString("CITA_ID"));
-					int pacienteId = Integer.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					int pacienteId = Integer
+							.parseInt(rs.getString("CITA_PACIENTE_ID"));
 					String horaI = rs.getString("CITA_HORA_INICIO");
 					String horaF = rs.getString("CITA_HORA_FIN");
 					boolean urgente = rs.getBoolean("CITA_URGENTE");
@@ -594,11 +695,12 @@ public class DataBase {
 					String telefono = rs.getString("CITA_TELEFONO");
 					String correo = rs.getString("CITA_CORREO");
 					String otros = rs.getString("CITA_OTROS");
-					boolean acudio = rs.getBoolean("CITA_ACUDIO");
-					String causa = rs.getString("CITA_CAUSA");
+					int acudio = rs.getInt("CITA_ACUDIO");
+					List<String> causas = getCausas(rs.getString("cita_id"));
 
-					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, acudio, causa));
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -621,11 +723,20 @@ public class DataBase {
 	 */
 	public void guardarCita(Cita c) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			Statement s = conn.createStatement();
+			PreparedStatement s = conn.prepareStatement(GUARDAR_CITA);
 			try {
-				s.executeUpdate(String.format(GUARDAR_CITA, c.getIdCita(), c.getIdPaciente(), c.getFecha(),
-						c.getHoraE(), c.getHoraS(), boolToBit(c.isUrgente()), c.getSala(), c.getTelefonoCita(),
-						c.getCorreoCita(), c.getOtrosCita(), boolToBit(c.isAcudio()), c.getCausaCita()));
+				s.setString(1, c.getIdCita() + "");
+				s.setString(2, c.getIdPaciente() + "");
+				s.setString(3, c.getFecha());
+				s.setString(4, c.getHoraE());
+				s.setString(5, c.getHoraS());
+				s.setInt(6, boolToBit(c.isUrgente()));
+				s.setString(7, c.getSala() + "");
+				s.setString(8, c.getTelefonoCita() + "");
+				s.setString(9, c.getCorreoCita());
+				s.setString(10, c.getOtrosCita());
+				s.setInt(11, serializeAcudio(c.isAcudio()));
+				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {
@@ -645,10 +756,18 @@ public class DataBase {
 	 */
 	public void actualizarCita(Cita c) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			Statement s = conn.createStatement();
+			PreparedStatement s = conn.prepareStatement(ACTUALIZAR_CITA_ACUDE);
+			PreparedStatement s2 = conn.prepareStatement(ACTUALIZAR_CAUSAS);
 			try {
-				s.executeUpdate(String.format(ACTUALIZAR_CITA_ACUDE, boolToBit(c.isAcudio()), c.getIdCita()));
-				s.executeUpdate(String.format(ACTUALIZAR_CITA_CAUSAS, c.getCausaCita(), c.getIdCita()));
+				s.setInt(1, serializeAcudio(c.isAcudio()));
+				s.setString(2, c.getIdCita() + "");
+				s.executeUpdate();
+				s2.setString(1, c.getIdCita() + "");
+				for (String causa : c.getCausas()) {
+					s2.setString(2, causa);
+					s2.executeUpdate();
+				}
+
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {
@@ -719,5 +838,43 @@ public class DataBase {
 		}
 
 		return especialidades;
+}
+	public List<String> cargarTodasCausas() {
+		ArrayList<String> causas = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery(QUERY_ALL_CAUSAS);
+				while (rs.next()) {
+					causas.add(rs.getString("causa"));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return causas;
+	}
+
+	public void nuevaCausa(String causa) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(NUEVA_CAUSA);
+			try {
+				s.setString(1, causa);
+				s.execute();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
 	}
 }
