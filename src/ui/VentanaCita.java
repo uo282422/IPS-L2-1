@@ -416,7 +416,8 @@ public class VentanaCita extends JFrame {
 	}
 
 	protected void addCausa() {
-		c.addCausa((String) cmbCausas.getSelectedItem());
+		if (!c.getCausas().contains((String) cmbCausas.getSelectedItem()))
+			c.addCausa((String) cmbCausas.getSelectedItem());
 		updateListaCausas();
 	}
 
@@ -455,10 +456,17 @@ public class VentanaCita extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					gestor.nuevaCausa(JOptionPane
 							.showInputDialog("Introduzca la nueva causa"));
+					updateListaCausas();
+					updateCmbCausas();
 				}
 			});
 		}
 		return btNuevaCausa;
+	}
+
+	protected void updateCmbCausas() {
+		cmbCausas.setModel(setUpComboModel(gestor.cargarTodasCausas()));
+
 	}
 
 	private JPanel getPnCausasInferior() {
