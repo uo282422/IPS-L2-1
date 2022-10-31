@@ -14,28 +14,31 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.border.EmptyBorder;
 
-import logic.Paciente;
 import nexus.GestorCitas;
 
 public class DialogoInfoContacto extends JDialog {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private final JPanel panelDialogoPrincipal = new JPanel();
 
 //	gP.getContactoPaciente(idPaciente)
-	
-	
-	
+
 //	gP.actualizarContactoPaciente(idPaciente,str);
 //	textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
 	private GestorCitas gC;
 	private JTextField tfCorreo;
 	private JTextField tfTlf;
 	private JTextPane tpOtros;
+
 	/**
 	 * Create the dialog.
 	 */
 	public DialogoInfoContacto(GestorCitas gC, int id) {
-		this.gC=gC;
+		this.gC = gC;
 		setBounds(100, 100, 450, 300);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -71,7 +74,7 @@ public class DialogoInfoContacto extends JDialog {
 				{
 					tfTlf = new JTextField();
 					tfTlf.setColumns(10);
-					tfTlf.setText(gC.getTlfProv()+"");
+					tfTlf.setText(gC.getTlfProv() + "");
 					panelTelefono.add(tfTlf);
 				}
 			}
@@ -80,7 +83,7 @@ public class DialogoInfoContacto extends JDialog {
 				panelNorte.add(panelCorreo);
 				{
 					JLabel lblCorreo = new JLabel("Correo");
-					
+
 					panelCorreo.add(lblCorreo);
 				}
 				{
@@ -101,7 +104,7 @@ public class DialogoInfoContacto extends JDialog {
 			}
 			{
 				JTextPane tpOtros = new JTextPane();
-				this.tpOtros=tpOtros;
+				this.tpOtros = tpOtros;
 				tpOtros.setText(gC.getOtrosProv());
 				panelOeste.add(tpOtros);
 			}
@@ -118,14 +121,15 @@ public class DialogoInfoContacto extends JDialog {
 					}
 
 					private void guardar() {
-						
-						gC.añadirInfoContactoProv(Integer.parseInt(tfTlf.getText()),tfCorreo.getText(),tpOtros.getText());
+
+						gC.añadirInfoContactoProv(
+								Integer.parseInt(tfTlf.getText()),
+								tfCorreo.getText(), tpOtros.getText());
 						dispose();
 //						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
 //						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
 //						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());
 
-						
 					}
 				});
 				panelBotones.add(btGuardar);
@@ -141,9 +145,7 @@ public class DialogoInfoContacto extends JDialog {
 				panelBotones.add(btCancelar);
 			}
 		}
-		
-	}
 
-	
+	}
 
 }
