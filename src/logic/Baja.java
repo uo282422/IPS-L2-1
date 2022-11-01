@@ -6,6 +6,8 @@ public class Baja {
 		BAJA, VACACIONES, MOSCOSOS, OTROS;
 	}
 
+	private String id;
+	private Medico medico;
 	private BajaTipos tipo;
 	private String fInicio;
 	private String fFin;
@@ -13,14 +15,35 @@ public class Baja {
 	private String hFin;
 	private String Observaciones;
 
-	public Baja(BajaTipos tipo, String fInicio, String fFin, String hInicio,
-			String hFin, String observaciones) {
+	public Baja() {
+	};
+
+	public Baja(String id, Medico medico, BajaTipos tipo, String fInicio,
+			String fFin, String hInicio, String hFin, String observaciones) {
+		this.id = id;
+		this.medico = medico;
 		this.tipo = tipo;
 		this.fInicio = fInicio;
 		this.fFin = fFin;
 		this.hInicio = hInicio;
 		this.hFin = hFin;
 		Observaciones = observaciones;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public Medico getMedico() {
+		return medico;
+	}
+
+	public void setMedico(Medico medico) {
+		this.medico = medico;
 	}
 
 	public BajaTipos getTipo() {

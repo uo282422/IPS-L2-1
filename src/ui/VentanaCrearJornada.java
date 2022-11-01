@@ -8,7 +8,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.List;
 
@@ -17,18 +17,19 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+import javax.swing.text.MaskFormatter;
 
 import com.toedter.calendar.JCalendar;
 
 import logic.Medico;
 import nexus.GestorJornada;
-import util.DataBase;
 
 public class VentanaCrearJornada extends JDialog {
 
@@ -45,16 +46,13 @@ public class VentanaCrearJornada extends JDialog {
 	private JLabel hInicioLb;
 	private JLabel hFinalLb;
 	private JLabel diasLb;
-	private JComboBox<String> medCmb;
-	private JComboBox<String> hInicioCmb;
-	private JComboBox<String> hFinCmb;
+	private JComboBox<Medico> medCmb;
+	private JFormattedTextField txtHInicio;
+	private JFormattedTextField txtHFin;
 	private JCalendar calendarI = new JCalendar();
 	private JCalendar calendarF = new JCalendar();
 	private JPanel semanaPn;
 	private GestorJornada gestorJornada = new GestorJornada();
-	private DataBase db = new DataBase();
-
-	
 
 	/**
 	 * Create the dialog.
@@ -81,7 +79,7 @@ public class VentanaCrearJornada extends JDialog {
 		{
 			medCmb = new JComboBox<>();
 			medLb.setLabelFor(medCmb);
-			medCmb.setModel(setUpComboModelMed(db.cargarMedicos()));
+			medCmb.setModel(setUpComboModelMed(gestorJornada.cargarMedicos()));
 			medPn.add(medCmb);
 		}
 		{
@@ -89,20 +87,36 @@ public class VentanaCrearJornada extends JDialog {
 			medPn.add(hInicioLb);
 		}
 		{
-			hInicioCmb = new JComboBox<>();
-			hInicioLb.setLabelFor(hInicioCmb);
-			hInicioCmb.setModel(setUpComboModel(generateTimeList(0, 23)));
-			medPn.add(hInicioCmb);
+			if (txtHInicio == null) {
+				try {
+					MaskFormatter mf = new MaskFormatter("##:##");
+					txtHInicio = new JFormattedTextField(mf);
+					txtHInicio.setHorizontalAlignment(SwingConstants.CENTER);
+
+					txtHInicio.setColumns(10);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			medPn.add(txtHInicio);
 		}
 		{
 			hFinalLb = new JLabel("Hora de fin:");
 			medPn.add(hFinalLb);
 		}
 		{
-			hFinCmb = new JComboBox<>();
-			hFinalLb.setLabelFor(hFinCmb);
-			hFinCmb.setModel(setUpComboModel(generateTimeList(0, 23)));
-			medPn.add(hFinCmb);
+			if (txtHFin == null) {
+				try {
+					MaskFormatter mf = new MaskFormatter("##:##");
+					txtHFin = new JFormattedTextField(mf);
+					txtHFin.setHorizontalAlignment(SwingConstants.CENTER);
+
+					txtHFin.setColumns(10);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			medPn.add(txtHFin);
 		}
 		{
 			diasLb = new JLabel("Días:");
@@ -242,43 +256,14 @@ public class VentanaCrearJornada extends JDialog {
 	 * 
 	 * @param meds conteniendo la lista de médicos de la que se busca sacar un
 	 *             ComboBoxModel.
-	 * @return ComboBoxModel<String> con los toString de cada médico.
+	 * @return ComboBoxModel<Medico> con cada médico.
 	 */
-	private ComboBoxModel<String> setUpComboModelMed(List<Medico> meds) {
-		String[] array = new String[meds.size()];
+	private ComboBoxModel<Medico> setUpComboModelMed(List<Medico> meds) {
+		Medico[] array = new Medico[meds.size()];
 		for (int i = 0; i < array.length; i++) {
-			array[i] = meds.get(i).toString();
+			array[i] = meds.get(i);
 		}
-		return new DefaultComboBoxModel<String>(array);
-	}
-
-	/**
-	 * Este método genera una lista llena con Strings de horas con una
-	 * separación de 1 hora entre las mismas.
-	 * 
-	 * Es utilizado para generar el modelo de las combos dedicadas a asignar las
-	 * horas de la jornada
-	 * 
-	 * @return List<String> Conteniendo las horas.
-	 */
-	private List<String> generateTimeList(int inicio, int fin) {
-		ArrayList<String> times = new ArrayList<>();
-		for (int i = inicio; i <= fin; i++) {
-			times.add(i + ":00");
-		}
-		return times;
-	}
-
-	/**
-	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la
-	 * lista recibida.
-	 * 
-	 * @param l List<String> con la que se quiere generar el modelo de combo
-	 * @return DefaultComboBoxModel<String> conteniendo la lista recibida.
-	 */
-	private DefaultComboBoxModel<String> setUpComboModel(List<String> l) {
-		String[] array = l.toArray(new String[l.size()]);
-		return new DefaultComboBoxModel<String>(array);
+		return new DefaultComboBoxModel<Medico>(array);
 	}
 
 	/**
@@ -287,8 +272,8 @@ public class VentanaCrearJornada extends JDialog {
 	 */
 	private void reset() {
 		medCmb.setSelectedIndex(0);
-		hInicioCmb.setSelectedIndex(0);
-		hFinCmb.setSelectedIndex(0);
+		txtHInicio.setText("");
+		txtHFin.setText("");
 		for (Component c : semanaPn.getComponents()) {
 			JToggleButton jtb = (JToggleButton) c;
 			jtb.setSelected(false);
@@ -311,22 +296,7 @@ public class VentanaCrearJornada extends JDialog {
 	 * @return
 	 */
 	private boolean comprobarCampos() {
-		if (compruebaHoras() && compruebaDias())
-			return true;
-		else
-			return false;
-	}
-
-	/**
-	 * Comprueba que la duración de la jornada no excede de las 12 horas
-	 * ininterrumpidas
-	 * 
-	 * @return true si no excede la condición
-	 */
-	private boolean compruebaHoras() {
-		int hC = hInicioCmb.getSelectedIndex();
-		int hF = hFinCmb.getSelectedIndex();
-		return hC < hF;
+		return compruebaDias();
 	}
 
 	/**
@@ -345,8 +315,7 @@ public class VentanaCrearJornada extends JDialog {
 	 */
 	private void guardarDatos() {
 		gestorJornada.parse(medCmb.getSelectedItem().toString(),
-				hInicioCmb.getSelectedItem().toString(),
-				hFinCmb.getSelectedItem().toString(), calendarI.getDate(),
+				txtHInicio.getText(), txtHFin.getText(), calendarI.getDate(),
 				calendarF.getDate(), getDays());
 		gestorJornada.guardarJornada();
 	}
@@ -365,4 +334,3 @@ public class VentanaCrearJornada extends JDialog {
 		return semana;
 	}
 }
-

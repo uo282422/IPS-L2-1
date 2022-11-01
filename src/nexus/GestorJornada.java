@@ -2,6 +2,7 @@ package nexus;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import logic.Jornada;
 import logic.Medico;
@@ -111,5 +112,9 @@ public class GestorJornada {
 			}
 		}
 		return null;
+	}
+
+	public List<Medico> cargarMedicos() {
+		return db.cargarMedicos();
 	}
 }
