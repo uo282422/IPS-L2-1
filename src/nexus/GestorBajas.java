@@ -30,21 +30,30 @@ public class GestorBajas {
 		return db.cargarMedicos();
 	}
 
-	public boolean checkColisiones(Medico m, Date inicio, Date fin) {
+	public boolean checkColisiones(Medico m, Date inicio, Date fin,
+			String hInicio, String hFin) {
 		List<Baja> bajas = db.getBajas(m);
 		if (bajas.isEmpty())
 			return true;
 		for (Baja b : bajas) {
 			try {
-				Date bInicio = new SimpleDateFormat("dd/MM/yyyy")
-						.parse(b.getfInicio());
-				Date bFin = new SimpleDateFormat("dd/MM/yyyy")
-						.parse(b.getfFin());
-				if (inicio.before(bFin) && inicio.after(bInicio)
-						|| fin.before(bFin) && fin.after(bInicio)) {
+				Date bInicio = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
+						.parse(b.getfInicio() + ";" + b.gethInicio());
+				Date bFin = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
+						.parse(b.getfFin() + ";" + b.gethFin());
+				String sinicio = new SimpleDateFormat("dd/MM/yyyy")
+						.format(inicio);
+				String sfin = new SimpleDateFormat("dd/MM/yyyy").format(fin);
+				Date dInicio = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
+						.parse(sinicio + ";" + hInicio);
+				Date dFin = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
+						.parse(sfin + ";" + hFin);
+				if (dInicio.before(bFin) && dInicio.after(bInicio)
+						|| dFin.before(bFin) && dFin.after(bInicio)) {
 					idColision = b.getId();
 					return false; // colisión
 				}
+
 			} catch (ParseException e) {
 			}
 

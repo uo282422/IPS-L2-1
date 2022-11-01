@@ -367,7 +367,7 @@ public class VentanaBajas extends JFrame {
 	}
 
 	protected void añadirBaja() {
-		if (checkMed() && checkHours()) {
+		if (checkHours() && checkMed()) {
 			if (JOptionPane.showConfirmDialog(null, String.format(
 					"Se añadirá baja a %s, ¿Es correcto?",
 					listMedicos.getSelectedValue())) == JOptionPane.YES_OPTION)
@@ -387,6 +387,10 @@ public class VentanaBajas extends JFrame {
 		if (!hInicio[1].isBlank() && Integer.parseInt(hInicio[1]) > 59
 				|| !hFin[1].isBlank() && Integer.parseInt(hFin[1]) > 59)
 			return false;
+		if (hInicio[0].isBlank())
+			txtHInicio.setText("00:00");
+		if (hFin[0].isBlank())
+			txtHFin.setText("00:00");
 		return true;
 	}
 
@@ -432,7 +436,8 @@ public class VentanaBajas extends JFrame {
 	 */
 	private boolean checkBajasMedico() {
 		if (!gestor.checkColisiones(listMedicos.getSelectedValue(),
-				calendarInicio.getDate(), calendarFin.getDate())) {
+				calendarInicio.getDate(), calendarFin.getDate(),
+				txtHInicio.getText(), txtHFin.getText())) {
 			JOptionPane.showMessageDialog(null,
 					"Hay una baja existente para este medico que colisiona con esta. Se sobreescribirá.");
 			gestor.update(true);
