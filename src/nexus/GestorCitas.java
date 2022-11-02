@@ -19,6 +19,7 @@ import logic.Medico;
 import logic.Paciente;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import ui.Especialidad;
 import util.DataBase;
 
 public class GestorCitas {
@@ -27,6 +28,7 @@ public class GestorCitas {
 
 	private ArrayList<Cita> listaCitas = new ArrayList<>();
 	private ArrayList<Medico> medicos = new ArrayList<Medico>();
+	private ArrayList<Especialidad> especialidades = new ArrayList<Especialidad>();
 
 	private int tlfProv;
 	private String correoProv;
@@ -45,7 +47,7 @@ public class GestorCitas {
 				Enum_acudio.NO_FIGURA, new ArrayList<String>());
 		listaCitas.add(c);
 
-		bd.crearCita(c, new ArrayList<Medico>(medicos));
+		bd.crearCita(c, new ArrayList<Medico>(medicos), new ArrayList<Especialidad>(especialidades));
 		
 
 		if (urg)
@@ -112,9 +114,18 @@ public class GestorCitas {
 		
 		medicos.add(medicoNuevo);
 	}
+	
+public void agregarEspecialidad(Especialidad espNueva) {
+		
+		especialidades.add(espNueva);
+	}
 
 	public ArrayList<Medico> getMedicosAgregados() {
 		return new ArrayList<Medico>(medicos);
+	}
+	
+	public ArrayList<Especialidad> getEspecialidadesAgregadas() {
+		return new ArrayList<Especialidad>(especialidades);
 	}
 	
 

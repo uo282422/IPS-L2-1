@@ -2,7 +2,6 @@ package ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -16,7 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
@@ -43,7 +41,7 @@ public class VentanaAñadirMedicos extends JFrame {
 	
 	
 	private ArrayList<Medico> meds=null;
-	private ArrayList<String> esp=null;
+	private ArrayList<Especialidad> esp=null;
 	private JTextArea txtAVisualizar;
 	
 	
@@ -130,9 +128,9 @@ public class VentanaAñadirMedicos extends JFrame {
 			vcc.agregarMedico(m.getId());
 		}
 		System.out.println("---"+esp.size());
-		for(String str :esp) {
-			seleccionarMedicosAlternativosSegunEspecialidad(str);
-			continue;
+		for(Especialidad e :esp) {
+			vcc.getTaMedicos().setText(vcc.getTaMedicos().getText()+e.getNombre_esp()+"\n");
+			vcc.agregarEspecialidad(e.getId_esp());
 			
 			
 		}
@@ -178,6 +176,7 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JComboBox<String> getCbEspecialidades() {
 		if (cbEspecialidades == null) {
 			cbEspecialidades = new JComboBox<String>();
+			cbEspecialidades.addItem("Sin especificar");
 			cbEspecialidades.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					actualizarComboMedicos();
@@ -186,9 +185,9 @@ public class VentanaAñadirMedicos extends JFrame {
 					else getBtAñadirEspecialidad().setEnabled(true);
 				}
 			});
-			cbEspecialidades.addItem("Sin especificar");
-			for(String nombre : vcc.getEspecialidades()) {
-				cbEspecialidades.addItem(nombre);
+			
+			for(Especialidad esp : vcc.getGE().getListaEspecialidades()) {
+				cbEspecialidades.addItem(esp.getNombre_esp());
 			}
 			
 		}
@@ -200,7 +199,7 @@ public class VentanaAñadirMedicos extends JFrame {
 			btAñadirEspecialidad.setEnabled(false);
 			btAñadirEspecialidad.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					esp.add( ((Medico) getCbMedicos().getSelectedItem()).getEspecialidad());
+					esp.add( vcc.getGE().buscarPorNombre(getCbEspecialidades().getSelectedItem().toString()));
 					getLbGuardado().setVisible(false);
 					getTextAreaVisualizar().setText(getTextAreaVisualizar().getText()+"\n"+ getCbEspecialidades().getSelectedItem());
 					
@@ -236,7 +235,7 @@ public class VentanaAñadirMedicos extends JFrame {
 		for (Medico m : vcc.getgM().getMedicos()) {
 			if(getCbEspecialidades().getSelectedItem().equals("Sin especificar")) {
 					cbMedicos.addItem(m);
-			}else if(m.getEspecialidad().equals(getCbEspecialidades().getSelectedItem())) {
+			}else if(m.getEspecialidad()==(vcc.getGE().buscarPorNombre(getCbEspecialidades().getSelectedItem().toString()).getId_esp())) {
 				cbMedicos.addItem(m);
 			}
 			
@@ -280,7 +279,7 @@ public class VentanaAñadirMedicos extends JFrame {
 		}
 		return lbGuardado;
 	}
-	public ArrayList<String> getEsp() {
+	public ArrayList<Especialidad> getEsp() {
 		return esp;
 	}
 	

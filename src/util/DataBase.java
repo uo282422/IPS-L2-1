@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import logic.Enfermedad;
@@ -18,6 +17,7 @@ import logic.Sala;
 import logic.Vacuna;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import ui.Especialidad;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";
@@ -51,7 +51,7 @@ public class DataBase {
 					String nombre = rs.getString("medico_nombre");
 					String apellido = rs.getString("medico_apellido");
 					String email = rs.getString("medico_email");
-					String esp = rs.getString("medico_especialidad");
+					String esp = rs.getString("medico_especialidad_id");
 
 					medicos.add(new Medico(id, nombre, apellido, email, esp));
 				}
@@ -175,7 +175,7 @@ public class DataBase {
 		return pacientes;
 	}
 
-	public void crearCita(Cita cita, ArrayList<Medico> medicos) {
+	public void crearCita(Cita cita, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			PreparedStatement pst = conn.prepareStatement(
@@ -216,11 +216,33 @@ public class DataBase {
 				pst.close();
 				conn.close();
 			}
+			
+			
+			
+			pst = conn.prepareStatement("insert into especialidad_cita values(?,?)");
+			try {
+				
+				for (Especialidad e : especialidades) {
+					pst.setString(1, e.getId_esp());
+					pst.setString(2, e.getNombre_esp());
+					pst.execute();
+				}
+				
+				
+
+			} catch (SQLException e) {
+				throw new Error("Error al linkear epecialidad-cita", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
 
 		} catch (SQLException e) {
 			throw new Error("Problem", e);
 		}
 	}
+	
+	
 
 	private void setCausas(int idCita, List<String> causas) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -810,21 +832,19 @@ public class DataBase {
 		return b ? 1 : 0;
 	}
 
-	public List<String> cargarEspecialidades() {
-		ArrayList<String> especialidades = new ArrayList<String>();
+	public List<Especialidad> cargarEspecialidades() {
+		ArrayList<Especialidad> especialidades = new ArrayList<Especialidad>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			PreparedStatement pst = conn.prepareStatement(
-					"select distinct medico_especialidad from medico");
+					"select especialidad_id, especialidad_nombre from especialidad");
 			try {
 				
 
 				ResultSet rs = pst.executeQuery();
 
 				while (rs.next()) {
-					if(!especialidades.contains(rs.getString("medico_especialidad"))) {
-						especialidades.add(rs.getString("medico_especialidad"));
-					}
+					especialidades.add(new Especialidad(rs.getString("especialidad_id"), rs.getString("especialidad_nombre")));
 				}
 				rs.close();
 			} catch (SQLException e) {

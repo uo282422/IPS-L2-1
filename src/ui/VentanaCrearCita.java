@@ -28,6 +28,7 @@ import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
 import nexus.GestorCitas;
+import nexus.GestorEspecialidades;
 import nexus.GestorMedicos;
 import nexus.GestorPacientes;
 import nexus.GestorSalas;
@@ -63,6 +64,7 @@ public class VentanaCrearCita extends JFrame {
 	private GestorCitas gC;
 	private GestorPacientes gP;
 	private GestorMedicos gM;
+	private GestorEspecialidades gE;
 	private DialogoInfoContacto dialContacto;
 	private JPanel panelContacto;
 	private JButton btContacto;
@@ -91,7 +93,8 @@ public class VentanaCrearCita extends JFrame {
 		gP = new GestorPacientes();
 		gC = new GestorCitas();
 		gM = new GestorMedicos();
-		gS=new GestorSalas();
+		gS= new GestorSalas();
+		gE= new GestorEspecialidades();
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		medicosAgregados=new ArrayList<>();
 		setBounds(100, 100, 715, 600);
@@ -315,9 +318,9 @@ public class VentanaCrearCita extends JFrame {
 	protected void comprobarYCrear() {
 		boolean valido = true;
 		
-		if(gC.getMedicosAgregados().size()==0) {
+		if(gC.getMedicosAgregados().size()==0 && gC.getEspecialidadesAgregadas().size()==0) {
 			valido=false;
-			new JOptionPane().showMessageDialog(this, "Error, No hay medicos agregados");
+			new JOptionPane().showMessageDialog(this, "Error, No hay medicos ni especialidades agregados");
 		}
 		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
 		String nombre = nomApe[0];
@@ -502,9 +505,7 @@ public class VentanaCrearCita extends JFrame {
 		return gM;
 	}
 
-	public ArrayList<String> getEspecialidades() {
-		return gM.getListaEspecialidades();
-	}
+	
 	private JPanel getPanelAgregarMedicos1() {
 		if (panelAgregarMedicos == null) {
 			panelAgregarMedicos = new JPanel();
@@ -563,6 +564,19 @@ public class VentanaCrearCita extends JFrame {
 		}
 		
 		
+	}
+	
+	
+	public void agregarEspecialidad(String id) {
+		for(Especialidad e:gE.getListaEspecialidades()) {
+			if(e.getId_esp()==id) {//si el str es un medico se le asocia a la cita
+				gC.agregarEspecialidad(e);
+			}
+		}
+	}
+	
+	public GestorEspecialidades getGE() {
+		return gE;
 	}
 
 }
