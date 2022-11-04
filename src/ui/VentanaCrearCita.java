@@ -85,6 +85,7 @@ public class VentanaCrearCita extends JFrame {
 	private JLabel ln0;
 	
 	private ArrayList<Medico>medicosAgregados;
+	private String motivosI="";
 
 	/**
 	 * Create the frame.
@@ -122,6 +123,10 @@ public class VentanaCrearCita extends JFrame {
 			panelCampos.add(getPanelBotonCrear());
 		}
 		return panelCampos;
+	}
+	
+	public void setMotivosI(String str) {
+		motivosI=str;
 	}
 
 	private JPanel getPanelPaciente() {
@@ -348,6 +353,7 @@ public class VentanaCrearCita extends JFrame {
 		
 		
 		int sala = ((Sala)getCbSala().getSelectedItem()).getId();
+		String motivos=motivosI;
 	
 		boolean urg;
 		if (getRbSi().isSelected()) {
@@ -356,16 +362,16 @@ public class VentanaCrearCita extends JFrame {
 			urg = false;
 
 		if (valido)
-			crearCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg);
+			crearCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg, motivos);
 
 	}
 
 	
 
 	private void crearCita(int idPaciente, String nombre, String fecha, String horaE, String horaS, int sala,
-			boolean urg) {
+			boolean urg, String motivos) {
 
-		gC.nuevaCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg);
+		gC.nuevaCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg, motivos);
 		resetear();
 
 	}
@@ -491,8 +497,19 @@ public class VentanaCrearCita extends JFrame {
 	private JButton getBtMotivos() {
 		if (btMotivos == null) {
 			btMotivos = new JButton("Añadir Motivos Cita");
+			btMotivos.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaMotivos();
+				}
+			});
 		}
 		return btMotivos;
+	}
+
+	protected void abrirVentanaMotivos() {
+		VentanaMotivos vm=new VentanaMotivos(this);
+		vm.setVisible(true);
+		
 	}
 
 	protected void abrirVentanaMedicos() {

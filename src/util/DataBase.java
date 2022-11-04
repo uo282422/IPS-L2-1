@@ -178,7 +178,7 @@ public class DataBase {
 	public void crearCita(Cita cita, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?)");
+			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
 			try {
 				pst.setString(1, cita.getIdCita() + "");
 				pst.setString(2, cita.getIdPaciente() + "");
@@ -191,6 +191,7 @@ public class DataBase {
 				pst.setString(9, cita.getCorreoCita());
 				pst.setString(10, cita.getOtrosCita());
 				pst.setInt(11, serializeAcudio(cita.isAcudio()));
+				pst.setString(12, cita.getMotivosIniciales());
 				pst.execute();
 
 			} catch (SQLException e) {
@@ -386,11 +387,12 @@ public class DataBase {
 							.parseInt(rs.getString("cita_telefono"));
 					String correoCita = rs.getString("cita_correo");
 					String otrosCita = rs.getString("cita_otros");
+					String motivos = rs.getString("cita_motivos");
 					int acudio = rs.getInt("cita_acudio");
 					List<String> causas = getCausas(id);
 					c = new Cita(idI, idPaciente, fecha, hora_inicio, hora_fin,
 							urgente, sala, telefonoCita, correoCita, otrosCita,
-							parseAcudio(acudio), causas);
+							parseAcudio(acudio), causas, motivos);
 					c.setNombrePaciente(nombrePaciente);
 					c.setIdCita(Integer.parseInt(id));
 				}
@@ -536,10 +538,11 @@ public class DataBase {
 					String otros = rs.getString("CITA_OTROS");
 					int acudio = rs.getInt("CITA_ACUDIO");
 					List<String> causas = getCausas(rs.getString("cita_id"));
-
+					String motivos = rs.getString("cita_motivos");
+					
 					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
 							urgente, salaId, Integer.parseInt(telefono), correo,
-							otros, parseAcudio(acudio), causas));
+							otros, parseAcudio(acudio), causas, motivos));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -716,10 +719,11 @@ public class DataBase {
 					String otros = rs.getString("CITA_OTROS");
 					int acudio = rs.getInt("CITA_ACUDIO");
 					List<String> causas = getCausas(rs.getString("cita_id"));
+					String motivos = rs.getString("cita_motivos");
 
 					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
 							urgente, salaId, Integer.parseInt(telefono), correo,
-							otros, parseAcudio(acudio), causas));
+							otros, parseAcudio(acudio), causas, motivos));
 				}
 				rs.close();
 			} catch (SQLException e) {

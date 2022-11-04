@@ -21,11 +21,13 @@ public class Cita {
 	private int telefonoCita;
 	private String correoCita;
 	private String otrosCita;
+	private String motivosIniciales;
 
 	public Cita(int id, int pacienteId, String fecha, String horaI,
 			String horaF, boolean urgente, int salaId, int telefono,
 			String correo, String otros, Enum_acudio acudio,
-			List<String> causas) {
+			List<String> causas, String motivos) {
+		this.motivosIniciales=motivos;
 		this.idCita = id;
 		setIdPaciente(pacienteId);
 		setFecha(fecha);
@@ -39,7 +41,15 @@ public class Cita {
 		this.causas = causas;
 		this.acudio=acudio;
 	}
+	private void setMotivosIniciales(String m) {
+		this.motivosIniciales = m;
+
+	}
 	
+	public String getMotivosIniciales() {
+		return this.motivosIniciales ;
+
+	}
 
 	private void setHoraS(String hs) {
 		this.horaS = hs;

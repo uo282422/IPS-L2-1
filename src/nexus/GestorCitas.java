@@ -41,10 +41,10 @@ public class GestorCitas {
 	}
 
 	public void nuevaCita(int idPaciente, String nombre, String fecha,
-			String horaE, String horaS, int salaId, boolean urg) {
+			String horaE, String horaS, int salaId, boolean urg, String motivos) {
 		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS,
 				urg, salaId, tlfProv, correoProv, otrosProv,
-				Enum_acudio.NO_FIGURA, new ArrayList<String>());
+				Enum_acudio.NO_FIGURA, new ArrayList<String>(), motivos);
 		listaCitas.add(c);
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos), new ArrayList<Especialidad>(especialidades));
