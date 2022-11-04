@@ -77,7 +77,7 @@ public class VentanaHorario extends JFrame {
 
 		this.gC = new GestorCitas();
 		this.gP = new GestorPacientes();
-		this.gS = new GestorSalas();
+		this.gS = new GestorSalas(gC);
 		this.gM = new GestorMedicos();
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

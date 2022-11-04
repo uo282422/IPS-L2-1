@@ -79,7 +79,7 @@ public class HistorialPaciente extends JFrame {
 		this.paciente = gP.getPaciente(idPaciente);
 
 		this.gC = new GestorCitas();
-		this.gS = new GestorSalas();
+		this.gS = new GestorSalas(gC);
 
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 802, 919);

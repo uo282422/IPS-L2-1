@@ -55,6 +55,14 @@ public class GestorCitas {
 
 	}
 
+	public ArrayList<Cita> getListaCitas() {
+		return listaCitas;
+	}
+
+	public void setListaCitas(ArrayList<Cita> listaCitas) {
+		this.listaCitas = listaCitas;
+	}
+
 	private void enviarCorreo(Cita c) {
 		// Al tener una cita urgente se notifica al medico, en este caso lo
 		// simuluaremos
@@ -257,10 +265,6 @@ public void agregarEspecialidad(Especialidad espNueva) {
 			for (Jornada j : jornadaDeMedico) {
 				Date fechaInicialJornada = fechaToDate(j.getDiaInicio());
 				Date fechaFinalJornada = fechaToDate(j.getDiaFinal());
-//				System.out.println("id del medico"+m.getId());
-//				System.out.println("fecha a evaluar"+fechaCandidato.toString());
-//				System.out.println("inicio de jornada"+fechaInicialJornada.toString());
-//				System.out.println("fin de jornada"+fechaFinalJornada.toString());
 
 				if (fechaCandidato.after(fechaInicialJornada)
 						&& fechaCandidato.before(fechaFinalJornada)) {
@@ -272,10 +276,6 @@ public void agregarEspecialidad(Especialidad espNueva) {
 
 				Date horaInicialJornada = horaToDate(j.getHoraComienzo());
 				Date horaFinalJornada = horaToDate(j.getHoraFinal());
-//				System.out.println("hora inicial candidato"+horaECandidato);
-//				System.out.println("hora final candidato"+horaSCandidato);
-//				System.out.println("hora inicial jornada"+ horaInicialJornada);
-//				System.out.println("hora final jornada"+ horaFinalJornada);
 				if (horaECandidato.after(horaInicialJornada)
 						&& horaECandidato.before(horaFinalJornada)
 						&& horaSCandidato.after(horaInicialJornada)
@@ -293,7 +293,6 @@ public void agregarEspecialidad(Especialidad espNueva) {
 			}
 
 		}
-//		System.out.println(valido);
 		return valido;
 	}
 

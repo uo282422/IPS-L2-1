@@ -27,6 +27,7 @@ import javax.swing.text.MaskFormatter;
 import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
+import logic.cita.Cita;
 import nexus.GestorCitas;
 import nexus.GestorEspecialidades;
 import nexus.GestorMedicos;
@@ -94,7 +95,7 @@ public class VentanaCrearCita extends JFrame {
 		gP = new GestorPacientes();
 		gC = new GestorCitas();
 		gM = new GestorMedicos();
-		gS= new GestorSalas();
+		gS= new GestorSalas(gC);
 		gE= new GestorEspecialidades();
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		medicosAgregados=new ArrayList<>();
@@ -339,20 +340,28 @@ public class VentanaCrearCita extends JFrame {
 
 		String fecha = getTfFecha().getText();
 		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
-			
-			valido = false;
-			new JOptionPane().showMessageDialog(this, "Error, la fecha y horas escritas no están en la jornada de los medicos seleccionados");
+			int res=JOptionPane.showConfirmDialog(this, "La fecha y horas escritas no están en la jornada de los medicos seleccionados. ¿Quieres crearla igual?");
+			if(res==JOptionPane.NO_OPTION)
+				valido=false;
+		
 		}
 			
 		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, getgM().getMedicos())==false) {
-			valido=false;
-			new JOptionPane().showMessageDialog(this, "Error, alguno de los medicos asignados ya tienen citas asignadas para el perido establecido");
+			int res=JOptionPane.showConfirmDialog(this, "Alguno de los medicos asignados ya tienen citas asignadas para el perido establecido. ¿Quieres crearla igual?");
+			if(res==JOptionPane.NO_OPTION)
+				valido=false;
 
 		}
 			
 		
 		
 		int sala = ((Sala)getCbSala().getSelectedItem()).getId();
+		if(gS.comprobarSala(sala,fecha,horaE, horaS)==false) {
+			int res=JOptionPane.showConfirmDialog(this, "La sala seleccionada esta ocupada en el horario establecido para ese dia. ¿Quieres crearla igual?");
+			if(res==JOptionPane.NO_OPTION)
+				valido=false;
+		}
+		
 		String motivos=motivosI;
 	
 		boolean urg;
@@ -361,10 +370,14 @@ public class VentanaCrearCita extends JFrame {
 		} else
 			urg = false;
 
-		if (valido)
+		if (valido) {
 			crearCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg, motivos);
+		}
+			
 
 	}
+
+	
 
 	
 
