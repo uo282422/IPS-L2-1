@@ -1,14 +1,21 @@
 package ui;
 
-import java.util.HashMap;
-
 public class Especialidad {
 	private String nombre_esp;
 	private String id_esp;
-	
+	private int uds;
 	public Especialidad(String id,String nom) {
 		this.id_esp=id;
 		this.nombre_esp=nom;
+		this.uds=0;
+	}
+	
+	public void aumentarUnidades() {
+		uds++;
+	}
+	
+	public int getUnidades() {
+		return uds;
 	}
 
 	public String getNombre_esp() {

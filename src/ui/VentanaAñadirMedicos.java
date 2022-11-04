@@ -199,7 +199,13 @@ public class VentanaAñadirMedicos extends JFrame {
 			btAñadirEspecialidad.setEnabled(false);
 			btAñadirEspecialidad.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					esp.add( vcc.getGE().buscarPorNombre(getCbEspecialidades().getSelectedItem().toString()));
+					Especialidad cand=vcc.getGE().buscarPorNombre(getCbEspecialidades().getSelectedItem().toString());
+					if(!esp.contains(cand)) {
+						cand.aumentarUnidades();
+						esp.add(cand);
+						
+					}
+					else esp.get(esp.indexOf(cand)).aumentarUnidades();
 					getLbGuardado().setVisible(false);
 					getTextAreaVisualizar().setText(getTextAreaVisualizar().getText()+"\n"+ getCbEspecialidades().getSelectedItem());
 					

@@ -178,8 +178,7 @@ public class DataBase {
 	public void crearCita(Cita cita, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
+			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?)");
 			try {
 				pst.setString(1, cita.getIdCita() + "");
 				pst.setString(2, cita.getIdPaciente() + "");
@@ -192,13 +191,12 @@ public class DataBase {
 				pst.setString(9, cita.getCorreoCita());
 				pst.setString(10, cita.getOtrosCita());
 				pst.setInt(11, serializeAcudio(cita.isAcudio()));
-				setCausas(cita.getIdCita(), cita.getCausas());
 				pst.execute();
 
 			} catch (SQLException e) {
 				throw new Error("Error al meter la cita", e);
 			}
-
+			setCausas(cita.getIdCita(), cita.getCausas());
 			pst = conn.prepareStatement("insert into medico_cita values(?,?)");
 			try {
 
@@ -212,19 +210,17 @@ public class DataBase {
 
 			} catch (SQLException e) {
 				throw new Error("Error al linkear medico-cita", e);
-			} finally {
-				pst.close();
-				conn.close();
 			}
 			
 			
 			
-			pst = conn.prepareStatement("insert into especialidad_cita values(?,?)");
+			pst = conn.prepareStatement("insert into especialidad_cita values(?,?,?)");
 			try {
 				
 				for (Especialidad e : especialidades) {
-					pst.setString(1, e.getId_esp());
-					pst.setString(2, e.getNombre_esp());
+					pst.setString(1, cita.getIdCita()+"");
+					pst.setString(2, e.getId_esp());
+					pst.setInt(3, e.getUnidades());
 					pst.execute();
 				}
 				
@@ -232,6 +228,7 @@ public class DataBase {
 
 			} catch (SQLException e) {
 				throw new Error("Error al linkear epecialidad-cita", e);
+				
 			} finally {
 				pst.close();
 				conn.close();
