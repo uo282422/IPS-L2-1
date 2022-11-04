@@ -26,7 +26,7 @@ public class DataBase {
 
 	private static final String QUERY_CITA_CON_ID = "SELECT * FROM cita WHERE cita_id = ?";
 	private static final String QUERY_NOMBRE_PACIENTE_CON_ID = "SELECT paciente_nombre FROM paciente WHERE paciente_id = ?";
-	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES (?, ?, ?, ?, ?, ?, ?)";
 	private static final String ACTUALIZAR_CITA_ACUDE = "UPDATE cita SET cita_acudio = ? WHERE cita_id = ?";
 	private static final String QUERY_ID_JORNADA = "SELECT jornada_id FROM jornada";
@@ -55,7 +55,7 @@ public class DataBase {
 					String nombre = rs.getString("medico_nombre");
 					String apellido = rs.getString("medico_apellido");
 					String email = rs.getString("medico_email");
-					String esp = rs.getString("medico_especialidad");
+					String esp = rs.getString("medico_especialidad_id");
 
 					medicos.add(new Medico(id, nombre, apellido, email, esp));
 				}
@@ -183,7 +183,7 @@ public class DataBase {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			PreparedStatement pst = conn.prepareStatement(
-					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
+					"INSERT INTO CITA VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 			try {
 				pst.setString(1, cita.getIdCita() + "");
 				pst.setString(2, cita.getIdPaciente() + "");
@@ -196,12 +196,12 @@ public class DataBase {
 				pst.setString(9, cita.getCorreoCita());
 				pst.setString(10, cita.getOtrosCita());
 				pst.setInt(11, serializeAcudio(cita.isAcudio()));
-				setCausas(cita.getIdCita(), cita.getCausas());
 				pst.execute();
 
 			} catch (SQLException e) {
 				throw new Error("Error al meter la cita", e);
 			}
+			setCausas(cita.getIdCita(), cita.getCausas());
 
 			pst = conn.prepareStatement("insert into medico_cita values(?,?)");
 			try {
@@ -816,15 +816,16 @@ public class DataBase {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			PreparedStatement pst = conn.prepareStatement(
-					"select distinct medico_especialidad from medico");
+					"select distinct medico_especialidad_id from medico");
 			try {
 
 				ResultSet rs = pst.executeQuery();
 
 				while (rs.next()) {
 					if (!especialidades
-							.contains(rs.getString("medico_especialidad"))) {
-						especialidades.add(rs.getString("medico_especialidad"));
+							.contains(rs.getString("medico_especialidad_id"))) {
+						especialidades
+								.add(rs.getString("medico_especialidad_id"));
 					}
 				}
 				rs.close();

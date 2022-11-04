@@ -37,6 +37,7 @@ public class Cita {
 		this.correoCita = correo;
 		this.otrosCita = otros;
 		this.causas = causas;
+		this.acudio = acudio;
 	}
 
 	private void setHoraS(String hs) {
