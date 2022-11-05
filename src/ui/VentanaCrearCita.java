@@ -87,6 +87,8 @@ public class VentanaCrearCita extends JFrame {
 	
 	private ArrayList<Medico>medicosAgregados;
 	private String motivosI="";
+	private JPanel panel;
+	private JButton btLimpiar;
 
 	/**
 	 * Create the frame.
@@ -323,57 +325,61 @@ public class VentanaCrearCita extends JFrame {
 
 	protected void comprobarYCrear() {
 		boolean valido = true;
+		String horaE = getTfHoraEntrada().getText();
+		String horaS = getTfHoraSalida().getText();
+		String fecha = getTfFecha().getText();
+		
 		
 		if(gC.getMedicosAgregados().size()==0 && gC.getEspecialidadesAgregadas().size()==0) {
 			valido=false;
 			new JOptionPane().showMessageDialog(this, "Error, No hay medicos ni especialidades agregados");
-		}
-		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
-		String nombre = nomApe[0];
-		String apellido = nomApe[1];
-		int idPaciente = gP.buscarIdPaciente(nombre, apellido);
-		if (idPaciente == -1)
-			valido = false;
-		String horaE = getTfHoraEntrada().getText();;
-		String horaS = getTfHoraSalida().getText();
-		
-
-		String fecha = getTfFecha().getText();
-		if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
-			int res=JOptionPane.showConfirmDialog(this, "La fecha y horas escritas no están en la jornada de los medicos seleccionados. ¿Quieres crearla igual?");
-			if(res==JOptionPane.NO_OPTION)
-				valido=false;
-		
-		}
+		}else if(fecha.isEmpty() ||fecha.contains(" ") || horaE.isEmpty() ||horaE.contains(" ") || horaS.isEmpty()||horaS.contains(" ") ) {
+			new JOptionPane().showMessageDialog(this, "Error, Hay campos sin cubrir");
+		}else {
+			String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
+			String nombre = nomApe[0];
+			String apellido = nomApe[1];
+			int idPaciente = gP.buscarIdPaciente(nombre, apellido);
+			if (idPaciente == -1)
+				valido = false;
 			
-		if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, getgM().getMedicos())==false) {
-			int res=JOptionPane.showConfirmDialog(this, "Alguno de los medicos asignados ya tienen citas asignadas para el perido establecido. ¿Quieres crearla igual?");
-			if(res==JOptionPane.NO_OPTION)
-				valido=false;
-
-		}
+			if (gC.comprobarCitaEnJornada(fecha,horaE, horaS,gC.getMedicosAgregados() )==false) {
+				int res=JOptionPane.showConfirmDialog(this, "La fecha y horas escritas no están en la jornada de los medicos seleccionados. ¿Quieres crearla igual?");
+				if(res==JOptionPane.NO_OPTION)
+					valido=false;
 			
-		
-		
-		int sala = ((Sala)getCbSala().getSelectedItem()).getId();
-		if(gS.comprobarSala(sala,fecha,horaE, horaS)==false) {
-			int res=JOptionPane.showConfirmDialog(this, "La sala seleccionada esta ocupada en el horario establecido para ese dia. ¿Quieres crearla igual?");
-			if(res==JOptionPane.NO_OPTION)
-				valido=false;
-		}
-		
-		String motivos=motivosI;
-	
-		boolean urg;
-		if (getRbSi().isSelected()) {
-			urg = true;
-		} else
-			urg = false;
+			}
+				
+			if(gC.comprobarCitasEnHorario(fecha, horaE, horaS, getgM().getMedicos())==false) {
+				int res=JOptionPane.showConfirmDialog(this, "Alguno de los medicos asignados ya tienen citas asignadas para el perido establecido. ¿Quieres crearla igual?");
+				if(res==JOptionPane.NO_OPTION)
+					valido=false;
 
-		if (valido) {
-			crearCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg, motivos);
-		}
+			}
+				
 			
+			
+			int sala = ((Sala)getCbSala().getSelectedItem()).getId();
+			if(gS.comprobarSala(sala,fecha,horaE, horaS)==false) {
+				int res=JOptionPane.showConfirmDialog(this, "La sala seleccionada esta ocupada en el horario establecido para ese dia. ¿Quieres crearla igual?");
+				if(res==JOptionPane.NO_OPTION)
+					valido=false;
+			}
+			
+			String motivos=motivosI;
+		
+			boolean urg;
+			if (getRbSi().isSelected()) {
+				urg = true;
+			} else
+				urg = false;
+
+			if (valido) {
+				crearCita(idPaciente, nombre, fecha, horaE, horaS, sala, urg, motivos);
+			}
+				
+		}
+		
 
 	}
 
@@ -568,6 +574,7 @@ public class VentanaCrearCita extends JFrame {
 			panelMedicosAgregados.setLayout(new GridLayout(0, 3, 0, 0));
 			panelMedicosAgregados.add(getLn0());
 			panelMedicosAgregados.add(getTaMedicos());
+			panelMedicosAgregados.add(getPanel());
 		}
 		return panelMedicosAgregados;
 	}
@@ -609,4 +616,25 @@ public class VentanaCrearCita extends JFrame {
 		return gE;
 	}
 
+	
+	private JPanel getPanel() {
+		if (panel == null) {
+			panel = new JPanel();
+			panel.add(getBtLimpiar());
+		}
+		return panel;
+	}
+	private JButton getBtLimpiar() {
+		if (btLimpiar == null) {
+			btLimpiar = new JButton("Limpiar medicos");
+			btLimpiar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					getTaMedicos().setText("");
+					gC.limpiarMedicos();
+					gC.limpiarEspecialidades();
+				}
+			});
+		}
+		return btLimpiar;
+	}
 }

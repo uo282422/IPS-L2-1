@@ -19,6 +19,11 @@ import javax.swing.JTextArea;
 import javax.swing.border.EmptyBorder;
 
 import logic.Medico;
+import javax.swing.SwingConstants;
+import javax.swing.JTextField;
+import javax.swing.JPopupMenu;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class VentanaAñadirMedicos extends JFrame {
 
@@ -36,13 +41,16 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JComboBox cbMedicos;
 	private JButton btAñadirMedicos;
 
-	private VentanaCrearCita vcc;
+	public VentanaCrearCita vcc;
 	private JLabel lbGuardado;
 	
 	
-	private ArrayList<Medico> meds=null;
+	public ArrayList<Medico> meds=null;
 	private ArrayList<Especialidad> esp=null;
 	private JTextArea txtAVisualizar;
+	private JButton btnBorrar;
+	private JPanel panelBuscador;
+	private JButton btnBuscar;
 	
 	
 	
@@ -72,8 +80,8 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JPanel getPanelSur() {
 		if (panelSur == null) {
 			panelSur = new JPanel();
-			FlowLayout flowLayout = (FlowLayout) panelSur.getLayout();
-			flowLayout.setAlignment(FlowLayout.RIGHT);
+			panelSur.setLayout(new GridLayout(0, 3, 0, 0));
+			panelSur.add(getBtnBorrar());
 			panelSur.add(getLbGuardado());
 			panelSur.add(getBtGuardarMedicos());
 		}
@@ -91,9 +99,10 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JPanel getPanelFiltros() {
 		if (panelFiltros == null) {
 			panelFiltros = new JPanel();
-			panelFiltros.setLayout(new GridLayout(2, 0, 0, 10));
+			panelFiltros.setLayout(new GridLayout(3, 0, 0, 10));
 			panelFiltros.add(getPanelEspecialidades());
 			panelFiltros.add(getPanelMedicos());
+			panelFiltros.add(getPanelBuscador());
 		}
 		return panelFiltros;
 	}
@@ -112,12 +121,15 @@ public class VentanaAñadirMedicos extends JFrame {
 							vcc.agregarMedico(m.getId());
 						}
 						dispose();
+						
 					}
 					
 					
 				}
 			});
 		}
+		
+		
 		return btGuardarMedicos;
 	}
 	protected void volcarACrearCita() {
@@ -221,9 +233,10 @@ public class VentanaAñadirMedicos extends JFrame {
 		}
 		return lbMedicos;
 	}
-	private JComboBox<Medico> getCbMedicos() {
+	public JComboBox<Medico> getCbMedicos() {
 		if (cbMedicos == null) {
 			cbMedicos = new JComboBox<Medico>();
+			
 			for(Medico m : vcc.getgM().getMedicos()) {
 				cbMedicos.addItem(m);
 			}
@@ -236,6 +249,7 @@ public class VentanaAñadirMedicos extends JFrame {
 	
 	
 
+	
 	private void actualizarComboMedicos() {
 		getCbMedicos().removeAllItems();
 		for (Medico m : vcc.getgM().getMedicos()) {
@@ -277,9 +291,10 @@ public class VentanaAñadirMedicos extends JFrame {
 		}
 		return txtAVisualizar;
 	}
-	private JLabel getLbGuardado() {
+	public JLabel getLbGuardado() {
 		if (lbGuardado == null) {
 			lbGuardado = new JLabel("Guardado!");
+			lbGuardado.setHorizontalAlignment(SwingConstants.RIGHT);
 			lbGuardado.setVisible(false);
 			lbGuardado.setForeground(Color.RED);
 		}
@@ -289,4 +304,55 @@ public class VentanaAñadirMedicos extends JFrame {
 		return esp;
 	}
 	
+	private JButton getBtnBorrar() {
+		if (btnBorrar == null) {
+			btnBorrar = new JButton("Borrar ultimo");
+			btnBorrar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(getTextAreaVisualizar().getText().isEmpty()) {}
+					else {
+						String[] txt=getTextAreaVisualizar().getText().split("\n");
+						String ultima =txt[txt.length-1];
+						
+						if(txt.length==1)getTextAreaVisualizar().setText("");
+						else {
+							for(int i=0;i<txt.length-1;i++) {
+								getTextAreaVisualizar().setText(txt[i]);
+							
+							}
+						}
+						if(ultima.contains("(")) {//el ultimo fue un medico
+							meds.remove(meds.size()-1);
+						}else esp.remove(esp.size()-1);//si no, el ultimo fue especialidad
+						System.out.println(meds.size());
+						System.out.println(esp.size());
+					}
+				}
+			});
+		}
+		return btnBorrar;
+	}
+	private JPanel getPanelBuscador() {
+		if (panelBuscador == null) {
+			panelBuscador = new JPanel();
+			panelBuscador.add(getBtnBuscar());
+		}
+		return panelBuscador;
+	}
+	private JButton getBtnBuscar() {
+		if (btnBuscar == null) {
+			btnBuscar = new JButton("Buscar medicos por nombre");
+			btnBuscar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaBuscador();
+				}
+			});
+		}
+		return btnBuscar;
+	}
+	protected void abrirVentanaBuscador() {
+		VentanaBuscador vb=new VentanaBuscador(this);
+		vb.setVisible(true);
+		
+	}
 }

@@ -375,4 +375,13 @@ public void agregarEspecialidad(Especialidad espNueva) {
 
 	}
 
+	public void limpiarMedicos() {
+		medicos.removeAll(medicos);
+		
+	}
+	public void limpiarEspecialidades() {
+		especialidades.removeAll(especialidades);
+		
+	}
+
 }
