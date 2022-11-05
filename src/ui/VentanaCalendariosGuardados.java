@@ -113,8 +113,8 @@ public class VentanaCalendariosGuardados extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					if (compruebaSeleccion()) {
 						v._setCalendarsValues(calendarInicio, calendarFin);
-						dispose();
 					}
+					dispose();
 				}
 			});
 		}
@@ -225,6 +225,7 @@ public class VentanaCalendariosGuardados extends JFrame {
 
 	protected void actualizarLista() {
 		list.setModel(cargarModeloCalendarios());
+		list.setSelectedIndex(-1);
 	}
 
 	private JButton getBtEliminar() {
