@@ -245,6 +245,7 @@ public class VentanaCalendariosGuardados extends JFrame {
 
 	protected void eliminarCalendario() {
 		g.eliminarCalendario(list.getSelectedValue());
+		actualizarLista();
 	}
 
 	protected boolean compruebaSeleccion() {
