@@ -3,7 +3,7 @@ package nexus;
 import java.util.Date;
 import java.util.List;
 
-import logic.Calendario;
+import logic.jornada.Calendario;
 import util.DataBase;
 
 public class GestorCalendario {

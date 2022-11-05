@@ -1,4 +1,4 @@
-package logic;
+package logic.jornada;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

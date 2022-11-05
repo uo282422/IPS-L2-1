@@ -25,7 +25,7 @@ import javax.swing.event.ListSelectionListener;
 
 import com.toedter.calendar.JCalendar;
 
-import logic.Calendario;
+import logic.jornada.Calendario;
 import nexus.GestorCalendario;
 
 public class VentanaCalendariosGuardados extends JFrame {

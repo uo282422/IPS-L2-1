@@ -11,15 +11,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logic.Baja;
-import logic.Calendario;
 import logic.Enfermedad;
-import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import logic.Sala;
 import logic.Vacuna;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import logic.jornada.Calendario;
+import logic.jornada.Jornada;
 
 public class DataBase {
 	private String url = "jdbc:hsqldb:hsql://localhost";

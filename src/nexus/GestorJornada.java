@@ -3,8 +3,8 @@ package nexus;
 import java.util.Date;
 import java.util.List;
 
-import logic.Jornada;
 import logic.Medico;
+import logic.jornada.Jornada;
 import util.DataBase;
 
 public class GestorJornada {

@@ -14,11 +14,11 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import logic.jornada.Jornada;
 import util.DataBase;
 
 public class GestorCitas {

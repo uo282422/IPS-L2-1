@@ -1,7 +1,8 @@
-package logic;
+package logic.jornada;
 
 import java.util.Date;
 
+import logic.Medico;
 import util.DataBase;
 
 public class Jornada {
