@@ -46,7 +46,6 @@ public class GestorCitas {
 		listaCitas.add(c);
 
 		bd.crearCita(c, new ArrayList<Medico>(medicos));
-		
 
 		if (urg)
 			enviarCorreo(c);
@@ -109,14 +108,13 @@ public class GestorCitas {
 	}
 
 	public void agregarMedico(Medico medicoNuevo) {
-		
+
 		medicos.add(medicoNuevo);
 	}
 
 	public ArrayList<Medico> getMedicosAgregados() {
 		return new ArrayList<Medico>(medicos);
 	}
-	
 
 	public void añadirInfoContactoProv(Paciente paciente) {
 		this.tlfProv = paciente.getTelefono();
@@ -244,8 +242,8 @@ public class GestorCitas {
 		for (Medico m : medicos) {
 			List<Jornada> jornadaDeMedico = bd.getJornadasDeMedico(m.getId());
 			for (Jornada j : jornadaDeMedico) {
-				Date fechaInicialJornada = fechaToDate(j.getDiaInicio());
-				Date fechaFinalJornada = fechaToDate(j.getDiaFinal());
+				Date fechaInicialJornada = j.getCalendario().getDiaInicio();
+				Date fechaFinalJornada = j.getCalendario().getDiaFin();
 //				System.out.println("id del medico"+m.getId());
 //				System.out.println("fecha a evaluar"+fechaCandidato.toString());
 //				System.out.println("inicio de jornada"+fechaInicialJornada.toString());

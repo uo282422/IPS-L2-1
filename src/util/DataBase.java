@@ -6,10 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import logic.Baja;
+import logic.Calendario;
 import logic.Enfermedad;
 import logic.Jornada;
 import logic.Medico;
@@ -38,6 +40,10 @@ public class DataBase {
 	private static final String BUSCAR_BAJAS_ID = "SELECT baja_id FROM baja";
 	private static final String GUARDAR_BAJA = "INSERT INTO baja VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String ACTUALIZAR_BAJA = "UPDATE baja SET baja_tipo = ?, baja_fecha_inicio = ?, baja_fecha_fin = ?, baja_hora_inicio = ?, baja_hora_fin = ?, baja_observaciones = ?, baja_medico_id = ? WHERE baja_id = ?";
+	private static final String CARGAR_CALENDARIOS = "SELECT * FROM CALENDARIO";
+	private static final String BUSCAR_CALENDARIOS_ID = "SELECT CALENDARIO_ID FROM CALENDARIO";
+	private static final String GUARDAR_CALENDARIO = "INSERT INTO CALENDARIO VALUES(?, ?, ?)";
+	private static final String ELIMINAR_CALENDARIO = "DELETE FROM CALENDARIO WHERE CALENDARIO_ID = ?";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -86,11 +92,10 @@ public class DataBase {
 					String dias = rs.getString("jornada_dias");
 					String horaI = rs.getString("jornada_hora_inicio");
 					String horaF = rs.getString("jornada_hora_fin");
-					String diaI = rs.getString("jornada_dia_inicio");
-					String diaF = rs.getString("jornada_dia_fin");
+					String calId = rs.getString("jornada_calendario_id");
 
-					jornadas.add(new Jornada(id, dias, horaI, horaF, diaI, diaF,
-							medId));
+					jornadas.add(
+							new Jornada(id, dias, horaI, horaF, medId, calId));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -327,9 +332,8 @@ public class DataBase {
 				s.setString(2, j.getDias());
 				s.setString(3, j.getHoraComienzo());
 				s.setString(4, j.getHoraFinal());
-				s.setString(5, j.getDiaInicio());
-				s.setString(6, j.getDiaFinal());
-				s.setString(7, j.getMedico().getId());
+				s.setString(5, j.getMedico().getId());
+				s.setString(6, j.getCalendario().getId());
 				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
@@ -953,7 +957,6 @@ public class DataBase {
 	public void guardarBaja(Baja b) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			PreparedStatement s = conn.prepareStatement(GUARDAR_BAJA);
-			ResultSet rs = null;
 			try {
 				s.setString(1, b.getId());
 				s.setString(2, b.getTipo().toString());
@@ -987,6 +990,96 @@ public class DataBase {
 				s.setString(6, b.getObservaciones());
 				s.setString(7, b.getMedico().getId());
 				s.setString(8, b.getId());
+				s.executeUpdate();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	public List<Calendario> cargarCalendarios() {
+		ArrayList<Calendario> cs = new ArrayList<Calendario>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(CARGAR_CALENDARIOS);
+			ResultSet rs = null;
+			try {
+				rs = s.executeQuery();
+				while (rs.next()) {
+					cs.add(new Calendario(rs.getString("calendario_id"),
+							rs.getString("calendario_inicio"),
+							rs.getString("calendario_fin")));
+				}
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return cs;
+	}
+
+	public String generarIdCalendario() {
+		String id = "";
+		List<String> ids = new ArrayList<String>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(BUSCAR_CALENDARIOS_ID);
+			ResultSet rs = null;
+			try {
+				rs = s.executeQuery();
+				while (rs.next()) {
+					ids.add(rs.getString("calendario_id"));
+				}
+				if (ids.isEmpty())
+					id = "700";
+				else
+					id = (Integer.parseInt(ids.get(ids.size() - 1)) + 1) + "";
+
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return id;
+	}
+
+	public void guardarCalendario(Calendario c) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(GUARDAR_CALENDARIO);
+			try {
+				s.setString(1, c.getId());
+				s.setString(2, new SimpleDateFormat("dd/MM/yyyy")
+						.format(c.getDiaInicio()));
+				s.setString(3, new SimpleDateFormat("dd/MM/yyyy")
+						.format(c.getDiaFin()));
+				s.executeUpdate();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	public void eliminarCalendario(Calendario c) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(ELIMINAR_CALENDARIO);
+			try {
+				s.setString(1, c.getId());
 				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);

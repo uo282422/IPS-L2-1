@@ -59,7 +59,7 @@ public class VentanaCrearJornada extends JDialog {
 	 */
 	public VentanaCrearJornada() {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 952, 558);
+		setBounds(100, 100, 930, 559);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(contentPanel, BorderLayout.CENTER);
@@ -157,7 +157,7 @@ public class VentanaCrearJornada extends JDialog {
 			}
 		}
 		contentPanel.add(jornadaPn);
-		jornadaPn.setLayout(new GridLayout(0, 1, 0, 0));
+		jornadaPn.setLayout(new BorderLayout(0, 0));
 		{
 			JPanel pnCalendarios = new JPanel();
 			jornadaPn.add(pnCalendarios);
@@ -198,6 +198,15 @@ public class VentanaCrearJornada extends JDialog {
 				diaFLb.setLabelFor(calendarF);
 				pnCalendarios.add(calendarF);
 			}
+		}
+		{
+			JButton btCalendarios = new JButton("Calendarios guardados");
+			btCalendarios.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					calendariosGuardados();
+				}
+			});
+			jornadaPn.add(btCalendarios, BorderLayout.SOUTH);
 		}
 		{
 			JPanel btnPn = new JPanel();
@@ -249,6 +258,12 @@ public class VentanaCrearJornada extends JDialog {
 				btnPn.add(cancelarBtn);
 			}
 		}
+	}
+
+	protected void calendariosGuardados() {
+		VentanaCalendariosGuardados v = new VentanaCalendariosGuardados(this);
+		v.setLocationRelativeTo(this);
+		v.setVisible(true);
 	}
 
 	/**
@@ -332,5 +347,10 @@ public class VentanaCrearJornada extends JDialog {
 				semana += day.getText();
 		}
 		return semana;
+	}
+
+	void _setCalendarsValues(JCalendar inicio, JCalendar fin) {
+		calendarI.setDate(inicio.getDate());
+		calendarF.setDate(fin.getDate());
 	}
 }

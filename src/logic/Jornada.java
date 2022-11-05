@@ -1,5 +1,7 @@
 package logic;
 
+import java.util.Date;
+
 import util.DataBase;
 
 public class Jornada {
@@ -9,9 +11,9 @@ public class Jornada {
 	private String dias;
 	private String horaComienzo;
 	private String horaFinal;
-	private String diaInicio;
-	private String diaFinal;
+	private Calendario c;
 	private String medicoId;
+	private String calId;
 
 	public Jornada() {
 		id = generarId();
@@ -28,15 +30,14 @@ public class Jornada {
 		this.id = id;
 	}
 
-	public Jornada(String id, String dias, String hI, String hF, String dI,
-			String dF, String medid) {
+	public Jornada(String id, String dias, String hI, String hF, String medid,
+			String calId) {
 		this.id = id;
 		this.dias = dias;
 		this.horaComienzo = hI;
 		this.horaFinal = hF;
-		this.diaInicio = dI;
-		this.diaFinal = dF;
 		this.medicoId = medid;
+		this.calId = calId;
 	}
 
 	public String getId() {
@@ -59,12 +60,8 @@ public class Jornada {
 		return horaFinal;
 	}
 
-	public String getDiaInicio() {
-		return diaInicio;
-	}
-
-	public String getDiaFinal() {
-		return diaFinal;
+	public Calendario getCalendario() {
+		return c;
 	}
 
 	public void setDias(String dias) {
@@ -79,15 +76,16 @@ public class Jornada {
 		this.horaFinal = horaFinal;
 	}
 
-	public void setDiaInicio(String diaInicio) {
-		this.diaInicio = diaInicio;
-	}
-
-	public void setDiaFinal(String diaFinal) {
-		this.diaFinal = diaFinal;
+	public void setCalendario(Calendario c) {
+		this.c = c;
 	}
 
 	public void setMedico(Medico m) {
 		medico = m;
+	}
+
+	public void creaCalendario(Date dInicio, Date dFin) {
+		c = new Calendario(dInicio, dFin);
+
 	}
 }

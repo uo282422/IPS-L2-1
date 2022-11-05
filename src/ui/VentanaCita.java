@@ -13,7 +13,6 @@ import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -21,8 +20,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
@@ -306,8 +303,6 @@ public class VentanaCita extends JFrame {
 		return lbAcude;
 	}
 
-
-
 	private JPanel getPnCausas() {
 		if (pnCausas == null) {
 			pnCausas = new JPanel();
@@ -327,7 +322,6 @@ public class VentanaCita extends JFrame {
 		return lbCausas;
 	}
 
-
 	private JButton getBtVerHistorial() {
 		if (btVerHistorial == null) {
 			btVerHistorial = new JButton("Ver historial");
@@ -342,7 +336,7 @@ public class VentanaCita extends JFrame {
 
 	protected void verHistorial() {
 		HistorialPaciente hP = new HistorialPaciente(c.getIdPaciente());
-		hP.show();
+		hP.setVisible(true);
 	}
 
 	private JPanel getPnRBtAcude() {
@@ -380,8 +374,6 @@ public class VentanaCita extends JFrame {
 		return rdBtNoFiguraAcude;
 	}
 
-	
-
 	/**
 	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la
 	 * lista recibida.
@@ -405,8 +397,6 @@ public class VentanaCita extends JFrame {
 		}
 		return pnCausasSuperior;
 	}
-
-	
 
 	private JComboBox<String> getCmbCausas() {
 		if (cmbCausas == null) {
@@ -492,7 +482,7 @@ public class VentanaCita extends JFrame {
 		return pnCausasInferior;
 	}
 
-	private JList getListCausasAñadidas() {
+	private JList<String> getListCausasAñadidas() {
 		if (listCausasAñadidas == null) {
 			listCausasAñadidas = new JList<String>();
 			listCausasAñadidas
