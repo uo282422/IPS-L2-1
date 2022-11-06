@@ -100,6 +100,17 @@ public class DataBase {
 					jornadas.add(
 							new Jornada(id, dias, horaI, horaF, medId, calId));
 				}
+				for (Jornada j : jornadas) {
+					rs = s.executeQuery(
+							"select * from calendario where calendario_id = "
+									+ j.getCalId());
+					while (rs.next()) {
+						j.setCalendario(
+								new Calendario(rs.getString("calendario_id"),
+										rs.getString("calendario_inicio"),
+										rs.getString("calendario_fin")));
+					}
+				}
 				rs.close();
 			} catch (SQLException e) {
 				throw new Error("Problema al cargar jornada", e);
@@ -1087,7 +1098,7 @@ public class DataBase {
 					ids.add(rs.getString("calendario_id"));
 				}
 				if (ids.isEmpty())
-					id = "700";
+					id = "800";
 				else
 					id = (Integer.parseInt(ids.get(ids.size() - 1)) + 1) + "";
 
