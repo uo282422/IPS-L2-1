@@ -22,12 +22,10 @@ import logic.cita.Cita;
 
 public class VentanaHora extends JFrame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private Cita cita;
+	private VentanaCita vc;
 
 	private JPanel contentPane;
 	private JPanel pnInferior;
@@ -44,12 +42,13 @@ public class VentanaHora extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public VentanaHora(Cita cita) {
+	public VentanaHora(Cita cita, VentanaCita vc) {
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 500, 371);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
+		this.vc = vc;
 		this.cita = cita;
 
 		setContentPane(contentPane);
@@ -87,6 +86,8 @@ public class VentanaHora extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					cita.setHoraEntrada(getTxtHoraEntrada().getText());
 					cita.setHoraSalida(getTxtHoraSalida().getText());
+					vc.refrescarInfo();
+					dispose();
 				}
 			});
 		}

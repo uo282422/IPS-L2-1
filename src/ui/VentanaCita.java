@@ -298,7 +298,6 @@ public class VentanaCita extends JFrame {
 			listCausasAñadidas = new JList<String>();
 			listCausasAñadidas
 					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			listCausasAñadidas.setEnabled(false);
 		}
 		return listCausasAñadidas;
 	}
@@ -348,7 +347,7 @@ public class VentanaCita extends JFrame {
 		return taPreview;
 	}
 
-	private void refrescarInfo() {
+	protected void refrescarInfo() {
 		StringBuilder sb = new StringBuilder(String.format(
 				"  CITA Nº%d\n  --------------------\n\n", c.getIdCita()));
 		sb.append(String.format("  Nombre del paciente: %s %s\n",
@@ -356,7 +355,9 @@ public class VentanaCita extends JFrame {
 		sb.append(String.format("  Hora: %s\n", c.getHoraE()));
 		sb.append(String.format("  Fecha: %s\n", c.getFecha()));
 		sb.append(String.format("  Sala: %d\n", c.getSala()));
-		sb.append(String.format("  Urgente: %s", c.isAcudio().toString()));
+		sb.append(String.format("  Urgente: %s\n", c.isAcudio().toString()));
+		sb.append(String.format("  Hora de entrada: %s\n", c.getHoraEntrada() == null ? "NO ESTABLECIDA" : c.getHoraEntrada()));
+		sb.append(String.format("  Hora de salida: %s\n", c.getHoraSalida() == null ? "NO ESTABLECIDA" : c.getHoraSalida()));
 
 		taPreview.setText(sb.toString());
 		validate();
@@ -383,14 +384,18 @@ public class VentanaCita extends JFrame {
 		if (btAlterar == null) {
 			btAlterar = new JButton("Añadir");
 			btAlterar.addActionListener(new ActionListener() {
-				@SuppressWarnings("deprecation")
 				public void actionPerformed(ActionEvent e) {
-					VentanaHora vh = new VentanaHora(c);
-					vh.show();
+					abrirVentanaHora();
 				}
 			});
 		}
 		return btAlterar;
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void abrirVentanaHora() {
+		VentanaHora vh = new VentanaHora(c, this);
+		vh.show();
 	}
 
 	private Component getHorizontalStrut() {

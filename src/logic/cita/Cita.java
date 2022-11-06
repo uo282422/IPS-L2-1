@@ -28,7 +28,7 @@ public class Cita {
 	private String horaEntrada;
 	private String horaSalida;
 
-	private List<Prescripcion> prescripciones;
+	private List<Prescripcion> prescripciones = new ArrayList<Prescripcion>();
 
 	public Cita(int id, int pacienteId, String fecha, String horaI,
 			String horaF, boolean urgente, int salaId, int telefono,
