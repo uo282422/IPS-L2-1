@@ -1087,7 +1087,7 @@ public class DataBase {
 					ids.add(rs.getString("calendario_id"));
 				}
 				if (ids.isEmpty())
-					id = "700";
+					id = "800";
 				else
 					id = (Integer.parseInt(ids.get(ids.size() - 1)) + 1) + "";
 
