@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
@@ -8,7 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
-import javax.swing.BoxLayout;
+import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
@@ -21,17 +22,19 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
+import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import logic.Prescripcion;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
 import nexus.GestorCitas;
-import java.awt.Component;
-import javax.swing.Box;
 
 public class VentanaCita extends JFrame {
 
@@ -54,24 +57,49 @@ public class VentanaCita extends JFrame {
 	private JRadioButton rdBtSiAcude;
 	private JRadioButton rdBtNoAcude;
 	private JRadioButton rdBtNoFiguraAcude;
-	private JPanel pnCausas;
-	private JPanel pnCausasSuperior;
-	private JLabel lbCausas;
-	private JComboBox<String> cmbCausas;
-	private JButton btAñadirCausas;
-	private JButton btEliminarCausas;
-	private JButton btNuevaCausa;
-	private JPanel pnCausasInferior;
 	private JList<String> listCausasAñadidas;
 	private JLabel lbCausasAñadidas;
-	private JPanel pnCampos;
-	private JPanel pnPreview;
+	private JPanel pnCamposGenerales;
+	private JPanel pnPreviewGenerales;
 	private JScrollPane spPreview;
 	private JTextArea taPreview;
 	private JPanel pnHora;
 	private JLabel lbHora;
 	private JButton btAlterar;
 	private Component horizontalStrut;
+	private JPanel pnCamposCausas;
+	private JPanel pnCamposProcedimientos;
+	private JPanel pnPrescripcionesCombo;
+	private JPanel pnPreviewCausas;
+	private JPanel pnPreviewProcedimientos;
+	private JPanel pnPreviewPrescripciones;
+	private JLabel lbCausas;
+	private JComboBox<String> cmbCausas;
+	private JButton btAñadirCausas;
+	private JButton btEliminarCausas;
+	private JButton btNuevaCausa;
+	private JLabel lbPrescripciones;
+	private JComboBox<Prescripcion> cbPrescripciones;
+	private JButton btnAddPrescripciones;
+	private JPanel pnCamposPrescripciones;
+	private JPanel pnPrescripcionesDetalles;
+	private JLabel lblCantidad;
+	private JTextField txtCantidad;
+	private Component horizontalStrut_1;
+	private JLabel lblIntervalo;
+	private JSpinner spIntervalo;
+	private JLabel lblIntervaloHoras;
+	private Component horizontalStrut_2;
+	private Component horizontalStrut_3;
+	private Component horizontalStrut_4;
+	private JLabel lblDuracion;
+	private JSpinner spDuracion;
+	private Component horizontalStrut_5;
+	private Component horizontalStrut_6;
+	private JLabel lblOtrosDatos;
+	private JTextField txtOtrosDatos;
+	private JLabel lblPrescripcionesAdded;
+	private JList<Prescripcion> listPrescripcionesAdded;
 
 	/**
 	 * Launch the application.
@@ -102,14 +130,21 @@ public class VentanaCita extends JFrame {
 		contentPane.setLayout(new BorderLayout(0, 0));
 		contentPane.add(getPnCentral(), BorderLayout.CENTER);
 		contentPane.add(getPnInferior(), BorderLayout.SOUTH);
+		contentPane.add(getBtVerHistorial(), BorderLayout.NORTH);
 	}
 
 	private JPanel getPnCentral() {
 		if (pnCentral == null) {
 			pnCentral = new JPanel();
-			pnCentral.setLayout(new GridLayout(0, 2, 0, 0));
-			pnCentral.add(getPnCampos());
-			pnCentral.add(getPnPreview());
+			pnCentral.setLayout(new GridLayout(4, 2, 0, 0));
+			pnCentral.add(getPnCamposGenerales());
+			pnCentral.add(getPnPreviewGenerales());
+			pnCentral.add(getPnCamposCausas());
+			pnCentral.add(getPnPreviewCausas());
+			pnCentral.add(getPnCamposProcedimientos());
+			pnCentral.add(getPnPreviewProcedimientos());
+			pnCentral.add(getPnCamposPrescripciones());
+			pnCentral.add(getPnPreviewPrescripciones());
 		}
 		return pnCentral;
 	}
@@ -168,25 +203,6 @@ public class VentanaCita extends JFrame {
 			lbAcude = new JLabel("Acude:");
 		}
 		return lbAcude;
-	}
-
-	private JPanel getPnCausas() {
-		if (pnCausas == null) {
-			pnCausas = new JPanel();
-			pnCausas.setLayout(new BoxLayout(pnCausas, BoxLayout.Y_AXIS));
-			pnCausas.add(getPnCausasSuperior());
-			pnCausas.add(getPnCausasInferior());
-
-		}
-		return pnCausas;
-	}
-
-	private JLabel getLbCausas() {
-		if (lbCausas == null) {
-			lbCausas = new JLabel("Causas:");
-			lbCausas.setHorizontalAlignment(SwingConstants.CENTER);
-		}
-		return lbCausas;
 	}
 
 	private JButton getBtVerHistorial() {
@@ -255,43 +271,6 @@ public class VentanaCita extends JFrame {
 		return new DefaultComboBoxModel<String>(array);
 	}
 
-	private JPanel getPnCausasSuperior() {
-		if (pnCausasSuperior == null) {
-			pnCausasSuperior = new JPanel();
-			pnCausasSuperior.add(getLbCausas());
-			pnCausasSuperior.add(getCmbCausas());
-			pnCausasSuperior.add(getBtAñadirCausas());
-			pnCausasSuperior.add(getBtEliminarCausas());
-			pnCausasSuperior.add(getBtNuevaCausa());
-		}
-		return pnCausasSuperior;
-	}
-
-	private JComboBox<String> getCmbCausas() {
-		if (cmbCausas == null) {
-			cmbCausas = new JComboBox<String>();
-			cmbCausas.setModel(setUpComboModel(gestor.cargarTodasCausas()));
-		}
-		return cmbCausas;
-	}
-
-	private JButton getBtAñadirCausas() {
-		if (btAñadirCausas == null) {
-			btAñadirCausas = new JButton("Añadir");
-			btAñadirCausas.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					addCausa();
-				}
-			});
-		}
-		return btAñadirCausas;
-	}
-
-	protected void addCausa() {
-		c.addCausa((String) cmbCausas.getSelectedItem());
-		updateListaCausas();
-	}
-
 	private void updateListaCausas() {
 		listCausasAñadidas.setModel(toListModel(c.getCausas()));
 	}
@@ -301,45 +280,6 @@ public class VentanaCita extends JFrame {
 		for (String c : l)
 			model.addElement(c);
 		return model;
-	}
-
-	private JButton getBtEliminarCausas() {
-		if (btEliminarCausas == null) {
-			btEliminarCausas = new JButton("Eliminar");
-			btEliminarCausas.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					deleteCausa();
-				}
-			});
-		}
-		return btEliminarCausas;
-	}
-
-	protected void deleteCausa() {
-		c.deleteCausa((String) cmbCausas.getSelectedItem());
-		updateListaCausas();
-	}
-
-	private JButton getBtNuevaCausa() {
-		if (btNuevaCausa == null) {
-			btNuevaCausa = new JButton("Nueva Causa");
-			btNuevaCausa.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					gestor.nuevaCausa(JOptionPane.showInputDialog("Introduzca la nueva causa"));
-				}
-			});
-		}
-		return btNuevaCausa;
-	}
-
-	private JPanel getPnCausasInferior() {
-		if (pnCausasInferior == null) {
-			pnCausasInferior = new JPanel();
-			pnCausasInferior.setLayout(new BorderLayout(0, 0));
-			pnCausasInferior.add(getListCausasAñadidas());
-			pnCausasInferior.add(getLbCausasAñadidas(), BorderLayout.NORTH);
-		}
-		return pnCausasInferior;
 	}
 
 	private JList<String> getListCausasAñadidas() {
@@ -358,26 +298,24 @@ public class VentanaCita extends JFrame {
 		return lbCausasAñadidas;
 	}
 
-	private JPanel getPnCampos() {
-		if (pnCampos == null) {
-			pnCampos = new JPanel();
-			FlowLayout flowLayout = (FlowLayout) pnCampos.getLayout();
-			flowLayout.setAlignment(FlowLayout.LEFT);
-			pnCampos.add(getPnAcude());
-			pnCampos.add(getPnHora());
-			pnCampos.add(getPnCausas());
+	private JPanel getPnCamposGenerales() {
+		if (pnCamposGenerales == null) {
+			pnCamposGenerales = new JPanel();
+			FlowLayout fl_pnCamposGenerales = (FlowLayout) pnCamposGenerales.getLayout();
+			fl_pnCamposGenerales.setAlignment(FlowLayout.LEFT);
+			pnCamposGenerales.add(getPnAcude());
+			pnCamposGenerales.add(getPnHora());
 		}
-		return pnCampos;
+		return pnCamposGenerales;
 	}
 
-	private JPanel getPnPreview() {
-		if (pnPreview == null) {
-			pnPreview = new JPanel();
-			pnPreview.setLayout(new BorderLayout(0, 0));
-			pnPreview.add(getBtVerHistorial(), BorderLayout.NORTH);
-			pnPreview.add(getSpPreview(), BorderLayout.CENTER);
+	private JPanel getPnPreviewGenerales() {
+		if (pnPreviewGenerales == null) {
+			pnPreviewGenerales = new JPanel();
+			pnPreviewGenerales.setLayout(new BorderLayout(0, 0));
+			pnPreviewGenerales.add(getSpPreview(), BorderLayout.CENTER);
 		}
-		return pnPreview;
+		return pnPreviewGenerales;
 	}
 
 	private JScrollPane getSpPreview() {
@@ -439,10 +377,329 @@ public class VentanaCita extends JFrame {
 		}
 		return btAlterar;
 	}
+
 	private Component getHorizontalStrut() {
 		if (horizontalStrut == null) {
 			horizontalStrut = Box.createHorizontalStrut(20);
 		}
 		return horizontalStrut;
+	}
+
+	private JPanel getPnCamposCausas() {
+		if (pnCamposCausas == null) {
+			pnCamposCausas = new JPanel();
+			FlowLayout flowLayout = (FlowLayout) pnCamposCausas.getLayout();
+			flowLayout.setAlignment(FlowLayout.LEFT);
+			pnCamposCausas.add(getLbCausas());
+			pnCamposCausas.add(getCmbCausas());
+			pnCamposCausas.add(getBtAñadirCausas());
+			pnCamposCausas.add(getBtEliminarCausas());
+			pnCamposCausas.add(getBtNuevaCausa());
+		}
+		return pnCamposCausas;
+	}
+
+	private JPanel getPnCamposProcedimientos() {
+		if (pnCamposProcedimientos == null) {
+			pnCamposProcedimientos = new JPanel();
+		}
+		return pnCamposProcedimientos;
+	}
+
+	private JPanel getPnPrescripcionesCombo() {
+		if (pnPrescripcionesCombo == null) {
+			pnPrescripcionesCombo = new JPanel();
+			FlowLayout fl_pnPrescripcionesCombo = (FlowLayout) pnPrescripcionesCombo.getLayout();
+			fl_pnPrescripcionesCombo.setAlignment(FlowLayout.LEFT);
+			pnPrescripcionesCombo.add(getLbPrescripciones());
+			pnPrescripcionesCombo.add(getCbPrescripciones());
+			pnPrescripcionesCombo.add(getBtAñadirPrescripciones());
+		}
+		return pnPrescripcionesCombo;
+	}
+
+	private JPanel getPnPreviewCausas() {
+		if (pnPreviewCausas == null) {
+			pnPreviewCausas = new JPanel();
+			pnPreviewCausas.setLayout(new BorderLayout(0, 0));
+			pnPreviewCausas.add(getLbCausasAñadidas(), BorderLayout.NORTH);
+			pnPreviewCausas.add(getListCausasAñadidas(), BorderLayout.CENTER);
+		}
+		return pnPreviewCausas;
+	}
+
+	private JPanel getPnPreviewProcedimientos() {
+		if (pnPreviewProcedimientos == null) {
+			pnPreviewProcedimientos = new JPanel();
+		}
+		return pnPreviewProcedimientos;
+	}
+
+	private JPanel getPnPreviewPrescripciones() {
+		if (pnPreviewPrescripciones == null) {
+			pnPreviewPrescripciones = new JPanel();
+			pnPreviewPrescripciones.add(getLblPrescripcionesAdded());
+			pnPreviewPrescripciones.add(getListPrescripcionesAdded());
+		}
+		return pnPreviewPrescripciones;
+	}
+
+	private JLabel getLbCausas() {
+		if (lbCausas == null) {
+			lbCausas = new JLabel("Causas:");
+			lbCausas.setHorizontalAlignment(SwingConstants.CENTER);
+		}
+		return lbCausas;
+	}
+
+	private JComboBox<String> getCmbCausas() {
+		if (cmbCausas == null) {
+			cmbCausas = new JComboBox<String>();
+			cmbCausas.setModel(setUpComboModel(gestor.cargarTodasCausas()));
+		}
+		return cmbCausas;
+	}
+
+	private JButton getBtAñadirCausas() {
+		if (btAñadirCausas == null) {
+			btAñadirCausas = new JButton("Añadir");
+			btAñadirCausas.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					addCausa();
+				}
+			});
+		}
+		return btAñadirCausas;
+	}
+
+	protected void addCausa() {
+		c.addCausa((String) cmbCausas.getSelectedItem());
+		updateListaCausas();
+	}
+
+	private JButton getBtEliminarCausas() {
+		if (btEliminarCausas == null) {
+			btEliminarCausas = new JButton("Eliminar");
+		}
+		return btEliminarCausas;
+	}
+
+	private JButton getBtNuevaCausa() {
+		if (btNuevaCausa == null) {
+			btNuevaCausa = new JButton("Nueva Causa");
+			btNuevaCausa.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					gestor.nuevaCausa(JOptionPane.showInputDialog("Introduzca la nueva causa"));
+				}
+			});
+		}
+		return btNuevaCausa;
+	}
+
+	private JLabel getLbPrescripciones() {
+		if (lbPrescripciones == null) {
+			lbPrescripciones = new JLabel("Prescripciones:");
+			lbPrescripciones.setHorizontalAlignment(SwingConstants.CENTER);
+		}
+		return lbPrescripciones;
+	}
+
+	private JComboBox<Prescripcion> getCbPrescripciones() {
+		if (cbPrescripciones == null) {
+			cbPrescripciones = new JComboBox<Prescripcion>();
+			for (Prescripcion p : gestor.cargarPrescripcionesSinParam()) {
+				cbPrescripciones.addItem(p);
+			}
+		}
+		return cbPrescripciones;
+	}
+
+	private JButton getBtAñadirPrescripciones() {
+		if (btnAddPrescripciones == null) {
+			btnAddPrescripciones = new JButton("Añadir");
+			btnAddPrescripciones.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					actualizarPrescripciones();
+				}
+			});
+		}
+		return btnAddPrescripciones;
+	}
+	
+	protected void actualizarPrescripciones() {
+		Prescripcion p = ((Prescripcion)getCbPrescripciones().getSelectedItem());
+		Prescripcion nuevaP = new Prescripcion(p.getIdPrescripcion(), p.toString());		// Obligatorio para mantener modelo
+		nuevaP.setCantidad(getTxtCantidad().getText());
+		nuevaP.setDuracion((Integer) getSpDuracion().getValue());
+		nuevaP.setIntervalo((Integer) getSpIntervalo().getValue());
+		nuevaP.setOtrosDatos(getTxtOtrosDatos().getText());
+		
+		c.getPrescripciones().add(nuevaP);
+		final DefaultListModel<Prescripcion> model = new DefaultListModel<Prescripcion>();
+		for (Prescripcion presc : c.getPrescripciones()) {
+			model.addElement(presc);
+		}
+		getListPrescripcionesAdded().setModel(model);
+	}
+
+	private JPanel getPnCamposPrescripciones() {
+		if (pnCamposPrescripciones == null) {
+			pnCamposPrescripciones = new JPanel();
+			pnCamposPrescripciones.setLayout(new GridLayout(2, 2, 0, 0));
+			pnCamposPrescripciones.add(getPnPrescripcionesCombo());
+			pnCamposPrescripciones.add(getPnPrescripcionesDetalles());
+		}
+		return pnCamposPrescripciones;
+	}
+
+	private JPanel getPnPrescripcionesDetalles() {
+		if (pnPrescripcionesDetalles == null) {
+			pnPrescripcionesDetalles = new JPanel();
+			FlowLayout flowLayout = (FlowLayout) pnPrescripcionesDetalles.getLayout();
+			flowLayout.setAlignment(FlowLayout.LEFT);
+			pnPrescripcionesDetalles.add(getLblCantidad());
+			pnPrescripcionesDetalles.add(getTxtCantidad());
+			pnPrescripcionesDetalles.add(getHorizontalStrut_1());
+			pnPrescripcionesDetalles.add(getHorizontalStrut_4());
+			pnPrescripcionesDetalles.add(getLblIntervalo());
+			pnPrescripcionesDetalles.add(getSpIntervalo());
+			pnPrescripcionesDetalles.add(getLblIntervaloHoras());
+			pnPrescripcionesDetalles.add(getHorizontalStrut_2());
+			pnPrescripcionesDetalles.add(getHorizontalStrut_3());
+			pnPrescripcionesDetalles.add(getLblDuracion());
+			pnPrescripcionesDetalles.add(getSpDuracion());
+			pnPrescripcionesDetalles.add(getHorizontalStrut_5());
+			pnPrescripcionesDetalles.add(getHorizontalStrut_6());
+			pnPrescripcionesDetalles.add(getLblOtrosDatos());
+			pnPrescripcionesDetalles.add(getTxtOtrosDatos());
+		}
+		return pnPrescripcionesDetalles;
+	}
+
+	private JLabel getLblCantidad() {
+		if (lblCantidad == null) {
+			lblCantidad = new JLabel("Cantidad:");
+		}
+		return lblCantidad;
+	}
+
+	private JTextField getTxtCantidad() {
+		if (txtCantidad == null) {
+			txtCantidad = new JTextField();
+			txtCantidad.setColumns(10);
+		}
+		return txtCantidad;
+	}
+
+	private Component getHorizontalStrut_1() {
+		if (horizontalStrut_1 == null) {
+			horizontalStrut_1 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_1;
+	}
+
+	private JLabel getLblIntervalo() {
+		if (lblIntervalo == null) {
+			lblIntervalo = new JLabel("Intervalo:");
+		}
+		return lblIntervalo;
+	}
+
+	private JSpinner getSpIntervalo() {
+		if (spIntervalo == null) {
+			spIntervalo = new JSpinner();
+			spIntervalo
+					.setModel(new SpinnerNumberModel(Integer.valueOf(6), Integer.valueOf(6), null, Integer.valueOf(6)));
+		}
+		return spIntervalo;
+	}
+
+	private JLabel getLblIntervaloHoras() {
+		if (lblIntervaloHoras == null) {
+			lblIntervaloHoras = new JLabel("  horas");
+		}
+		return lblIntervaloHoras;
+	}
+
+	private Component getHorizontalStrut_2() {
+		if (horizontalStrut_2 == null) {
+			horizontalStrut_2 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_2;
+	}
+
+	private Component getHorizontalStrut_3() {
+		if (horizontalStrut_3 == null) {
+			horizontalStrut_3 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_3;
+	}
+
+	private Component getHorizontalStrut_4() {
+		if (horizontalStrut_4 == null) {
+			horizontalStrut_4 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_4;
+	}
+
+	private JLabel getLblDuracion() {
+		if (lblDuracion == null) {
+			lblDuracion = new JLabel("Duración:");
+		}
+		return lblDuracion;
+	}
+
+	private JSpinner getSpDuracion() {
+		if (spDuracion == null) {
+			spDuracion = new JSpinner();
+			spDuracion
+					.setModel(new SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+		}
+		return spDuracion;
+	}
+
+	private Component getHorizontalStrut_5() {
+		if (horizontalStrut_5 == null) {
+			horizontalStrut_5 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_5;
+	}
+
+	private Component getHorizontalStrut_6() {
+		if (horizontalStrut_6 == null) {
+			horizontalStrut_6 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_6;
+	}
+
+	private JLabel getLblOtrosDatos() {
+		if (lblOtrosDatos == null) {
+			lblOtrosDatos = new JLabel("Otros datos:");
+		}
+		return lblOtrosDatos;
+	}
+
+	private JTextField getTxtOtrosDatos() {
+		if (txtOtrosDatos == null) {
+			txtOtrosDatos = new JTextField();
+			txtOtrosDatos.setColumns(10);
+		}
+		return txtOtrosDatos;
+	}
+
+	private JLabel getLblPrescripcionesAdded() {
+		if (lblPrescripcionesAdded == null) {
+			lblPrescripcionesAdded = new JLabel("New label");
+		}
+		return lblPrescripcionesAdded;
+	}
+
+	private JList<Prescripcion> getListPrescripcionesAdded() {
+		if (listPrescripcionesAdded == null) {
+			listPrescripcionesAdded = new JList<Prescripcion>();
+			listCausasAñadidas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listCausasAñadidas.setEnabled(false);
+		}
+		return listPrescripcionesAdded;
 	}
 }

@@ -13,6 +13,7 @@ import logic.Enfermedad;
 import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
+import logic.Prescripcion;
 import logic.Sala;
 import logic.Vacuna;
 import logic.cita.Cita;
@@ -34,6 +35,7 @@ public class DataBase {
 	private static final String ACTUALIZAR_CAUSAS = "INSERT INTO causacita (cita_id, causa) VALUES(?,?)";
 	private static final String QUERY_ALL_CAUSAS = "SELECT causa FROM causa";
 	private static final String NUEVA_CAUSA = "INSERT INTO causa VALUES(?)";
+	private static final String LISTAR_PRESC = "SELECT prescripcion_id, prescripcion_nombre from prescripcion";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -880,6 +882,28 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 		return causas;
+	}
+
+	public List<Prescripcion> cargarPrescripciones() {
+		ArrayList<Prescripcion> prescripciones = new ArrayList<>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery(LISTAR_PRESC);
+				while (rs.next()) {
+					prescripciones.add(new Prescripcion(rs.getString(1),rs.getString(2)));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return prescripciones;
 	}
 
 	public void nuevaCausa(String causa) {
