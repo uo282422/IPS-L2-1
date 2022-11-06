@@ -5,6 +5,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import logic.Prescripcion;
+
 public class Cita {
 
 	private int idCita;
@@ -25,6 +27,8 @@ public class Cita {
 
 	private String horaEntrada;
 	private String horaSalida;
+	
+	private List<Prescripcion> prescripciones;
 
 	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
 			int telefono, String correo, String otros, Enum_acudio acudio, List<String> causas, String motivos) {
@@ -274,6 +278,14 @@ public class Cita {
 
 	public void setHoraSalida(String horaSalida) {
 		this.horaSalida = horaSalida;
+	}
+
+	public List<Prescripcion> getPrescripciones() {
+		return prescripciones;
+	}
+
+	public void setPrescripciones(List<Prescripcion> prescripciones) {
+		this.prescripciones = prescripciones;
 	}
 
 }

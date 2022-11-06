@@ -17,6 +17,7 @@ import javax.mail.internet.MimeMessage;
 import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
+import logic.Prescripcion;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
 import ui.Especialidad;
@@ -382,6 +383,10 @@ public void agregarEspecialidad(Especialidad espNueva) {
 	public void limpiarEspecialidades() {
 		especialidades.removeAll(especialidades);
 		
+	}
+
+	public List<Prescripcion> cargarPrescripcionesSinParam() {
+		return bd.cargarPrescripciones();
 	}
 
 }
