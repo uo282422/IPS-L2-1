@@ -4,6 +4,13 @@
   <artifactId>PL2-1</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <dependencies>
+  <!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
+	<dependency>
+	   <groupId>org.hsqldb</groupId>
+	   <artifactId>hsqldb</artifactId>
+	   <version>2.3.3</version>
+	</dependency>
+
   <!-- https://mvnrepository.com/artifact/com.toedter/jcalendar -->
   	<dependency>
     <groupId>com.toedter</groupId>
@@ -22,13 +29,7 @@
     	<artifactId>javax.mail-api</artifactId>
     	<version>1.6.2</version>
 	</dependency>
-	<!-- https://mvnrepository.com/artifact/org.hsqldb/hsqldb -->
-	<dependency>
-	    <groupId>org.hsqldb</groupId>
-	    <artifactId>hsqldb</artifactId>
-	    <version>2.3.3</version>
-	    <scope>test</scope>
-	</dependency>
+	
 
   </dependencies>
   <name>PL2-1</name>
