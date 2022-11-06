@@ -3,7 +3,6 @@ package ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.Label;
 import java.awt.event.ActionEvent;
@@ -249,6 +248,7 @@ public class VentanaHorario extends JFrame {
 		return pnCbMedicos;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void abrirDetallesCita(int idCita) {
 		// Abrir la ventana de ManuH
 		VentanaCita vC=new VentanaCita(idCita+"");

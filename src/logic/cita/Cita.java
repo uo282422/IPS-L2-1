@@ -23,11 +23,12 @@ public class Cita {
 	private String otrosCita;
 	private String motivosIniciales;
 
-	public Cita(int id, int pacienteId, String fecha, String horaI,
-			String horaF, boolean urgente, int salaId, int telefono,
-			String correo, String otros, Enum_acudio acudio,
-			List<String> causas, String motivos) {
-		this.motivosIniciales=motivos;
+	private String horaEntrada;
+	private String horaSalida;
+
+	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
+			int telefono, String correo, String otros, Enum_acudio acudio, List<String> causas, String motivos) {
+		this.motivosIniciales = motivos;
 		this.idCita = id;
 		setIdPaciente(pacienteId);
 		setFecha(fecha);
@@ -39,15 +40,15 @@ public class Cita {
 		this.correoCita = correo;
 		this.otrosCita = otros;
 		this.causas = causas;
-		this.acudio=acudio;
+		this.acudio = acudio;
 	}
-	private void setMotivosIniciales(String m) {
-		this.motivosIniciales = m;
 
-	}
-	
+//	private void setMotivosIniciales(String m) {
+//		this.motivosIniciales = m;
+//	}
+
 	public String getMotivosIniciales() {
-		return this.motivosIniciales ;
+		return this.motivosIniciales;
 
 	}
 
@@ -119,8 +120,8 @@ public class Cita {
 	}
 
 	/*
-	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato:
-	 * DD/MM/YYYY 0 1 2
+	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato: DD/MM/YYYY
+	 * 0 1 2
 	 */
 	public Date fechaToDate(String fecha) {
 		String[] sep = fecha.split("/");
@@ -155,13 +156,10 @@ public class Cita {
 
 	@Override
 	public String toString() {
-		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente
-				+ ", nombrePaciente=" + nombrePaciente + ", fecha=" + fecha
-				+ ", horaE=" + horaE + ", horaS=" + horaS + ", urgente="
-				+ urgente + ", sala=" + sala + ", acudio=" + acudio
-				+ ", telefonoCita=" + telefonoCita + ", correoCita="
-				+ correoCita + ", otrosCita=" + otrosCita + ", causaCita="
-				+ causas + "]";
+		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente + ", nombrePaciente=" + nombrePaciente
+				+ ", fecha=" + fecha + ", horaE=" + horaE + ", horaS=" + horaS + ", urgente=" + urgente + ", sala="
+				+ sala + ", acudio=" + acudio + ", telefonoCita=" + telefonoCita + ", correoCita=" + correoCita
+				+ ", otrosCita=" + otrosCita + ", causaCita=" + causas + "]";
 	}
 
 	/*
@@ -256,6 +254,26 @@ public class Cita {
 
 	public void deleteCausa(String c) {
 		causas.remove(c);
+	}
+
+	public String getApellidoPaciente() {
+		return "Chinchurreta"; // testear longitud
+	}
+
+	public String getHoraEntrada() {
+		return horaEntrada;
+	}
+
+	public void setHoraEntrada(String horaEntrada) {
+		this.horaEntrada = horaEntrada;
+	}
+
+	public String getHoraSalida() {
+		return horaSalida;
+	}
+
+	public void setHoraSalida(String horaSalida) {
+		this.horaSalida = horaSalida;
 	}
 
 }
