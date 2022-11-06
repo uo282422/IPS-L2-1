@@ -438,8 +438,9 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnPreviewPrescripciones() {
 		if (pnPreviewPrescripciones == null) {
 			pnPreviewPrescripciones = new JPanel();
-			pnPreviewPrescripciones.add(getLblPrescripcionesAdded());
-			pnPreviewPrescripciones.add(getListPrescripcionesAdded());
+			pnPreviewPrescripciones.setLayout(new BorderLayout(0, 0));
+			pnPreviewPrescripciones.add(getLblPrescripcionesAdded(), BorderLayout.NORTH);
+			pnPreviewPrescripciones.add(getListPrescripcionesAdded(), BorderLayout.CENTER);
 		}
 		return pnPreviewPrescripciones;
 	}
@@ -689,7 +690,7 @@ public class VentanaCita extends JFrame {
 
 	private JLabel getLblPrescripcionesAdded() {
 		if (lblPrescripcionesAdded == null) {
-			lblPrescripcionesAdded = new JLabel("New label");
+			lblPrescripcionesAdded = new JLabel("Prescripciones añadidas:");
 		}
 		return lblPrescripcionesAdded;
 	}
