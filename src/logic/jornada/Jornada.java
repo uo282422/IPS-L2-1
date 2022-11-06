@@ -89,4 +89,8 @@ public class Jornada {
 		c = new Calendario(dInicio, dFin);
 
 	}
+
+	public String getCalId() {
+		return calId;
+	}
 }

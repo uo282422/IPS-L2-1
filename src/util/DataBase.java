@@ -100,6 +100,17 @@ public class DataBase {
 					jornadas.add(
 							new Jornada(id, dias, horaI, horaF, medId, calId));
 				}
+				for (Jornada j : jornadas) {
+					rs = s.executeQuery(
+							"select * from calendario where calendario_id = "
+									+ j.getCalId());
+					while (rs.next()) {
+						j.setCalendario(
+								new Calendario(rs.getString("calendario_id"),
+										rs.getString("calendario_inicio"),
+										rs.getString("calendario_fin")));
+					}
+				}
 				rs.close();
 			} catch (SQLException e) {
 				throw new Error("Problema al cargar jornada", e);
