@@ -6,11 +6,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import logic.Baja;
 import logic.Enfermedad;
-import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import logic.Prescripcion;
@@ -18,6 +19,8 @@ import logic.Sala;
 import logic.Vacuna;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import logic.jornada.Calendario;
+import logic.jornada.Jornada;
 import ui.Especialidad;
 
 public class DataBase {
@@ -27,8 +30,8 @@ public class DataBase {
 
 	private static final String QUERY_CITA_CON_ID = "SELECT * FROM cita WHERE cita_id = ?";
 	private static final String QUERY_NOMBRE_PACIENTE_CON_ID = "SELECT paciente_nombre FROM paciente WHERE paciente_id = ?";
-	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES (?, ?, ?, ?, ?, ?, ?)";
+	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES (?, ?, ?, ?, ?, ?)";
 	private static final String ACTUALIZAR_CITA_ACUDE = "UPDATE cita SET cita_acudio = ? WHERE cita_id = ?";
 	private static final String QUERY_ID_JORNADA = "SELECT jornada_id FROM jornada";
 	private static final String QUERY_CAUSAS = "SELECT causa FROM causacita WHERE cita_id = ?";
@@ -36,6 +39,14 @@ public class DataBase {
 	private static final String QUERY_ALL_CAUSAS = "SELECT causa FROM causa";
 	private static final String NUEVA_CAUSA = "INSERT INTO causa VALUES(?)";
 	private static final String LISTAR_PRESC = "SELECT prescripcion_id, prescripcion_nombre from prescripcion";
+	private static final String BUSCAR_BAJAS_PORMEDICO = "SELECT * FROM baja WHERE baja_medico_id = ?";
+	private static final String BUSCAR_BAJAS_ID = "SELECT baja_id FROM baja";
+	private static final String GUARDAR_BAJA = "INSERT INTO baja VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
+	private static final String ACTUALIZAR_BAJA = "UPDATE baja SET baja_tipo = ?, baja_fecha_inicio = ?, baja_fecha_fin = ?, baja_hora_inicio = ?, baja_hora_fin = ?, baja_observaciones = ?, baja_medico_id = ? WHERE baja_id = ?";
+	private static final String CARGAR_CALENDARIOS = "SELECT * FROM CALENDARIO";
+	private static final String BUSCAR_CALENDARIOS_ID = "SELECT CALENDARIO_ID FROM CALENDARIO";
+	private static final String GUARDAR_CALENDARIO = "INSERT INTO CALENDARIO VALUES(?, ?, ?)";
+	private static final String ELIMINAR_CALENDARIO = "DELETE FROM CALENDARIO WHERE CALENDARIO_ID = ?";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -84,11 +95,10 @@ public class DataBase {
 					String dias = rs.getString("jornada_dias");
 					String horaI = rs.getString("jornada_hora_inicio");
 					String horaF = rs.getString("jornada_hora_fin");
-					String diaI = rs.getString("jornada_dia_inicio");
-					String diaF = rs.getString("jornada_dia_fin");
+					String calId = rs.getString("jornada_calendario_id");
 
-					jornadas.add(new Jornada(id, dias, horaI, horaF, diaI, diaF,
-							medId));
+					jornadas.add(
+							new Jornada(id, dias, horaI, horaF, medId, calId));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -177,10 +187,14 @@ public class DataBase {
 		return pacientes;
 	}
 
-	public void crearCita(Cita cita, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
+	public void crearCita(Cita cita, ArrayList<Medico> medicos,
+			ArrayList<Especialidad> especialidades) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
+
+			PreparedStatement pst = conn.prepareStatement(
+					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
+
 			try {
 				pst.setString(1, cita.getIdCita() + "");
 				pst.setString(2, cita.getIdPaciente() + "");
@@ -194,6 +208,7 @@ public class DataBase {
 				pst.setString(10, cita.getOtrosCita());
 				pst.setInt(11, serializeAcudio(cita.isAcudio()));
 				pst.setString(12, cita.getMotivosIniciales());
+
 				pst.execute();
 
 			} catch (SQLException e) {
@@ -208,30 +223,25 @@ public class DataBase {
 					pst.setString(2, cita.getIdCita() + "");
 					pst.execute();
 				}
-				
-				
 
 			} catch (SQLException e) {
 				throw new Error("Error al linkear medico-cita", e);
 			}
-			
-			
-			
-			pst = conn.prepareStatement("insert into especialidad_cita values(?,?,?)");
+
+			pst = conn.prepareStatement(
+					"insert into especialidad_cita values(?,?,?)");
 			try {
-				
+
 				for (Especialidad e : especialidades) {
-					pst.setString(1, cita.getIdCita()+"");
+					pst.setString(1, cita.getIdCita() + "");
 					pst.setString(2, e.getId_esp());
 					pst.setInt(3, e.getUnidades());
 					pst.execute();
 				}
-				
-				
 
 			} catch (SQLException e) {
 				throw new Error("Error al linkear epecialidad-cita", e);
-				
+
 			} finally {
 				pst.close();
 				conn.close();
@@ -241,8 +251,6 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 	}
-	
-	
 
 	private void setCausas(int idCita, List<String> causas) {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -347,9 +355,8 @@ public class DataBase {
 				s.setString(2, j.getDias());
 				s.setString(3, j.getHoraComienzo());
 				s.setString(4, j.getHoraFinal());
-				s.setString(5, j.getDiaInicio());
-				s.setString(6, j.getDiaFinal());
-				s.setString(7, j.getMedico().getId());
+				s.setString(5, j.getMedico().getId());
+				s.setString(6, j.getCalendario().getId());
 				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
@@ -541,7 +548,7 @@ public class DataBase {
 					int acudio = rs.getInt("CITA_ACUDIO");
 					List<String> causas = getCausas(rs.getString("cita_id"));
 					String motivos = rs.getString("cita_motivos");
-					
+
 					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
 							urgente, salaId, Integer.parseInt(telefono), correo,
 							otros, parseAcudio(acudio), causas, motivos));
@@ -578,7 +585,6 @@ public class DataBase {
 					String apellido = rs.getString("MEDICO_APELLIDO");
 					String email = rs.getString("MEDICO_EMAIL");
 					String esp = rs.getString("MEDICO_ESPECIALIDAD");
-
 
 					medicos.add(new Medico(id, nombre, apellido, email, esp));
 				}
@@ -841,13 +847,16 @@ public class DataBase {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			PreparedStatement pst = conn.prepareStatement(
 					"select especialidad_id, especialidad_nombre from especialidad");
+
 			try {
-				
 
 				ResultSet rs = pst.executeQuery();
 
 				while (rs.next()) {
-					especialidades.add(new Especialidad(rs.getString("especialidad_id"), rs.getString("especialidad_nombre")));
+					especialidades.add(
+							new Especialidad(rs.getString("especialidad_id"),
+									rs.getString("especialidad_nombre")));
+
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -861,7 +870,8 @@ public class DataBase {
 		}
 
 		return especialidades;
-}
+	}
+
 	public List<String> cargarTodasCausas() {
 		ArrayList<String> causas = new ArrayList<>();
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -891,7 +901,8 @@ public class DataBase {
 			try {
 				ResultSet rs = s.executeQuery(LISTAR_PRESC);
 				while (rs.next()) {
-					prescripciones.add(new Prescripcion(rs.getString(1),rs.getString(2)));
+					prescripciones.add(
+							new Prescripcion(rs.getString(1), rs.getString(2)));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -912,6 +923,213 @@ public class DataBase {
 			try {
 				s.setString(1, causa);
 				s.execute();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	/**
+	 * Devuelve una lista con las bajas asignadas a un medico
+	 * 
+	 * @param m Medico para el que se buscan las bajas
+	 * @return List<Baja> conteniendo las bajas del medico buscado
+	 */
+	public List<Baja> getBajas(Medico m) {
+		List<Baja> bajas = new ArrayList<Baja>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(BUSCAR_BAJAS_PORMEDICO);
+			ResultSet rs = null;
+			try {
+				s.setString(1, m.getId());
+				rs = s.executeQuery();
+				while (rs.next()) {
+					bajas.add(parseBaja(rs, m));
+				}
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return bajas;
+	}
+
+	private Baja parseBaja(ResultSet rs, Medico m) throws SQLException {
+		Baja b = new Baja();
+		b.setMedico(m);
+		b.setId(rs.getString("baja_id"));
+		b.setfInicio(rs.getString("baja_fecha_inicio"));
+		b.setfFin(rs.getString("baja_fecha_fin"));
+		b.sethInicio(rs.getString("baja_hora_inicio"));
+		b.sethFin(rs.getString("baja_hora_fin"));
+		b.setObservaciones(rs.getString("baja_observaciones"));
+		return b;
+	}
+
+	public String generarIdBaja() {
+		String id = "";
+		List<String> ids = new ArrayList<String>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(BUSCAR_BAJAS_ID);
+			ResultSet rs = null;
+			try {
+				rs = s.executeQuery();
+				while (rs.next()) {
+					ids.add(rs.getString("baja_id"));
+				}
+				if (ids.isEmpty())
+					id = "100";
+				else
+					id = (Integer.parseInt(ids.get(ids.size() - 1)) + 1) + "";
+
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return id;
+	}
+
+	public void guardarBaja(Baja b) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(GUARDAR_BAJA);
+			try {
+				s.setString(1, b.getId());
+				s.setString(2, b.getTipo().toString());
+				s.setString(3, b.getfInicio());
+				s.setString(4, b.getfFin());
+				s.setString(5, b.gethInicio());
+				s.setString(6, b.gethFin());
+				s.setString(7, b.getObservaciones());
+				s.setString(8, b.getMedico().getId());
+				s.executeUpdate();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	public void actualizarBaja(Baja b) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(ACTUALIZAR_BAJA);
+			try {
+				s.setString(1, b.getTipo().toString());
+				s.setString(2, b.getfInicio());
+				s.setString(3, b.getfFin());
+				s.setString(4, b.gethInicio());
+				s.setString(5, b.gethFin());
+				s.setString(6, b.getObservaciones());
+				s.setString(7, b.getMedico().getId());
+				s.setString(8, b.getId());
+				s.executeUpdate();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	public List<Calendario> cargarCalendarios() {
+		ArrayList<Calendario> cs = new ArrayList<Calendario>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(CARGAR_CALENDARIOS);
+			ResultSet rs = null;
+			try {
+				rs = s.executeQuery();
+				while (rs.next()) {
+					cs.add(new Calendario(rs.getString("calendario_id"),
+							rs.getString("calendario_inicio"),
+							rs.getString("calendario_fin")));
+				}
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return cs;
+	}
+
+	public String generarIdCalendario() {
+		String id = "";
+		List<String> ids = new ArrayList<String>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(BUSCAR_CALENDARIOS_ID);
+			ResultSet rs = null;
+			try {
+				rs = s.executeQuery();
+				while (rs.next()) {
+					ids.add(rs.getString("calendario_id"));
+				}
+				if (ids.isEmpty())
+					id = "700";
+				else
+					id = (Integer.parseInt(ids.get(ids.size() - 1)) + 1) + "";
+
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return id;
+	}
+
+	public void guardarCalendario(Calendario c) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(GUARDAR_CALENDARIO);
+			try {
+				s.setString(1, c.getId());
+				s.setString(2, new SimpleDateFormat("dd/MM/yyyy")
+						.format(c.getDiaInicio()));
+				s.setString(3, new SimpleDateFormat("dd/MM/yyyy")
+						.format(c.getDiaFin()));
+				s.executeUpdate();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	public void eliminarCalendario(Calendario c) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(ELIMINAR_CALENDARIO);
+			try {
+				s.setString(1, c.getId());
+				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {

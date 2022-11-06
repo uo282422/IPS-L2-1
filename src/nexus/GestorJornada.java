@@ -1,10 +1,10 @@
 package nexus;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
-import logic.Jornada;
 import logic.Medico;
+import logic.jornada.Jornada;
 import util.DataBase;
 
 public class GestorJornada {
@@ -13,8 +13,8 @@ public class GestorJornada {
 	private String hComienzo;
 	private String hFin;
 	private String dias;
-	private String dInicio;
-	private String dFin;
+	private Date dInicio;
+	private Date dFin;
 	private DataBase db = new DataBase();
 
 	private void setMedicoJornada() {
@@ -29,14 +29,6 @@ public class GestorJornada {
 		jornada.setHoraFinal(hFin);
 	}
 
-	private void setDiaInicioJornada() {
-		jornada.setDiaInicio(dInicio);
-	}
-
-	private void setDiaFinJornada() {
-		jornada.setDiaFinal(dFin);
-	}
-
 	private void setDiasJornada() {
 		jornada.setDias(dias);
 	}
@@ -46,8 +38,8 @@ public class GestorJornada {
 		this.m = parseMedico(m);
 		this.hComienzo = hComienzo;
 		this.hFin = hFin;
-		this.dInicio = parseDate(dInicio);
-		this.dFin = parseDate(dFin);
+		this.dInicio = dInicio;
+		this.dFin = dFin;
 		this.dias = dias;
 	}
 
@@ -60,10 +52,13 @@ public class GestorJornada {
 		setMedicoJornada();
 		setHoraComienzoJornada();
 		setHoraFinJornada();
-		setDiaInicioJornada();
-		setDiaFinJornada();
+		setCalendario();
 		setDiasJornada();
 		db.guardarJornada(jornada);
+	}
+
+	private void setCalendario() {
+		jornada.creaCalendario(dInicio, dFin);
 	}
 
 	private void setId(String id) {
@@ -82,15 +77,15 @@ public class GestorJornada {
 		return id + "";
 	}
 
-	/**
-	 * Recoge la fecha en Date y la devuelve en String en el formato deseado.
-	 * 
-	 * @param d Date conteniendo la fecha.
-	 * @return String con el objeto Date a String correctamente formateado.
-	 */
-	private String parseDate(Date d) {
-		return new SimpleDateFormat("dd/MM/yyyy").format(d);
-	}
+//	/**
+//	 * Recoge la fecha en Date y la devuelve en String en el formato deseado.
+//	 * 
+//	 * @param d Date conteniendo la fecha.
+//	 * @return String con el objeto Date a String correctamente formateado.
+//	 */
+//	private String parseDate(Date d) {
+//		return new SimpleDateFormat("dd/MM/yyyy").format(d);
+//	}
 
 //	private String parseHora(String h) {
 //		String[] hour = h.trim().split(":");
@@ -111,5 +106,9 @@ public class GestorJornada {
 			}
 		}
 		return null;
+	}
+
+	public List<Medico> cargarMedicos() {
+		return db.cargarMedicos();
 	}
 }

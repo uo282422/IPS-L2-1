@@ -27,11 +27,13 @@ public class Cita {
 
 	private String horaEntrada;
 	private String horaSalida;
-	
+
 	private List<Prescripcion> prescripciones;
 
-	public Cita(int id, int pacienteId, String fecha, String horaI, String horaF, boolean urgente, int salaId,
-			int telefono, String correo, String otros, Enum_acudio acudio, List<String> causas, String motivos) {
+	public Cita(int id, int pacienteId, String fecha, String horaI,
+			String horaF, boolean urgente, int salaId, int telefono,
+			String correo, String otros, Enum_acudio acudio,
+			List<String> causas, String motivos) {
 		this.motivosIniciales = motivos;
 		this.idCita = id;
 		setIdPaciente(pacienteId);
@@ -45,6 +47,7 @@ public class Cita {
 		this.otrosCita = otros;
 		this.causas = causas;
 		this.acudio = acudio;
+
 	}
 
 //	private void setMotivosIniciales(String m) {
@@ -53,7 +56,6 @@ public class Cita {
 
 	public String getMotivosIniciales() {
 		return this.motivosIniciales;
-
 	}
 
 	private void setHoraS(String hs) {
@@ -124,8 +126,8 @@ public class Cita {
 	}
 
 	/*
-	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato: DD/MM/YYYY
-	 * 0 1 2
+	 * Pasa del string guardado en bd a un objeto del tipo fecha Formato:
+	 * DD/MM/YYYY 0 1 2
 	 */
 	public Date fechaToDate(String fecha) {
 		String[] sep = fecha.split("/");
@@ -160,10 +162,13 @@ public class Cita {
 
 	@Override
 	public String toString() {
-		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente + ", nombrePaciente=" + nombrePaciente
-				+ ", fecha=" + fecha + ", horaE=" + horaE + ", horaS=" + horaS + ", urgente=" + urgente + ", sala="
-				+ sala + ", acudio=" + acudio + ", telefonoCita=" + telefonoCita + ", correoCita=" + correoCita
-				+ ", otrosCita=" + otrosCita + ", causaCita=" + causas + "]";
+		return "Cita [idCita=" + idCita + ", idPaciente=" + idPaciente
+				+ ", nombrePaciente=" + nombrePaciente + ", fecha=" + fecha
+				+ ", horaE=" + horaE + ", horaS=" + horaS + ", urgente="
+				+ urgente + ", sala=" + sala + ", acudio=" + acudio
+				+ ", telefonoCita=" + telefonoCita + ", correoCita="
+				+ correoCita + ", otrosCita=" + otrosCita + ", causaCita="
+				+ causas + "]";
 	}
 
 	/*

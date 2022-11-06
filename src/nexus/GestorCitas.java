@@ -14,12 +14,12 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
-import logic.Jornada;
 import logic.Medico;
 import logic.Paciente;
 import logic.Prescripcion;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import logic.jornada.Jornada;
 import ui.Especialidad;
 import util.DataBase;
 
@@ -42,14 +42,15 @@ public class GestorCitas {
 	}
 
 	public void nuevaCita(int idPaciente, String nombre, String fecha,
-			String horaE, String horaS, int salaId, boolean urg, String motivos) {
+			String horaE, String horaS, int salaId, boolean urg,
+			String motivos) {
 		Cita c = new Cita(bd.generarIdCita(), idPaciente, fecha, horaE, horaS,
 				urg, salaId, tlfProv, correoProv, otrosProv,
 				Enum_acudio.NO_FIGURA, new ArrayList<String>(), motivos);
 		listaCitas.add(c);
 
-		bd.crearCita(c, new ArrayList<Medico>(medicos), new ArrayList<Especialidad>(especialidades));
-		
+		bd.crearCita(c, new ArrayList<Medico>(medicos),
+				new ArrayList<Especialidad>(especialidades));
 
 		if (urg)
 			enviarCorreo(c);
@@ -120,23 +121,22 @@ public class GestorCitas {
 	}
 
 	public void agregarMedico(Medico medicoNuevo) {
-		
+
 		medicos.add(medicoNuevo);
 	}
-	
-public void agregarEspecialidad(Especialidad espNueva) {
-		
+
+	public void agregarEspecialidad(Especialidad espNueva) {
+
 		especialidades.add(espNueva);
 	}
 
 	public ArrayList<Medico> getMedicosAgregados() {
 		return new ArrayList<Medico>(medicos);
 	}
-	
+
 	public ArrayList<Especialidad> getEspecialidadesAgregadas() {
 		return new ArrayList<Especialidad>(especialidades);
 	}
-	
 
 	public void añadirInfoContactoProv(Paciente paciente) {
 		this.tlfProv = paciente.getTelefono();
@@ -264,8 +264,13 @@ public void agregarEspecialidad(Especialidad espNueva) {
 		for (Medico m : medicos) {
 			List<Jornada> jornadaDeMedico = bd.getJornadasDeMedico(m.getId());
 			for (Jornada j : jornadaDeMedico) {
-				Date fechaInicialJornada = fechaToDate(j.getDiaInicio());
-				Date fechaFinalJornada = fechaToDate(j.getDiaFinal());
+
+				Date fechaInicialJornada = j.getCalendario().getDiaInicio();
+				Date fechaFinalJornada = j.getCalendario().getDiaFin();
+//				System.out.println("id del medico"+m.getId());
+//				System.out.println("fecha a evaluar"+fechaCandidato.toString());
+//				System.out.println("inicio de jornada"+fechaInicialJornada.toString());
+//				System.out.println("fin de jornada"+fechaFinalJornada.toString());
 
 				if (fechaCandidato.after(fechaInicialJornada)
 						&& fechaCandidato.before(fechaFinalJornada)) {
@@ -378,11 +383,12 @@ public void agregarEspecialidad(Especialidad espNueva) {
 
 	public void limpiarMedicos() {
 		medicos.removeAll(medicos);
-		
+
 	}
+
 	public void limpiarEspecialidades() {
 		especialidades.removeAll(especialidades);
-		
+
 	}
 
 	public List<Prescripcion> cargarPrescripcionesSinParam() {

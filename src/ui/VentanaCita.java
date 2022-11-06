@@ -165,7 +165,8 @@ public class VentanaCita extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					c.setAcudio(acudio());
 					guardarDatos();
-					JOptionPane.showMessageDialog(null, "La información de la cita se ha guaradado.");
+					JOptionPane.showMessageDialog(null,
+							"La información de la cita se ha guaradado.");
 					dispose();
 				}
 			});
@@ -205,6 +206,17 @@ public class VentanaCita extends JFrame {
 		return lbAcude;
 	}
 
+//	private JPanel getPnCausas() {
+//		if (pnCausas == null) {
+//			pnCausas = new JPanel();
+//			pnCausas.setLayout(new BoxLayout(pnCausas, BoxLayout.Y_AXIS));
+//			pnCausas.add(getPnCausasSuperior());
+//			pnCausas.add(getPnCausasInferior());
+//
+//		}
+//		return pnCausas;
+//	}
+
 	private JButton getBtVerHistorial() {
 		if (btVerHistorial == null) {
 			btVerHistorial = new JButton("Ver historial");
@@ -217,10 +229,9 @@ public class VentanaCita extends JFrame {
 		return btVerHistorial;
 	}
 
-	@SuppressWarnings("deprecation")
 	protected void verHistorial() {
 		HistorialPaciente hP = new HistorialPaciente(c.getIdPaciente());
-		hP.show();
+		hP.setVisible(true);
 	}
 
 	private JPanel getPnRBtAcude() {
@@ -260,8 +271,8 @@ public class VentanaCita extends JFrame {
 	}
 
 	/**
-	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la lista
-	 * recibida.
+	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la
+	 * lista recibida.
 	 * 
 	 * @param l List<String> con la que se quiere generar el modelo de combo
 	 * @return DefaultComboBoxModel<String> conteniendo la lista recibida.
@@ -285,7 +296,8 @@ public class VentanaCita extends JFrame {
 	private JList<String> getListCausasAñadidas() {
 		if (listCausasAñadidas == null) {
 			listCausasAñadidas = new JList<String>();
-			listCausasAñadidas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listCausasAñadidas
+					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 			listCausasAñadidas.setEnabled(false);
 		}
 		return listCausasAñadidas;
@@ -301,7 +313,8 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnCamposGenerales() {
 		if (pnCamposGenerales == null) {
 			pnCamposGenerales = new JPanel();
-			FlowLayout fl_pnCamposGenerales = (FlowLayout) pnCamposGenerales.getLayout();
+			FlowLayout fl_pnCamposGenerales = (FlowLayout) pnCamposGenerales
+					.getLayout();
 			fl_pnCamposGenerales.setAlignment(FlowLayout.LEFT);
 			pnCamposGenerales.add(getPnAcude());
 			pnCamposGenerales.add(getPnHora());
@@ -336,8 +349,10 @@ public class VentanaCita extends JFrame {
 	}
 
 	private void refrescarInfo() {
-		StringBuilder sb = new StringBuilder(String.format("  CITA Nº%d\n  --------------------\n\n", c.getIdCita()));
-		sb.append(String.format("  Nombre del paciente: %s %s\n", c.getNombrePaciente(), c.getApellidoPaciente()));
+		StringBuilder sb = new StringBuilder(String.format(
+				"  CITA Nº%d\n  --------------------\n\n", c.getIdCita()));
+		sb.append(String.format("  Nombre del paciente: %s %s\n",
+				c.getNombrePaciente(), c.getApellidoPaciente()));
 		sb.append(String.format("  Hora: %s\n", c.getHoraE()));
 		sb.append(String.format("  Fecha: %s\n", c.getFecha()));
 		sb.append(String.format("  Sala: %d\n", c.getSala()));
@@ -409,7 +424,8 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnPrescripcionesCombo() {
 		if (pnPrescripcionesCombo == null) {
 			pnPrescripcionesCombo = new JPanel();
-			FlowLayout fl_pnPrescripcionesCombo = (FlowLayout) pnPrescripcionesCombo.getLayout();
+			FlowLayout fl_pnPrescripcionesCombo = (FlowLayout) pnPrescripcionesCombo
+					.getLayout();
 			fl_pnPrescripcionesCombo.setAlignment(FlowLayout.LEFT);
 			pnPrescripcionesCombo.add(getLbPrescripciones());
 			pnPrescripcionesCombo.add(getCbPrescripciones());
@@ -489,7 +505,8 @@ public class VentanaCita extends JFrame {
 			btNuevaCausa = new JButton("Nueva Causa");
 			btNuevaCausa.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					gestor.nuevaCausa(JOptionPane.showInputDialog("Introduzca la nueva causa"));
+					gestor.nuevaCausa(JOptionPane
+							.showInputDialog("Introduzca la nueva causa"));
 				}
 			});
 		}
@@ -525,15 +542,17 @@ public class VentanaCita extends JFrame {
 		}
 		return btnAddPrescripciones;
 	}
-	
+
 	protected void actualizarPrescripciones() {
-		Prescripcion p = ((Prescripcion)getCbPrescripciones().getSelectedItem());
-		Prescripcion nuevaP = new Prescripcion(p.getIdPrescripcion(), p.toString());		// Obligatorio para mantener modelo
+		Prescripcion p = ((Prescripcion) getCbPrescripciones()
+				.getSelectedItem());
+		Prescripcion nuevaP = new Prescripcion(p.getIdPrescripcion(),
+				p.toString()); // Obligatorio para mantener modelo
 		nuevaP.setCantidad(getTxtCantidad().getText());
 		nuevaP.setDuracion((Integer) getSpDuracion().getValue());
 		nuevaP.setIntervalo((Integer) getSpIntervalo().getValue());
 		nuevaP.setOtrosDatos(getTxtOtrosDatos().getText());
-		
+
 		c.getPrescripciones().add(nuevaP);
 		final DefaultListModel<Prescripcion> model = new DefaultListModel<Prescripcion>();
 		for (Prescripcion presc : c.getPrescripciones()) {
@@ -555,7 +574,8 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnPrescripcionesDetalles() {
 		if (pnPrescripcionesDetalles == null) {
 			pnPrescripcionesDetalles = new JPanel();
-			FlowLayout flowLayout = (FlowLayout) pnPrescripcionesDetalles.getLayout();
+			FlowLayout flowLayout = (FlowLayout) pnPrescripcionesDetalles
+					.getLayout();
 			flowLayout.setAlignment(FlowLayout.LEFT);
 			pnPrescripcionesDetalles.add(getLblCantidad());
 			pnPrescripcionesDetalles.add(getTxtCantidad());
@@ -608,8 +628,8 @@ public class VentanaCita extends JFrame {
 	private JSpinner getSpIntervalo() {
 		if (spIntervalo == null) {
 			spIntervalo = new JSpinner();
-			spIntervalo
-					.setModel(new SpinnerNumberModel(Integer.valueOf(6), Integer.valueOf(6), null, Integer.valueOf(6)));
+			spIntervalo.setModel(new SpinnerNumberModel(Integer.valueOf(6),
+					Integer.valueOf(6), null, Integer.valueOf(6)));
 		}
 		return spIntervalo;
 	}
@@ -652,8 +672,8 @@ public class VentanaCita extends JFrame {
 	private JSpinner getSpDuracion() {
 		if (spDuracion == null) {
 			spDuracion = new JSpinner();
-			spDuracion
-					.setModel(new SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
+			spDuracion.setModel(new SpinnerNumberModel(Integer.valueOf(1),
+					Integer.valueOf(1), null, Integer.valueOf(1)));
 		}
 		return spDuracion;
 	}
@@ -697,8 +717,9 @@ public class VentanaCita extends JFrame {
 	private JList<Prescripcion> getListPrescripcionesAdded() {
 		if (listPrescripcionesAdded == null) {
 			listPrescripcionesAdded = new JList<Prescripcion>();
-			listCausasAñadidas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			listCausasAñadidas.setEnabled(false);
+			listCausasAñadidas
+					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 		}
 		return listPrescripcionesAdded;
 	}

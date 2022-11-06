@@ -1,22 +1,24 @@
 package ui;
 
-import java.awt.EventQueue;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-import java.awt.GridLayout;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class VentanaAdministrador extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel panelPrincipal;
 	private JButton btCrearCita;
 	private JButton btCrearJornada;
-
-
+	private JButton btBajasVacaciones;
 
 	/**
 	 * Create the frame.
@@ -29,9 +31,10 @@ public class VentanaAdministrador extends JFrame {
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		setContentPane(panelPrincipal);
-		panelPrincipal.setLayout(new GridLayout(2, 0, 0, 0));
+		panelPrincipal.setLayout(new GridLayout(3, 0, 0, 0));
 		panelPrincipal.add(getBtCrearCita());
 		panelPrincipal.add(getBtCrearJornada());
+		panelPrincipal.add(getBtBajasVacaciones());
 	}
 
 	private JButton getBtCrearCita() {
@@ -45,10 +48,10 @@ public class VentanaAdministrador extends JFrame {
 		}
 		return btCrearCita;
 	}
+
 	protected void irVentanaCrearCita() {
-		VentanaCrearCita vCC=new VentanaCrearCita();
-		vCC.show();
-		
+		VentanaCrearCita vCC = new VentanaCrearCita();
+		vCC.setVisible(true);
 	}
 
 	private JButton getBtCrearJornada() {
@@ -64,8 +67,26 @@ public class VentanaAdministrador extends JFrame {
 	}
 
 	protected void irVentanaCrearJornada() {
-		VentanaCrearJornada vCJ=new VentanaCrearJornada();
-		vCJ.show();
-		
+		VentanaCrearJornada vCJ = new VentanaCrearJornada();
+		vCJ.setVisible(true);
+
+	}
+
+	private JButton getBtBajasVacaciones() {
+		if (btBajasVacaciones == null) {
+			btBajasVacaciones = new JButton("Bajas y vacaciones");
+			btBajasVacaciones.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					irVentanaBajas();
+				}
+			});
+		}
+		return btBajasVacaciones;
+	}
+
+	protected void irVentanaBajas() {
+		VentanaBajas v = new VentanaBajas();
+		v.setLocationRelativeTo(this);
+		v.setVisible(true);
 	}
 }
