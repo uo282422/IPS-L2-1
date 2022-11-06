@@ -204,7 +204,7 @@ public class DataBase {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
 			PreparedStatement pst = conn.prepareStatement(
-					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?)");
+					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?,NULL, NULL)");
 
 			try {
 				pst.setString(1, cita.getIdCita() + "");
