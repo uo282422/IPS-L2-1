@@ -59,6 +59,7 @@ public class GestorJornada {
 
 	private void setCalendario() {
 		jornada.creaCalendario(dInicio, dFin);
+		jornada.getCalendario().setId(db.generarIdCalendario());
 	}
 
 	private void setId(String id) {
