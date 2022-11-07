@@ -76,16 +76,18 @@ public class VentanaCalendariosGuardados extends JFrame {
 	public VentanaCalendariosGuardados(VentanaCrearJornada v) {
 		this.v = v;
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 1019, 703);
+		setBounds(100, 100, 615, 697);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		
 
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
 		contentPane.add(getPnPrincipal(), BorderLayout.NORTH);
 		contentPane.add(getBtAceptar(), BorderLayout.SOUTH);
 		setCalendars();
-		pack();
+		rootPane.setDefaultButton(btAceptar);
+		//pack();
 	}
 
 	private JPanel getPnPrincipal() {
@@ -134,7 +136,7 @@ public class VentanaCalendariosGuardados extends JFrame {
 	private JPanel getPnCalendarios() {
 		if (pnCalendarios == null) {
 			pnCalendarios = new JPanel();
-			pnCalendarios.setLayout(new GridLayout(4, 0, 0, 0));
+			pnCalendarios.setLayout(new GridLayout(2, 0, 0, 0));
 			pnCalendarios.add(getLbInicio());
 			pnCalendarios.add(getCalendarInicio());
 			pnCalendarios.add(getLbFin());
