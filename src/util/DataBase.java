@@ -595,7 +595,7 @@ public class DataBase {
 					String nombre = rs.getString("MEDICO_NOMBRE");
 					String apellido = rs.getString("MEDICO_APELLIDO");
 					String email = rs.getString("MEDICO_EMAIL");
-					String esp = rs.getString("MEDICO_ESPECIALIDAD");
+					String esp = rs.getString("MEDICO_ESPECIALIDAD_ID");
 
 					medicos.add(new Medico(id, nombre, apellido, email, esp));
 				}
