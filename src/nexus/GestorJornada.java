@@ -54,6 +54,7 @@ public class GestorJornada {
 		setHoraFinJornada();
 		setCalendario();
 		setDiasJornada();
+		db.guardarCalendario(jornada.getCalendario());
 		db.guardarJornada(jornada);
 	}
 
