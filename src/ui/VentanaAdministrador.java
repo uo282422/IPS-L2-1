@@ -19,6 +19,7 @@ public class VentanaAdministrador extends JFrame {
 	private JButton btCrearCita;
 	private JButton btCrearJornada;
 	private JButton btBajasVacaciones;
+	private JButton btAsignarCalendarios;
 
 	/**
 	 * Create the frame.
@@ -31,9 +32,10 @@ public class VentanaAdministrador extends JFrame {
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		setContentPane(panelPrincipal);
-		panelPrincipal.setLayout(new GridLayout(3, 0, 0, 0));
+		panelPrincipal.setLayout(new GridLayout(4, 0, 0, 0));
 		panelPrincipal.add(getBtCrearCita());
 		panelPrincipal.add(getBtCrearJornada());
+		panelPrincipal.add(getBtAsignarCalendarios());
 		panelPrincipal.add(getBtBajasVacaciones());
 	}
 
@@ -56,7 +58,7 @@ public class VentanaAdministrador extends JFrame {
 
 	private JButton getBtCrearJornada() {
 		if (btCrearJornada == null) {
-			btCrearJornada = new JButton("Crear jornada");
+			btCrearJornada = new JButton("Asignar Jornadas");
 			btCrearJornada.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					irVentanaCrearJornada();
@@ -88,5 +90,15 @@ public class VentanaAdministrador extends JFrame {
 		VentanaBajas v = new VentanaBajas();
 		v.setLocationRelativeTo(this);
 		v.setVisible(true);
+	}
+	private JButton getBtAsignarCalendarios() {
+		if (btAsignarCalendarios == null) {
+			btAsignarCalendarios = new JButton("Asignar calendarios");
+			btAsignarCalendarios.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+				}
+			});
+		}
+		return btAsignarCalendarios;
 	}
 }
