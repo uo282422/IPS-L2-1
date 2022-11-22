@@ -39,6 +39,7 @@ public class GestorCitas {
 
 	public GestorCitas() {
 		this.bd = new DataBase();
+		listaCitas=bd.cargarCitas();
 	}
 
 	public void nuevaCita(int idPaciente, String nombre, String fecha,

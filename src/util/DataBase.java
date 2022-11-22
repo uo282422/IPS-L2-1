@@ -1151,4 +1151,49 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 	}
+
+	public ArrayList<Cita> cargarCitas() {
+		ArrayList<Cita> citas = new ArrayList<Cita>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from cita");
+			try {
+
+				ResultSet rs = pst.executeQuery();
+
+				while (rs.next()) {
+
+					int id = Integer.parseInt(rs.getString("CITA_ID"));
+					int pacienteId = Integer
+							.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					String fecha = rs.getString("CITA_FECHA");
+					String horaI = rs.getString("CITA_HORA_INICIO");
+					String horaF = rs.getString("CITA_HORA_FIN");
+					boolean urgente = rs.getBoolean("CITA_URGENTE");
+					int salaId = Integer.parseInt(rs.getString("CITA_SALA_ID"));
+					String telefono = rs.getString("CITA_TELEFONO");
+					String correo = rs.getString("CITA_CORREO");
+					String otros = rs.getString("CITA_OTROS");
+					int acudio = rs.getInt("CITA_ACUDIO");
+					List<String> causas = getCausas(rs.getString("cita_id"));
+					String motivos = rs.getString("cita_motivos");
+
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas, motivos));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+
+		return citas;
+	}
 }

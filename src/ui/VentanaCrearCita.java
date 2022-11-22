@@ -33,6 +33,7 @@ import nexus.GestorEspecialidades;
 import nexus.GestorMedicos;
 import nexus.GestorPacientes;
 import nexus.GestorSalas;
+import javax.swing.JCheckBox;
 
 public class VentanaCrearCita extends JFrame {
 
@@ -89,6 +90,7 @@ public class VentanaCrearCita extends JFrame {
 	private String motivosI="";
 	private JPanel panel;
 	private JButton btLimpiar;
+	private JCheckBox chckbxDisponibles;
 
 	/**
 	 * Create the frame.
@@ -196,6 +198,7 @@ public class VentanaCrearCita extends JFrame {
 			panelSala.setLayout(new GridLayout(0, 3, 10, 0));
 			panelSala.add(getLbSala_1());
 			panelSala.add(getCbSala());
+			panelSala.add(getChckbxDisponibles());
 		}
 		return panelSala;
 	}
@@ -502,12 +505,33 @@ public class VentanaCrearCita extends JFrame {
 	private JComboBox<Sala> getCbSala() {
 		if (cbSala == null) {
 			cbSala = new JComboBox<Sala>();
-			cargarComboSalas();
+			if(getChckbxDisponibles().isSelected())cargarComboSalasDisponibles();
+			else cargarComboSalas();
 		}
 		return cbSala;
 	}
 
+	private void cargarComboSalasDisponibles() {
+		getCbSala().removeAllItems();
+		String horaE = getTfHoraEntrada().getText();
+		String horaS = getTfHoraSalida().getText();
+		String fecha = getTfFecha().getText();
+		
+		
+		if(getTfHoraEntrada().getText().equals("  :  ")){
+			horaE="00:00";
+		}
+		if(getTfHoraSalida().getText().equals("  :  ")) {
+			horaS="23:59";
+		}
+		for (Sala s : gS.getListaSalasDisponibles(fecha, horaE, horaS)) {
+			getCbSala().addItem(s);
+		}
+		
+	}
+
 	private void cargarComboSalas() {
+		getCbSala().removeAllItems();
 		for (Sala s : gS.getListaSalas()) {
 			getCbSala().addItem(s);
 		}
@@ -636,5 +660,17 @@ public class VentanaCrearCita extends JFrame {
 			});
 		}
 		return btLimpiar;
+	}
+	private JCheckBox getChckbxDisponibles() {
+		if (chckbxDisponibles == null) {
+			chckbxDisponibles = new JCheckBox("Ver sólo disponibles");
+			chckbxDisponibles.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(getChckbxDisponibles().isSelected())cargarComboSalasDisponibles();
+					else cargarComboSalas();
+				}
+			});
+		}
+		return chckbxDisponibles;
 	}
 }
