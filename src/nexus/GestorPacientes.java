@@ -126,4 +126,6 @@ public class GestorPacientes {
 	public ArrayList<Paciente> getListaPacientes() {
 		return this.listaPacientes;
 	}
+	
+	
 }

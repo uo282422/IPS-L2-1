@@ -163,6 +163,10 @@ public class DataBase {
 					String telefono = rs.getString("paciente_telefono");
 					String correo = rs.getString("paciente_correo");
 					String otros = rs.getString("paciente_otros");
+					
+					String dni = rs.getString("paciente_dni");
+					String nhc = rs.getString("paciente_nhc");
+					String tarjeta = rs.getString("paciente_tarjeta");
 
 //					if(!apellido.isBlank() && !apellido.isEmpty())
 //						apellido= rs.getString("paciente_apellido");
@@ -183,7 +187,7 @@ public class DataBase {
 					if (valido)
 						pacientes.add(new Paciente(Integer.parseInt(id), nombre,
 								apellido, Integer.parseInt(telefono), correo,
-								otros));
+								otros, dni, nhc, tarjeta));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -316,9 +320,13 @@ public class DataBase {
 							.parseInt(rs.getString("PACIENTE_TELEFONO"));
 					String correo = rs.getString("PACIENTE_CORREO");
 					String otros = rs.getString("PACIENTE_OTROS");
+					
+					String dni = rs.getString("paciente_dni");
+					String nhc = rs.getString("paciente_nhc");
+					String tarjeta = rs.getString("paciente_tarjeta");
 
 					paciente = new Paciente(id, nombre, apellido, telefono,
-							correo, otros);
+							correo, otros, dni, nhc, tarjeta);
 				}
 
 				rs.close();
@@ -1196,4 +1204,6 @@ public class DataBase {
 
 		return citas;
 	}
+
+	
 }
