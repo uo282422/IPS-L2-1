@@ -65,8 +65,11 @@ public class DataBase {
 					String apellido = rs.getString("medico_apellido");
 					String email = rs.getString("medico_email");
 					String esp = rs.getString("medico_especialidad_id");
+					
+					String dni = rs.getString("medico_dni");
+					String coleg = rs.getString("medico_colegiado");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp));
+					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -605,7 +608,10 @@ public class DataBase {
 					String email = rs.getString("MEDICO_EMAIL");
 					String esp = rs.getString("MEDICO_ESPECIALIDAD_ID");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp));
+					String dni = rs.getString("medico_dni");
+					String coleg = rs.getString("medico_colegiado");
+
+					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {

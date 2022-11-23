@@ -33,13 +33,9 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JPanel panelFiltros;
 	private JButton btGuardarMedicos;
 	private JPanel panelEspecialidades;
-	private JPanel panelMedicos;
 	private JLabel lbEspecialidades;
 	private JComboBox cbEspecialidades;
 	private JButton btAñadirEspecialidad;
-	private JLabel lbMedicos;
-	private JComboBox cbMedicos;
-	private JButton btAñadirMedicos;
 
 	public VentanaCrearCita vcc;
 	private JLabel lbGuardado;
@@ -99,9 +95,8 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JPanel getPanelFiltros() {
 		if (panelFiltros == null) {
 			panelFiltros = new JPanel();
-			panelFiltros.setLayout(new GridLayout(3, 0, 0, 10));
+			panelFiltros.setLayout(new GridLayout(2, 0, 0, 0));
 			panelFiltros.add(getPanelEspecialidades());
-			panelFiltros.add(getPanelMedicos());
 			panelFiltros.add(getPanelBuscador());
 		}
 		return panelFiltros;
@@ -168,16 +163,6 @@ public class VentanaAñadirMedicos extends JFrame {
 		}
 		return panelEspecialidades;
 	}
-	private JPanel getPanelMedicos() {
-		if (panelMedicos == null) {
-			panelMedicos = new JPanel();
-			panelMedicos.setLayout(new BorderLayout(10, 5));
-			panelMedicos.add(getLbMedicos(), BorderLayout.WEST);
-			panelMedicos.add(getCbMedicos());
-			panelMedicos.add(getBtAñadirMedicos(), BorderLayout.EAST);
-		}
-		return panelMedicos;
-	}
 	private JLabel getLbEspecialidades() {
 		if (lbEspecialidades == null) {
 			lbEspecialidades = new JLabel("Especialidades");
@@ -191,7 +176,6 @@ public class VentanaAñadirMedicos extends JFrame {
 			cbEspecialidades.addItem("Sin especificar");
 			cbEspecialidades.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					actualizarComboMedicos();
 					if(cbEspecialidades.getSelectedItem().equals("Sin especificar"))
 						getBtAñadirEspecialidad().setEnabled(false);
 					else getBtAñadirEspecialidad().setEnabled(true);
@@ -226,59 +210,22 @@ public class VentanaAñadirMedicos extends JFrame {
 		}
 		return btAñadirEspecialidad;
 	}
-	private JLabel getLbMedicos() {
-		if (lbMedicos == null) {
-			lbMedicos = new JLabel("Medicos");
-			lbMedicos.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		}
-		return lbMedicos;
-	}
-	public JComboBox<Medico> getCbMedicos() {
-		if (cbMedicos == null) {
-			cbMedicos = new JComboBox<Medico>();
-			
-			for(Medico m : vcc.getgM().getMedicos()) {
-				cbMedicos.addItem(m);
-			}
-			System.out.println(vcc.getgM().getMedicos().size());
-		}
-		
-		
-		return cbMedicos;
-	}
 	
-	
+	public void añadirMedicos(ArrayList<Medico>lista) {
+		for(Medico m :meds) {
+			System.out.println(m.toString());
+		}
+		for(Medico m : lista) {
+			if(!meds.contains(m)) {
+				meds.add(m);
+				getLbGuardado().setVisible(false);
+				getTextAreaVisualizar().setText(getTextAreaVisualizar().getText()+"\n"+ m.toString()+" ("+(m.getEspecialidad()+")"));
+			}else JOptionPane.showMessageDialog(rootPane, "El medico ya está asignado!");
+				
+		}
+	}
+		
 
-	
-	private void actualizarComboMedicos() {
-		getCbMedicos().removeAllItems();
-		for (Medico m : vcc.getgM().getMedicos()) {
-			if(getCbEspecialidades().getSelectedItem().equals("Sin especificar")) {
-					cbMedicos.addItem(m);
-			}else if(m.getEspecialidad()==(vcc.getGE().buscarPorNombre(getCbEspecialidades().getSelectedItem().toString()).getId_esp())) {
-				cbMedicos.addItem(m);
-			}
-			
-		}
-	}
-	private JButton getBtAñadirMedicos() {
-		if (btAñadirMedicos == null) {
-			btAñadirMedicos = new JButton("+");
-			btAñadirMedicos.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					if(!meds.contains(getCbMedicos().getSelectedItem())) {
-						meds.add((Medico) getCbMedicos().getSelectedItem());
-						
-						getLbGuardado().setVisible(false);
-						getTextAreaVisualizar().setText(getTextAreaVisualizar().getText()+"\n"+ getCbMedicos().getSelectedItem().toString()+" ("+((Medico) getCbMedicos().getSelectedItem()).getEspecialidad()+")");
-					}else JOptionPane.showMessageDialog(rootPane, "El medico ya está asignado!");
-					
-					
-				}
-			});
-		}
-		return btAñadirMedicos;
-	}
 	
 	public JTextArea getTextAreaVisualizar() {
 		if (txtAVisualizar == null) {
@@ -335,13 +282,15 @@ public class VentanaAñadirMedicos extends JFrame {
 	private JPanel getPanelBuscador() {
 		if (panelBuscador == null) {
 			panelBuscador = new JPanel();
+			FlowLayout flowLayout = (FlowLayout) panelBuscador.getLayout();
+			flowLayout.setVgap(15);
 			panelBuscador.add(getBtnBuscar());
 		}
 		return panelBuscador;
 	}
 	private JButton getBtnBuscar() {
 		if (btnBuscar == null) {
-			btnBuscar = new JButton("Buscar medicos por nombre");
+			btnBuscar = new JButton("Buscar medicos ");
 			btnBuscar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					abrirVentanaBuscador();
@@ -351,7 +300,7 @@ public class VentanaAñadirMedicos extends JFrame {
 		return btnBuscar;
 	}
 	protected void abrirVentanaBuscador() {
-		VentanaBuscador vb=new VentanaBuscador(this);
+		VentanaBuscadorMedicos vb=new VentanaBuscadorMedicos(this);
 		vb.setVisible(true);
 		
 	}

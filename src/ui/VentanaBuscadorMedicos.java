@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -21,9 +22,11 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
+import logic.Medico;
 import logic.Paciente;
+import logic.Sala;
 
-public class VentanaBuscadorPacientes extends JFrame {
+public class VentanaBuscadorMedicos extends JFrame {
 
 	private JPanel panel;
 	private JPanel panelSur;
@@ -31,11 +34,11 @@ public class VentanaBuscadorPacientes extends JFrame {
 	private JButton btCancelar;
 	private JPanel panelCentral;
 	private JPanel panelFiltros;
-	private JScrollPane scrollPane;
-	private JTable table;
 	
 	private VentanaCrearCita vcc;
+	private VentanaAñadirMedicos vam;
 	private DefaultTableModel tm;
+	private DefaultTableModel tma;
 	private JPanel panelNombre;
 	private JLabel lbNombre;
 	private JTextField tfNombre;
@@ -48,27 +51,36 @@ public class VentanaBuscadorPacientes extends JFrame {
 	private JLabel lbDni;
 	private JTextField tfDni;
 	private JCheckBox chckbxDni;
-	private JPanel panelNhc;
-	private JLabel lbNhc;
-	private JTextField tfNhc;
-	private JCheckBox chckbxNhc;
-	private JPanel panelTarjeta;
-	private JLabel lbTarjeta;
-	private JTextField tfTarjeta;
-	private JCheckBox chckbxTarjeta;
+	private JPanel panelColegiado;
+	private JLabel lbColegiado;
+	private JTextField tfColegiado;
+	private JCheckBox chckbxColegiado;
+	private JPanel panelEspecialidad;
+	private JLabel lbEspecialidad;
+	private JCheckBox chckbxEspecialidad;
 	private JPanel panelBotones;
 	private JPanel panelFiltrar;
 	private JPanel panelVerTodos;
 	private JButton btFiltrar;
 	private JButton btVerTodos;
+	private JComboBox<String> cbEspecialidades;
+	private JPanel panelVistas;
+	private JScrollPane scrollPaneTabla;
+	private JScrollPane scrollPaneVista;
+	private JTable table;
+	private JTable tableVista;
+	private JButton btBorrar;
+	private JButton btAñadir;
 
+	private ArrayList<Medico> añadidos=new ArrayList<>();
 	
 
 	/**
 	 * Create the frame.
 	 */
-	public VentanaBuscadorPacientes(VentanaCrearCita vcc) {
-		this.vcc=vcc;
+	public VentanaBuscadorMedicos(VentanaAñadirMedicos vam) {
+		this.vam=vam;
+		this.vcc=vam.getVCC();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 922, 595);
 		panel = new JPanel();
@@ -79,22 +91,38 @@ public class VentanaBuscadorPacientes extends JFrame {
 		panel.add(getPanelSur(), BorderLayout.SOUTH);
 		panel.add(getPanelCentral(), BorderLayout.CENTER);
 		ponerModeloDefault();
+		ponerModeloAñadidos();
 	}
 	
 	private void ponerModeloDefault() {
 		cargarModeloCompletoTabla();
-		getTable().setModel(tm);
+		table.setModel(tm);
 	}
-
+	
+	private void ponerModeloAñadidos() {
+		actualizarModeloAñadidos();
+		tableVista.setModel(tma);
+	}
+	private void actualizarModeloAñadidos() {
+		tma=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido","Especialidad", "NºColegiado"},añadidos.size() );
+		for(int i=0;i<añadidos.size();i++) {
+			Medico m=añadidos.get(i);
+			tma.setValueAt(m.getDni(), i, 0);
+			tma.setValueAt(m.getNombre(), i, 1);
+			tma.setValueAt(m.getApellido(), i, 2);
+			tma.setValueAt(vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
+			tma.setValueAt(m.getColegiado(), i, 4);
+		}
+	}
 	private void cargarModeloCompletoTabla() {
-		tm=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido", "NHC", "NºTarjeta"},vcc.getGP().getListaPacientes().size() );
-		for(int i=0;i<vcc.getGP().getListaPacientes().size();i++) {
-			Paciente p=vcc.getGP().getListaPacientes().get(i);
-			tm.setValueAt(p.getDni(), i, 0);
-			tm.setValueAt(p.getNombre(), i, 1);
-			tm.setValueAt(p.getApellido(), i, 2);
-			tm.setValueAt(p.getNHC(), i, 3);
-			tm.setValueAt(p.getTarjeta(), i, 4);
+		tm=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido","Especialidad", "NºColegiado"},vcc.getgM().getMedicos().size() );
+		for(int i=0;i<vcc.getgM().getMedicos().size();i++) {
+			Medico m=vcc.getgM().getMedicos().get(i);
+			tm.setValueAt(m.getDni(), i, 0);
+			tm.setValueAt(m.getNombre(), i, 1);
+			tm.setValueAt(m.getApellido(), i, 2);
+			tm.setValueAt(vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
+			tm.setValueAt(m.getColegiado(), i, 4);
 		}
 		
 	}
@@ -104,6 +132,8 @@ public class VentanaBuscadorPacientes extends JFrame {
 			panelSur = new JPanel();
 			FlowLayout flowLayout = (FlowLayout) panelSur.getLayout();
 			flowLayout.setAlignment(FlowLayout.RIGHT);
+			panelSur.add(getBtAñadir());
+			panelSur.add(getBtBorrar());
 			panelSur.add(getBtAceptar());
 			panelSur.add(getBtCancelar());
 		}
@@ -114,10 +144,7 @@ public class VentanaBuscadorPacientes extends JFrame {
 			btAceptar = new JButton("Aceptar");
 			btAceptar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					
-					String n=(String) tm.getValueAt(table.getSelectedRow(), 1);
-					String a=(String) tm.getValueAt(table.getSelectedRow(), 2);
-					vcc.getTfPaciente().setText(n+" "+a);
+					vam.añadirMedicos(añadidos);;
 					dispose();
 				}
 			});
@@ -138,9 +165,9 @@ public class VentanaBuscadorPacientes extends JFrame {
 	private JPanel getPanelCentral() {
 		if (panelCentral == null) {
 			panelCentral = new JPanel();
-			panelCentral.setLayout(new GridLayout(0, 2, 0, 0));
+			panelCentral.setLayout(new GridLayout(0, 2, 5, 0));
 			panelCentral.add(getPanelFiltros());
-			panelCentral.add(getScrollPane());
+			panelCentral.add(getPanelVistas());
 		}
 		return panelCentral;
 	}
@@ -151,29 +178,11 @@ public class VentanaBuscadorPacientes extends JFrame {
 			panelFiltros.add(getPanel_1_1());
 			panelFiltros.add(getPanelApellido());
 			panelFiltros.add(getPanelDni());
-			panelFiltros.add(getPanelNhc());
-			panelFiltros.add(getPanelTarjeta());
+			panelFiltros.add(getPanelColegiado());
+			panelFiltros.add(getPanelEspecialidad());
 			panelFiltros.add(getPanelBotones());
 		}
 		return panelFiltros;
-	}
-	private JScrollPane getScrollPane() {
-		if (scrollPane == null) {
-			scrollPane = new JScrollPane();
-			scrollPane.setViewportView(getTable());
-		}
-		return scrollPane;
-	}
-	private JTable getTable() {
-		if (table == null) {
-			table = new JTable();
-			table.setDefaultEditor(Object.class, null);
-			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-			table.setFocusable(false);
-			
-			
-		}
-		return table;
 	}
 	private JPanel getPanel_1_1() {
 		if (panelNombre == null) {
@@ -271,69 +280,62 @@ public class VentanaBuscadorPacientes extends JFrame {
 		}
 		return chckbxDni;
 	}
-	private JPanel getPanelNhc() {
-		if (panelNhc == null) {
-			panelNhc = new JPanel();
-			panelNhc.setLayout(new GridLayout(0, 3, 0, 0));
-			panelNhc.add(getLbNhc());
-			panelNhc.add(getTfNhc());
-			panelNhc.add(getChckbxNhc());
+	private JPanel getPanelColegiado() {
+		if (panelColegiado == null) {
+			panelColegiado = new JPanel();
+			panelColegiado.setLayout(new GridLayout(0, 3, 0, 0));
+			panelColegiado.add(getLbColegiado());
+			panelColegiado.add(getTfColegiado());
+			panelColegiado.add(getChckbxColegiado());
 		}
-		return panelNhc;
+		return panelColegiado;
 	}
-	private JLabel getLbNhc() {
-		if (lbNhc == null) {
-			lbNhc = new JLabel("Nhc: ");
-			lbNhc.setFont(new Font("Tahoma", Font.PLAIN, 14));
-			lbNhc.setHorizontalAlignment(SwingConstants.CENTER);
+	private JLabel getLbColegiado() {
+		if (lbColegiado == null) {
+			lbColegiado = new JLabel("NºColegiado: ");
+			lbColegiado.setFont(new Font("Tahoma", Font.PLAIN, 14));
+			lbColegiado.setHorizontalAlignment(SwingConstants.CENTER);
 		}
-		return lbNhc;
+		return lbColegiado;
 	}
-	private JTextField getTfNhc() {
-		if (tfNhc == null) {
-			tfNhc = new JTextField();
-			tfNhc.setColumns(10);
+	private JTextField getTfColegiado() {
+		if (tfColegiado == null) {
+			tfColegiado = new JTextField();
+			tfColegiado.setColumns(10);
 		}
-		return tfNhc;
+		return tfColegiado;
 	}
-	private JCheckBox getChckbxNhc() {
-		if (chckbxNhc == null) {
-			chckbxNhc = new JCheckBox("");
-			chckbxNhc.setHorizontalAlignment(SwingConstants.CENTER);
+	private JCheckBox getChckbxColegiado() {
+		if (chckbxColegiado == null) {
+			chckbxColegiado = new JCheckBox("");
+			chckbxColegiado.setHorizontalAlignment(SwingConstants.CENTER);
 		}
-		return chckbxNhc;
+		return chckbxColegiado;
 	}
-	private JPanel getPanelTarjeta() {
-		if (panelTarjeta == null) {
-			panelTarjeta = new JPanel();
-			panelTarjeta.setLayout(new GridLayout(0, 3, 0, 0));
-			panelTarjeta.add(getLbTarjeta());
-			panelTarjeta.add(getTfTarjeta());
-			panelTarjeta.add(getChckbxTarjeta());
+	private JPanel getPanelEspecialidad() {
+		if (panelEspecialidad == null) {
+			panelEspecialidad = new JPanel();
+			panelEspecialidad.setLayout(new GridLayout(0, 3, 0, 0));
+			panelEspecialidad.add(getLbEspecialidad());
+			panelEspecialidad.add(getCbEspecialidades());
+			panelEspecialidad.add(getChckbxEspecialidad());
 		}
-		return panelTarjeta;
+		return panelEspecialidad;
 	}
-	private JLabel getLbTarjeta() {
-		if (lbTarjeta == null) {
-			lbTarjeta = new JLabel("Tarjeta: ");
-			lbTarjeta.setFont(new Font("Tahoma", Font.PLAIN, 14));
-			lbTarjeta.setHorizontalAlignment(SwingConstants.CENTER);
+	private JLabel getLbEspecialidad() {
+		if (lbEspecialidad == null) {
+			lbEspecialidad = new JLabel("Tarjeta: ");
+			lbEspecialidad.setFont(new Font("Tahoma", Font.PLAIN, 14));
+			lbEspecialidad.setHorizontalAlignment(SwingConstants.CENTER);
 		}
-		return lbTarjeta;
+		return lbEspecialidad;
 	}
-	private JTextField getTfTarjeta() {
-		if (tfTarjeta == null) {
-			tfTarjeta = new JTextField();
-			tfTarjeta.setColumns(10);
+	private JCheckBox getChckbxEspecialidad() {
+		if (chckbxEspecialidad == null) {
+			chckbxEspecialidad = new JCheckBox("");
+			chckbxEspecialidad.setHorizontalAlignment(SwingConstants.CENTER);
 		}
-		return tfTarjeta;
-	}
-	private JCheckBox getChckbxTarjeta() {
-		if (chckbxTarjeta == null) {
-			chckbxTarjeta = new JCheckBox("");
-			chckbxTarjeta.setHorizontalAlignment(SwingConstants.CENTER);
-		}
-		return chckbxTarjeta;
+		return chckbxEspecialidad;
 	}
 	private JPanel getPanelBotones() {
 		if (panelBotones == null) {
@@ -376,53 +378,54 @@ public class VentanaBuscadorPacientes extends JFrame {
 	}
 	
 	private void filtrar() {
-		ArrayList<Paciente> listaTodos=vcc.getGP().getListaPacientes();
-		ArrayList<Paciente> listaFiltrados=new ArrayList<>();
-		for(Paciente p : listaTodos) {
-			if(cumpleFiltros(p))
-				listaFiltrados.add(p);
+		ArrayList<Medico> listaTodos=vcc.getgM().getMedicos();
+		ArrayList<Medico> listaFiltrados=new ArrayList<>();
+		for(Medico m : listaTodos) {
+			if(cumpleFiltros(m))
+				listaFiltrados.add(m);
 		}
 		ponerModeloFiltrado(listaFiltrados);
 		
 	}
-	private void ponerModeloFiltrado(ArrayList<Paciente> lista) {
+	private void ponerModeloFiltrado(ArrayList<Medico> lista) {
 		cargarModeloFiltrado(lista);
 		getTable().setModel(tm);
 	}
-	private void cargarModeloFiltrado(ArrayList<Paciente> lista) {
-		tm=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido", "NHC", "NºTarjeta"},lista.size() );
+	private void cargarModeloFiltrado(ArrayList<Medico> lista) {
+		tm=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido","Especialidad", "NºColegiado"},lista.size() );
 		for(int i=0;i<lista.size();i++) {
-			Paciente p=lista.get(i);
-			tm.setValueAt(p.getDni(), i, 0);
-			tm.setValueAt(p.getNombre(), i, 1);
-			tm.setValueAt(p.getApellido(), i, 2);
-			tm.setValueAt(p.getNHC(), i, 3);
-			tm.setValueAt(p.getTarjeta(), i, 4);
+			Medico m=lista.get(i);
+			tm.setValueAt(m.getDni(), i, 0);
+			tm.setValueAt(m.getNombre(), i, 1);
+			tm.setValueAt(m.getApellido(), i, 2);
+			tm.setValueAt(vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
+			tm.setValueAt(m.getColegiado(), i, 4);
 		}
+			
 		
 		
 	}
 
-	private boolean cumpleFiltros(Paciente p) {
+	private boolean cumpleFiltros(Medico m) {
 		boolean valido=true;
 		if(getChckbxNombre().isSelected() && getTfNombre().getText()!="") {
-			if(!p.getNombre().startsWith(getTfNombre().getText()))
+			if(!m.getNombre().startsWith(getTfNombre().getText()))
 				valido=false;
 		}
 		if(getChckbxApellido().isSelected() && getTfApellido().getText()!="") {
-			if(!p.getApellido().startsWith(getTfApellido().getText()))
+			if(!m.getApellido().startsWith(getTfApellido().getText()))
 				valido=false;
 		}
 		if(getChckbxDni().isSelected() && getTfDni().getText()!="") {
-			if(!p.getDni().startsWith(getTfDni().getText()))
+			if(!m.getDni().startsWith(getTfDni().getText()))
 				valido=false;
 		}
-		if(getChckbxNhc().isSelected() && getTfNhc().getText()!="") {
-			if(!p.getNHC().startsWith(getTfNhc().getText()))
+		if(getChckbxColegiado().isSelected() && getTfColegiado().getText()!="") {
+			if(!m.getColegiado().startsWith(getTfColegiado().getText()))
 				valido=false;
 		}
-		if(getChckbxTarjeta().isSelected() && getTfTarjeta().getText()!="") {
-			if(!p.getTarjeta().startsWith(getTfTarjeta().getText()))
+		if(getChckbxEspecialidad().isSelected() ) {
+			if(!vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp().equals(cbEspecialidades.getSelectedItem()))
 				valido=false;
 		}
 		
@@ -451,14 +454,110 @@ public class VentanaBuscadorPacientes extends JFrame {
 		getTfNombre().setText("");
 		getTfApellido().setText("");
 		getTfDni().setText("");
-		getTfNhc().setText("");
-		getTfTarjeta().setText("");
+		getTfColegiado().setText("");
+		getCbEspecialidades().setSelectedIndex(0);;
 		
 		getChckbxNombre().setSelected(false);
 		getChckbxApellido().setSelected(false);
 		getChckbxDni().setSelected(false);
-		getChckbxNhc().setSelected(false);
-		getChckbxTarjeta().setSelected(false);
+		getChckbxColegiado().setSelected(false);
+		getChckbxEspecialidad().setSelected(false);
 		
 	}
+	private JComboBox<String> getCbEspecialidades() {
+		if (cbEspecialidades == null) {
+			cbEspecialidades = new JComboBox();
+			cargarComboEspecialidades();
+		}
+		return cbEspecialidades;
+	}
+	private void cargarComboEspecialidades() {
+		for(Especialidad esp : vcc.getGE().getListaEspecialidades()) {
+			cbEspecialidades.addItem(esp.getNombre_esp());
+		}
+		
+	}
+
+	private JPanel getPanelVistas() {
+		if (panelVistas == null) {
+			panelVistas = new JPanel();
+			panelVistas.setLayout(new GridLayout(2, 1, 0, 0));
+			panelVistas.add(getScrollPaneTabla());
+			panelVistas.add(getScrollPane_1());
+		}
+		return panelVistas;
+	}
+	private JScrollPane getScrollPaneTabla() {
+		if (scrollPaneTabla == null) {
+			scrollPaneTabla = new JScrollPane();
+			scrollPaneTabla.setViewportView(getTable());
+		}
+		return scrollPaneTabla;
+	}
+	private JScrollPane getScrollPane_1() {
+		if (scrollPaneVista == null) {
+			scrollPaneVista = new JScrollPane();
+			scrollPaneVista.setViewportView(getTableVista());
+		}
+		return scrollPaneVista;
+	}
+	private JTable getTable() {
+		if (table == null) {
+			table = new JTable();
+			table.setDefaultEditor(Object.class, null);
+			table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			table.setFocusable(false);
+		}
+		return table;
+	}
+	private JTable getTableVista() {
+		if (tableVista == null) {
+			tableVista = new JTable();
+			tableVista.setDefaultEditor(Object.class, null);
+			tableVista.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			tableVista.setFocusable(false);
+		}
+		return tableVista;
+	}
+	private JButton getBtBorrar() {
+		if (btBorrar == null) {
+			btBorrar = new JButton("Borrar");
+			btBorrar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					borrar();
+				}
+			});
+		}
+		return btBorrar;
+	}
+	
+
+	private JButton getBtAñadir() {
+		if (btAñadir == null) {
+			btAñadir = new JButton("Añadir");
+			btAñadir.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					añadir();
+				}
+			});
+		}
+		return btAñadir;
+	}
+
+	protected void borrar() {
+		String d=(String) tma.getValueAt(tableVista.getSelectedRow(), 0);
+		
+		añadidos.remove(vcc.getgM().buscarPorDni(d));
+		ponerModeloAñadidos();
+		
+	}
+	protected void añadir() {
+		String d=(String) tm.getValueAt(table.getSelectedRow(), 0);
+		
+		añadidos.add(vcc.getgM().buscarPorDni(d));
+		ponerModeloAñadidos();
+		
+	}
+
+	
 }

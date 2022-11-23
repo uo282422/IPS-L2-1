@@ -19,6 +19,13 @@ public class GestorMedicos {
 	public ArrayList<Medico> getMedicos() {
 		return medicos;
 	}
-
+	
+	public Medico buscarPorDni(String dni) {
+		for(Medico m :medicos) {
+			if(m.getDni().equals(dni))
+				return m;
+		}
+		return null;
+	}
 	
 }

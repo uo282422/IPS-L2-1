@@ -560,13 +560,13 @@ public class VentanaCrearCita extends JFrame {
 			btAñadirMedicos = new JButton("Añadir médicos");
 			btAñadirMedicos.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					abrirVentanaCrearMedicos();
+					abrirVentanaBuscarMedicos();
 				}
 			});
 		}
 		return btAñadirMedicos;
 	}
-	protected void abrirVentanaCrearMedicos() {
+	protected void abrirVentanaBuscarMedicos() {
 		VentanaAñadirMedicos vam=new VentanaAñadirMedicos(this);
 		vam.setVisible(true);
 		
