@@ -8,12 +8,20 @@ public class Medico {
 	private String email;
 	private String especialidad;
 	
-	public Medico(String id, String nombre, String apellido, String email, String esp) {
+	
+
+	private String dni;
+	private String colegiado;
+	
+	public Medico(String id, String nombre, String apellido, String email, String esp, String dni, String colegiado) {
 		this.id = id;
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.email = email;
 		this.especialidad=esp;
+		
+		this.dni=dni;
+		this.colegiado=colegiado;
 	}
 
 	public String getId() {
@@ -53,6 +61,22 @@ public class Medico {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+	public String getDni() {
+		return dni;
+	}
+
+	public void setDni(String dni) {
+		this.dni = dni;
+	}
+
+	public String getColegiado() {
+		return colegiado;
+	}
+
+	public void setColegiado(String colegiado) {
+		this.colegiado = colegiado;
 	}
 	
 	public String toString() {

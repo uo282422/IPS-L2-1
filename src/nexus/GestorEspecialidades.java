@@ -26,6 +26,13 @@ public class GestorEspecialidades {
 		}
 		return null;
 	}
+	public Especialidad buscarPorId(String id) {
+		for(Especialidad e :especialidades) {
+			if(e.getId_esp().equals(id))
+				return e;
+		}
+		return null;
+	}
 
 	
 }

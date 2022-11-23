@@ -16,26 +16,27 @@ import javax.swing.border.EmptyBorder;
 
 import logic.Paciente;
 import nexus.GestorCitas;
+import nexus.GestorPacientes;
 
 public class DialogoInfoContacto extends JDialog {
 
 	private final JPanel panelDialogoPrincipal = new JPanel();
 
-//	gP.getContactoPaciente(idPaciente)
-	
-	
-	
-//	gP.actualizarContactoPaciente(idPaciente,str);
-//	textAreaPrincipal.setText(gP.getContactoPaciente(idPaciente));
 	private GestorCitas gC;
+	private GestorPacientes gP;
 	private JTextField tfCorreo;
 	private JTextField tfTlf;
 	private JTextPane tpOtros;
+	
+	private Paciente p;
 	/**
 	 * Create the dialog.
 	 */
-	public DialogoInfoContacto(GestorCitas gC, int id) {
+	public DialogoInfoContacto(GestorCitas gC, GestorPacientes gP, int id) {
+		
 		this.gC=gC;
+		p=gP.getPaciente(id);
+		gC.añadirInfoContactoProv(p);
 		setBounds(100, 100, 450, 300);
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
@@ -49,7 +50,7 @@ public class DialogoInfoContacto extends JDialog {
 				panelNorte.add(lbInfoContacto);
 			}
 			{
-				JLabel lbIdPaciente = new JLabel(String.valueOf(id));
+				JLabel lbIdPaciente = new JLabel(String.valueOf(p.getId()));
 				panelNorte.add(lbIdPaciente);
 			}
 		}
@@ -121,9 +122,7 @@ public class DialogoInfoContacto extends JDialog {
 						
 						gC.añadirInfoContactoProv(Integer.parseInt(tfTlf.getText()),tfCorreo.getText(),tpOtros.getText());
 						dispose();
-//						gP.actualizarTelefonoPaciente(idPaciente,Integer.parseInt(tfTlf.getText()));
-//						gP.actualizarCorreoPaciente(idPaciente,tfCorreo.getText());
-//						gP.actualizarOtrosContactosPaciente(id, tpOtros.getText());
+
 
 						
 					}

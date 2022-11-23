@@ -33,6 +33,7 @@ import nexus.GestorEspecialidades;
 import nexus.GestorMedicos;
 import nexus.GestorPacientes;
 import nexus.GestorSalas;
+import javax.swing.JCheckBox;
 
 public class VentanaCrearCita extends JFrame {
 
@@ -69,7 +70,6 @@ public class VentanaCrearCita extends JFrame {
 	private DialogoInfoContacto dialContacto;
 	private JPanel panelContacto;
 	private JButton btContacto;
-	private JComboBox cbPacientes;
 	private JPanel panelHoraSalida;
 	private JLabel lbHoraSalida;
 	private JFormattedTextField tfHoraSalida;
@@ -89,6 +89,9 @@ public class VentanaCrearCita extends JFrame {
 	private String motivosI="";
 	private JPanel panel;
 	private JButton btLimpiar;
+	private JCheckBox chckbxDisponibles;
+	private JTextField tfPaciente;
+	private JButton btBuscarPaciente;
 
 	/**
 	 * Create the frame.
@@ -135,9 +138,10 @@ public class VentanaCrearCita extends JFrame {
 	private JPanel getPanelPaciente() {
 		if (panelPaciente == null) {
 			panelPaciente = new JPanel();
-			panelPaciente.setLayout(new GridLayout(0, 3, 10, 0));
+			panelPaciente.setLayout(new GridLayout(0, 4, 10, 0));
+			panelPaciente.add(getBtBuscarPaciente_1());
 			panelPaciente.add(getLbPaciente());
-			panelPaciente.add(getCbPacientes());
+			panelPaciente.add(getTfPaciente());
 			panelPaciente.add(getPanelContacto_1());
 		}
 		return panelPaciente;
@@ -146,7 +150,7 @@ public class VentanaCrearCita extends JFrame {
 	private JLabel getLbPaciente() {
 		if (lbPaciente == null) {
 			lbPaciente = new JLabel("Paciente:");
-			lbPaciente.setHorizontalAlignment(SwingConstants.RIGHT);
+			lbPaciente.setHorizontalAlignment(SwingConstants.CENTER);
 		}
 		return lbPaciente;
 	}
@@ -196,6 +200,7 @@ public class VentanaCrearCita extends JFrame {
 			panelSala.setLayout(new GridLayout(0, 3, 10, 0));
 			panelSala.add(getLbSala_1());
 			panelSala.add(getCbSala());
+			panelSala.add(getChckbxDisponibles());
 		}
 		return panelSala;
 	}
@@ -336,7 +341,7 @@ public class VentanaCrearCita extends JFrame {
 		}else if(fecha.isEmpty() ||fecha.contains(" ") || horaE.isEmpty() ||horaE.contains(" ") || horaS.isEmpty()||horaS.contains(" ") ) {
 			new JOptionPane().showMessageDialog(this, "Error, Hay campos sin cubrir");
 		}else {
-			String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
+			String[] nomApe = getTfPaciente().getText().split(" ");
 			String nombre = nomApe[0];
 			String apellido = nomApe[1];
 			int idPaciente = gP.buscarIdPaciente(nombre, apellido);
@@ -396,7 +401,7 @@ public class VentanaCrearCita extends JFrame {
 	}
 
 	private void resetear() {
-		getCbPacientes().setSelectedIndex(0);
+		
 		actualizarInfoProvisional();
 		getTfFecha().setText("");
 		getTfHoraEntrada().setText("");
@@ -405,13 +410,13 @@ public class VentanaCrearCita extends JFrame {
 		getRbSi().setSelected(false);
 		getRbNo().setSelected(false);
 		getTaMedicos().setText("");
-		
+		getTfPaciente().setText("");
 
 	}
 
 	private void mostrarVentanaInfoContacto() {
-		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
-		dialContacto = new DialogoInfoContacto(gC, gP.buscarIdPaciente(nomApe[0], nomApe[1]));
+		String[] nomApe = getTfPaciente().getText().split(" ");
+		dialContacto = new DialogoInfoContacto(gC,gP, gP.buscarIdPaciente(nomApe[0], nomApe[1]));
 		dialContacto.setVisible(true);
 	}
 
@@ -436,36 +441,15 @@ public class VentanaCrearCita extends JFrame {
 		return btContacto;
 	}
 
-	private JComboBox getCbPacientes() {
-		if (cbPacientes == null) {
-			cbPacientes = new JComboBox();
-			cbPacientes.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					actualizarInfoProvisional();
-				}
-			});
-			cargarComboPacientes();
-			actualizarInfoProvisional();
-		}
-		
-	
-		return cbPacientes;
-	}
-
 	private void actualizarInfoProvisional() {
-		String[] nomApe = getCbPacientes().getSelectedItem().toString().split(" ");
-		String nombre = nomApe[0];
-		String apellido = nomApe[1];
+		System.out.println(getTfPaciente().getText());
+		String nombre = getTfPaciente().getText().split(" ")[0];
+		String apellido = getTfPaciente().getText().split(" ")[1];
 		int idPaciente = gP.buscarIdPaciente(nombre, apellido);//id del paciente seleccionado al inicio
 		gC.añadirInfoContactoProv(gP.getPaciente(idPaciente));
 	}
 
-	private void cargarComboPacientes() {
-		for (Paciente p : gP.getListaPacientes()) {
-			getCbPacientes().addItem(p.getNombre() + " " + p.getApellido());
-		}
-	}
-
+	
 	private JPanel getPanelHoraSalida() {
 		if (panelHoraSalida == null) {
 			panelHoraSalida = new JPanel();
@@ -502,12 +486,33 @@ public class VentanaCrearCita extends JFrame {
 	private JComboBox<Sala> getCbSala() {
 		if (cbSala == null) {
 			cbSala = new JComboBox<Sala>();
-			cargarComboSalas();
+			if(getChckbxDisponibles().isSelected())cargarComboSalasDisponibles();
+			else cargarComboSalas();
 		}
 		return cbSala;
 	}
 
+	private void cargarComboSalasDisponibles() {
+		getCbSala().removeAllItems();
+		String horaE = getTfHoraEntrada().getText();
+		String horaS = getTfHoraSalida().getText();
+		String fecha = getTfFecha().getText();
+		
+		
+		if(getTfHoraEntrada().getText().equals("  :  ")){
+			horaE="00:00";
+		}
+		if(getTfHoraSalida().getText().equals("  :  ")) {
+			horaS="23:59";
+		}
+		for (Sala s : gS.getListaSalasDisponibles(fecha, horaE, horaS)) {
+			getCbSala().addItem(s);
+		}
+		
+	}
+
 	private void cargarComboSalas() {
+		getCbSala().removeAllItems();
 		for (Sala s : gS.getListaSalas()) {
 			getCbSala().addItem(s);
 		}
@@ -555,18 +560,21 @@ public class VentanaCrearCita extends JFrame {
 			btAñadirMedicos = new JButton("Añadir médicos");
 			btAñadirMedicos.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					abrirVentanaCrearMedicos();
+					abrirVentanaBuscarMedicos();
 				}
 			});
 		}
 		return btAñadirMedicos;
 	}
-	protected void abrirVentanaCrearMedicos() {
+	protected void abrirVentanaBuscarMedicos() {
 		VentanaAñadirMedicos vam=new VentanaAñadirMedicos(this);
 		vam.setVisible(true);
 		
 	}
-
+	protected void abrirVentanaBuscadorpaciente() {
+		VentanaBuscadorPacientes vbp=new VentanaBuscadorPacientes(this);
+		vbp.setVisible(true);
+	}
 	private JPanel getPanelMedicosAgregados_1() {
 		if (panelMedicosAgregados == null) {
 			panelMedicosAgregados = new JPanel();
@@ -615,7 +623,9 @@ public class VentanaCrearCita extends JFrame {
 	public GestorEspecialidades getGE() {
 		return gE;
 	}
-
+	public GestorPacientes getGP() {
+		return gP;
+	}
 	
 	private JPanel getPanel() {
 		if (panel == null) {
@@ -637,4 +647,37 @@ public class VentanaCrearCita extends JFrame {
 		}
 		return btLimpiar;
 	}
+	private JCheckBox getChckbxDisponibles() {
+		if (chckbxDisponibles == null) {
+			chckbxDisponibles = new JCheckBox("Ver sólo disponibles");
+			chckbxDisponibles.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					if(getChckbxDisponibles().isSelected())cargarComboSalasDisponibles();
+					else cargarComboSalas();
+				}
+			});
+		}
+		return chckbxDisponibles;
+	}
+	public JTextField getTfPaciente() {
+		if (tfPaciente == null) {
+			tfPaciente = new JTextField();
+			tfPaciente.setEditable(false);
+			tfPaciente.setColumns(10);
+		}
+		return tfPaciente;
+	}
+	private JButton getBtBuscarPaciente_1() {
+		if (btBuscarPaciente == null) {
+			btBuscarPaciente = new JButton("BuscarPaciente");
+			btBuscarPaciente.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaBuscadorpaciente();
+				}
+			});
+		}
+		return btBuscarPaciente;
+	}
+
+	
 }

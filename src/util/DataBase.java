@@ -65,8 +65,11 @@ public class DataBase {
 					String apellido = rs.getString("medico_apellido");
 					String email = rs.getString("medico_email");
 					String esp = rs.getString("medico_especialidad_id");
+					
+					String dni = rs.getString("medico_dni");
+					String coleg = rs.getString("medico_colegiado");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp));
+					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -163,6 +166,10 @@ public class DataBase {
 					String telefono = rs.getString("paciente_telefono");
 					String correo = rs.getString("paciente_correo");
 					String otros = rs.getString("paciente_otros");
+					
+					String dni = rs.getString("paciente_dni");
+					String nhc = rs.getString("paciente_nhc");
+					String tarjeta = rs.getString("paciente_tarjeta");
 
 //					if(!apellido.isBlank() && !apellido.isEmpty())
 //						apellido= rs.getString("paciente_apellido");
@@ -183,7 +190,7 @@ public class DataBase {
 					if (valido)
 						pacientes.add(new Paciente(Integer.parseInt(id), nombre,
 								apellido, Integer.parseInt(telefono), correo,
-								otros));
+								otros, dni, nhc, tarjeta));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -316,9 +323,13 @@ public class DataBase {
 							.parseInt(rs.getString("PACIENTE_TELEFONO"));
 					String correo = rs.getString("PACIENTE_CORREO");
 					String otros = rs.getString("PACIENTE_OTROS");
+					
+					String dni = rs.getString("paciente_dni");
+					String nhc = rs.getString("paciente_nhc");
+					String tarjeta = rs.getString("paciente_tarjeta");
 
 					paciente = new Paciente(id, nombre, apellido, telefono,
-							correo, otros);
+							correo, otros, dni, nhc, tarjeta);
 				}
 
 				rs.close();
@@ -597,7 +608,10 @@ public class DataBase {
 					String email = rs.getString("MEDICO_EMAIL");
 					String esp = rs.getString("MEDICO_ESPECIALIDAD_ID");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp));
+					String dni = rs.getString("medico_dni");
+					String coleg = rs.getString("medico_colegiado");
+
+					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -1151,4 +1165,51 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 	}
+
+	public ArrayList<Cita> cargarCitas() {
+		ArrayList<Cita> citas = new ArrayList<Cita>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement pst = conn.prepareStatement(
+					"select * from cita");
+			try {
+
+				ResultSet rs = pst.executeQuery();
+
+				while (rs.next()) {
+
+					int id = Integer.parseInt(rs.getString("CITA_ID"));
+					int pacienteId = Integer
+							.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					String fecha = rs.getString("CITA_FECHA");
+					String horaI = rs.getString("CITA_HORA_INICIO");
+					String horaF = rs.getString("CITA_HORA_FIN");
+					boolean urgente = rs.getBoolean("CITA_URGENTE");
+					int salaId = Integer.parseInt(rs.getString("CITA_SALA_ID"));
+					String telefono = rs.getString("CITA_TELEFONO");
+					String correo = rs.getString("CITA_CORREO");
+					String otros = rs.getString("CITA_OTROS");
+					int acudio = rs.getInt("CITA_ACUDIO");
+					List<String> causas = getCausas(rs.getString("cita_id"));
+					String motivos = rs.getString("cita_motivos");
+
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas, motivos));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+
+		return citas;
+	}
+
+	
 }
