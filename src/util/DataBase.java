@@ -11,11 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logic.Baja;
+import logic.Diagnostico;
 import logic.Enfermedad;
 import logic.Medico;
 import logic.Paciente;
 import logic.Prescripcion;
 import logic.Sala;
+import logic.Seguimiento;
 import logic.Vacuna;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
@@ -82,6 +84,64 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 		return medicos;
+	}
+	
+	public List<Diagnostico> cargarDiagnosticos() {
+		ArrayList<Diagnostico> diagnosticos = new ArrayList<Diagnostico>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery("select * from diagnostico");
+				while (rs.next()) {
+					String citaid = rs.getString("cita_id");
+					String apartadoid = rs.getString("apartado_id");
+					String fecha = rs.getString("diagnostico_fecha");
+					String hora = rs.getString("diagnostico_hora");
+					boolean seg = rs.getBoolean("seguimiento");
+					
+					
+
+					diagnosticos.add(new Diagnostico(citaid, apartadoid, fecha, hora, seg));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return diagnosticos;
+	}
+	public List<Seguimiento> cargarSeguimientos() {
+		ArrayList<Seguimiento> seguimientos = new ArrayList<Seguimiento>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery("select * from seguimiento");
+				while (rs.next()) {
+					String id = rs.getString("seguimiento_id");
+					String cita = rs.getString("cita_id");
+					String esta = rs.getString("seguimiento_estado");
+					String com = rs.getString("seguimiento_comentarios");
+					
+					
+
+					seguimientos.add(new Seguimiento(id, cita, esta, com));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return seguimientos;
 	}
 
 	public List<Jornada> getJornadasDeMedico(String medId) {
@@ -1209,6 +1269,100 @@ public class DataBase {
 		}
 
 		return citas;
+	}
+
+	public String generarIdSeguimiento() {
+		String id = "";
+		List<String> ids = new ArrayList<String>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement("SELECT SEGUIMIENTO_ID FROM SEGUIMIENTO");
+			ResultSet rs = null;
+			try {
+				rs = s.executeQuery();
+				while (rs.next()) {
+					ids.add(rs.getString("seguimiento_id"));
+				}
+				if (ids.isEmpty())
+					id = "1000";
+				else
+					id = (Integer.parseInt(ids.get(ids.size() - 1)) + 1) + "";
+
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return id;
+	}
+
+	public void insertarSeguimiento(Seguimiento seg) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement("INSERT INTO seguimiento VALUES (?, ?, ?, ?)");
+			try {
+				s.setString(1, seg.getId_seguimiento());
+				s.setString(2, seg.getId_cita());
+				s.setString(3, seg.getEstado());
+				s.setString(4, seg.getComentarios());
+				
+				s.execute();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		
+	}
+
+	public void actualizarEstadoSeguimiento(String estado,String com, String citaId) {
+		System.out.println(estado+" "+com+" "+citaId);
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement("UPDATE seguimiento SET seguimiento_estado = ?, seguimiento_comentarios = ? WHERE cita_id = ?");
+			try {
+				s.setString(1, estado);
+				s.setString(2, com);
+				s.setString(3, citaId);
+				s.executeUpdate();
+				
+
+			} catch (SQLException e) {
+				throw new Error("Problem1", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem2", e);
+		}
+		
+	}
+
+	public void actualizarSeguimientoDiagnostico(boolean b, String citaId) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement("UPDATE diagnostico SET seguimiento = ? WHERE cita_id = ?");
+			try {
+				s.setBoolean(1, b);
+				s.setString(2, citaId);
+				s.executeUpdate();
+				
+
+			} catch (SQLException e) {
+				throw new Error("Problem1", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem2", e);
+		}
+		
 	}
 
 	
