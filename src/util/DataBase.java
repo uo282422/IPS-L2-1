@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class DataBase {
 	private static final String QUERY_CITA_CON_ID = "SELECT * FROM cita WHERE cita_id = ?";
 	private static final String QUERY_NOMBRE_PACIENTE_CON_ID = "SELECT paciente_nombre FROM paciente WHERE paciente_id = ?";
 	private static final String GUARDAR_CITA = "INSERT INTO cita VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES (?, ?, ?, ?, ?, ?)";
+	private static final String GUARDAR_JORNADA = "INSERT INTO jornada VALUES (?, ?, ?, ?, ?, ?, ?)";
 	private static final String ACTUALIZAR_CITA_ACUDE = "UPDATE cita SET cita_acudio = ? WHERE cita_id = ?";
 	private static final String QUERY_ID_JORNADA = "SELECT jornada_id FROM jornada";
 	private static final String QUERY_CAUSAS = "SELECT causa FROM causacita WHERE cita_id = ?";
@@ -45,8 +44,15 @@ public class DataBase {
 	private static final String ACTUALIZAR_BAJA = "UPDATE baja SET baja_tipo = ?, baja_fecha_inicio = ?, baja_fecha_fin = ?, baja_hora_inicio = ?, baja_hora_fin = ?, baja_observaciones = ?, baja_medico_id = ? WHERE baja_id = ?";
 	private static final String CARGAR_CALENDARIOS = "SELECT * FROM CALENDARIO";
 	private static final String BUSCAR_CALENDARIOS_ID = "SELECT CALENDARIO_ID FROM CALENDARIO";
-	private static final String GUARDAR_CALENDARIO = "INSERT INTO CALENDARIO VALUES(?, ?, ?)";
+	private static final String GUARDAR_CALENDARIO = "INSERT INTO CALENDARIO VALUES(?, ?)";
+	private static final String GUARDAR_MEDICO_CALENDARIO = "INSERT INTO MEDICO_CALENDARIO VALUES(?, ?)";
 	private static final String ELIMINAR_CALENDARIO = "DELETE FROM CALENDARIO WHERE CALENDARIO_ID = ?";
+	private static final String JORNADAS_CARGAR = "SELECT * FROM JORNADA";
+	private static final String CARGAR_JORNADAS_PARA_CALENDARIO = "SELECT * FROM JORNADA WHERE JORNADA_ID IN (SELECT JORNADA_ID FROM JORNADA_CALENDARIO WHERE CALENDARIO_ID = ?)";
+	private static final String CARGAR_JORNADAS_PARA_MEDICO = "SELECT * FROM JORNADA WHERE JORNADA_ID IN (SELECT JORNADA_ID FROM JORNADA_CALENDARIO WHERE CALENDARIO_ID IN (SELECT CALENDARIO_ID FROM MEDICO_CALENDARIO WHERE MEDICO_ID = ?))";
+	private static final String GUARDAR_JORNADA_PARA_CALENDARIO = "INSERT INTO JORNADA_CALENDARIO VALUES (?, ?)";
+	private static final String EDITAR_CALENDARIO = "UPDATE CALENDARIO SET CALENDARIO_NOMBRE = ? WHERE CALENDARIO_ID = ?";
+	private static final String BORRAR_JORNADAS_PARA_CALENDARIO = "DELETE FROM JORNADA_CALENDARIO WHERE CALENDARIO_ID = ?";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -65,11 +71,12 @@ public class DataBase {
 					String apellido = rs.getString("medico_apellido");
 					String email = rs.getString("medico_email");
 					String esp = rs.getString("medico_especialidad_id");
-					
+
 					String dni = rs.getString("medico_dni");
 					String coleg = rs.getString("medico_colegiado");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
+					medicos.add(new Medico(id, nombre, apellido, email, esp,
+							dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -90,29 +97,18 @@ public class DataBase {
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 			Statement s = conn.createStatement();
 			try {
-				ResultSet rs = s.executeQuery(
-						"select * from jornada where jornada_medico_id='"
-								+ medId + "'");
+				ResultSet rs = s.executeQuery(CARGAR_JORNADAS_PARA_MEDICO);
 				while (rs.next()) {
 					String id = rs.getString("jornada_id");
 					String dias = rs.getString("jornada_dias");
 					String horaI = rs.getString("jornada_hora_inicio");
 					String horaF = rs.getString("jornada_hora_fin");
-					String calId = rs.getString("jornada_calendario_id");
+					String inicio = rs.getString("JORNADA_INCIO");
+					String fin = rs.getString("JORNADA_FIN");
 
-					jornadas.add(
-							new Jornada(id, dias, horaI, horaF, medId, calId));
-				}
-				for (Jornada j : jornadas) {
-					rs = s.executeQuery(
-							"select * from calendario where calendario_id = "
-									+ j.getCalId());
-					while (rs.next()) {
-						j.setCalendario(
-								new Calendario(rs.getString("calendario_id"),
-										rs.getString("calendario_inicio"),
-										rs.getString("calendario_fin")));
-					}
+					jornadas.add(new Jornada(id, dias, horaI, horaF, medId,
+							inicio, fin));
+
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -166,7 +162,7 @@ public class DataBase {
 					String telefono = rs.getString("paciente_telefono");
 					String correo = rs.getString("paciente_correo");
 					String otros = rs.getString("paciente_otros");
-					
+
 					String dni = rs.getString("paciente_dni");
 					String nhc = rs.getString("paciente_nhc");
 					String tarjeta = rs.getString("paciente_tarjeta");
@@ -210,8 +206,7 @@ public class DataBase {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
-			PreparedStatement pst = conn.prepareStatement(
-					"insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?,NULL, NULL)");
+			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?,NULL, NULL)");
 
 			try {
 				pst.setString(1, cita.getIdCita() + "");
@@ -246,8 +241,7 @@ public class DataBase {
 				throw new Error("Error al linkear medico-cita", e);
 			}
 
-			pst = conn.prepareStatement(
-					"insert into especialidad_cita values(?,?,?)");
+			pst = conn.prepareStatement("insert into especialidad_cita values(?,?,?)");
 			try {
 
 				for (Especialidad e : especialidades) {
@@ -306,8 +300,7 @@ public class DataBase {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from paciente where paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from paciente where paciente_id = ?");
 
 			try {
 
@@ -319,11 +312,10 @@ public class DataBase {
 					int id = Integer.parseInt(rs.getString("PACIENTE_ID"));
 					String nombre = rs.getString("PACIENTE_NOMBRE");
 					String apellido = rs.getString("PACIENTE_APELLIDO");
-					int telefono = Integer
-							.parseInt(rs.getString("PACIENTE_TELEFONO"));
+					int telefono = Integer.parseInt(rs.getString("PACIENTE_TELEFONO"));
 					String correo = rs.getString("PACIENTE_CORREO");
 					String otros = rs.getString("PACIENTE_OTROS");
-					
+
 					String dni = rs.getString("paciente_dni");
 					String nhc = rs.getString("paciente_nhc");
 					String tarjeta = rs.getString("paciente_tarjeta");
@@ -374,11 +366,12 @@ public class DataBase {
 			PreparedStatement s = conn.prepareStatement(GUARDAR_JORNADA);
 			try {
 				s.setString(1, j.getId());
-				s.setString(2, j.getDias());
-				s.setString(3, j.getHoraComienzo());
-				s.setString(4, j.getHoraFinal());
-				s.setString(5, j.getMedico().getId());
-				s.setString(6, j.getCalendario().getId());
+				s.setString(2, j.getNombre());
+				s.setString(3, j.getDias());
+				s.setString(4, j.getHoraComienzo());
+				s.setString(5, j.getHoraFinal());
+				s.setString(6, j.getInicio());
+				s.setString(7, j.getFin());
 				s.executeUpdate();
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
@@ -406,16 +399,14 @@ public class DataBase {
 				ResultSet rs = ps.executeQuery();
 				while (rs.next()) {
 					int idI = Integer.parseInt(id);
-					int idPaciente = Integer
-							.parseInt(rs.getString("cita_paciente_id"));
+					int idPaciente = Integer.parseInt(rs.getString("cita_paciente_id"));
 					String fecha = rs.getString("cita_fecha");
 					String hora_inicio = rs.getString("cita_hora_inicio");
 					String hora_fin = rs.getString("cita_hora_fin");
 					boolean urgente = rs.getBoolean("cita_urgente");
 					int sala = Integer.parseInt(rs.getString("cita_sala_id"));
 					String nombrePaciente = getNombrePaciente(idPaciente);
-					int telefonoCita = Integer
-							.parseInt(rs.getString("cita_telefono"));
+					int telefonoCita = Integer.parseInt(rs.getString("cita_telefono"));
 					String correoCita = rs.getString("cita_correo");
 					String otrosCita = rs.getString("cita_otros");
 					String motivos = rs.getString("cita_motivos");
@@ -485,8 +476,7 @@ public class DataBase {
 	private String getNombrePaciente(int id) {
 		String nombrePaciente = "";
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement ps = conn
-					.prepareStatement(QUERY_NOMBRE_PACIENTE_CON_ID);
+			PreparedStatement ps = conn.prepareStatement(QUERY_NOMBRE_PACIENTE_CON_ID);
 			try {
 				ps.setString(1, "" + id);
 				ResultSet rs = ps.executeQuery();
@@ -512,8 +502,7 @@ public class DataBase {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
-			PreparedStatement pst = conn
-					.prepareStatement("select * from sala where sala_id = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from sala where sala_id = ?");
 
 			try {
 
@@ -547,8 +536,7 @@ public class DataBase {
 		ArrayList<Cita> citas = new ArrayList<Cita>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from cita c where c.cita_paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from cita c where c.cita_paciente_id = ?");
 			try {
 				pst.setString(1, idPaciente + "");
 
@@ -557,8 +545,7 @@ public class DataBase {
 				while (rs.next()) {
 
 					int id = Integer.parseInt(rs.getString("CITA_ID"));
-					int pacienteId = Integer
-							.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					int pacienteId = Integer.parseInt(rs.getString("CITA_PACIENTE_ID"));
 					String fecha = rs.getString("CITA_FECHA");
 					String horaI = rs.getString("CITA_HORA_INICIO");
 					String horaF = rs.getString("CITA_HORA_FIN");
@@ -593,8 +580,7 @@ public class DataBase {
 		ArrayList<Medico> medicos = new ArrayList<Medico>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from medico m, medico_cita c where c.cita_id = ? and m.medico_id = c.medico_id");
+			PreparedStatement pst = conn.prepareStatement("select * from medico m, medico_cita c where c.cita_id = ? and m.medico_id = c.medico_id");
 			try {
 				pst.setString(1, idCita + "");
 
@@ -611,7 +597,8 @@ public class DataBase {
 					String dni = rs.getString("medico_dni");
 					String coleg = rs.getString("medico_colegiado");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
+					medicos.add(new Medico(id, nombre, apellido, email, esp,
+							dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -631,8 +618,7 @@ public class DataBase {
 		ArrayList<Enfermedad> enfermedades = new ArrayList<Enfermedad>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from enfermedad where enfermedad_paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from enfermedad where enfermedad_paciente_id = ?");
 			try {
 				pst.setString(1, idPaciente + "");
 
@@ -645,8 +631,7 @@ public class DataBase {
 					String descripcion = rs.getString("ENFERMEDAD_DESCRIPCION");
 					boolean enCita = rs.getBoolean("ENFERMEDAD_EN_CITA");
 					int idCita = enCita
-							? Integer.parseInt(
-									rs.getString("ENFERMEDAD_CITA_ID"))
+							? Integer.parseInt(rs.getString("ENFERMEDAD_CITA_ID"))
 							: 0;
 
 					enfermedades.add(new Enfermedad(id, nombre, descripcion,
@@ -670,8 +655,7 @@ public class DataBase {
 		ArrayList<Vacuna> vacunas = new ArrayList<Vacuna>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from vacuna where vacuna_paciente_id = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from vacuna where vacuna_paciente_id = ?");
 			try {
 				pst.setString(1, idPaciente + "");
 
@@ -730,8 +714,7 @@ public class DataBase {
 		ArrayList<Cita> citas = new ArrayList<Cita>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = ? and c.cita_fecha = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = ? and c.cita_fecha = ?");
 			try {
 				pst.setString(1, idMedico);
 				pst.setString(2, fecha);
@@ -741,8 +724,7 @@ public class DataBase {
 				while (rs.next()) {
 
 					int id = Integer.parseInt(rs.getString("CITA_ID"));
-					int pacienteId = Integer
-							.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					int pacienteId = Integer.parseInt(rs.getString("CITA_PACIENTE_ID"));
 					String horaI = rs.getString("CITA_HORA_INICIO");
 					String horaF = rs.getString("CITA_HORA_FIN");
 					boolean urgente = rs.getBoolean("CITA_URGENTE");
@@ -870,17 +852,16 @@ public class DataBase {
 		ArrayList<Especialidad> especialidades = new ArrayList<Especialidad>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select especialidad_id, especialidad_nombre from especialidad");
+			PreparedStatement pst = conn.prepareStatement("select especialidad_id, especialidad_nombre from especialidad");
 
 			try {
 
 				ResultSet rs = pst.executeQuery();
 
 				while (rs.next()) {
-					especialidades.add(
-							new Especialidad(rs.getString("especialidad_id"),
-									rs.getString("especialidad_nombre")));
+					especialidades.add(new Especialidad(
+							rs.getString("especialidad_id"),
+							rs.getString("especialidad_nombre")));
 
 				}
 				rs.close();
@@ -926,8 +907,8 @@ public class DataBase {
 			try {
 				ResultSet rs = s.executeQuery(LISTAR_PRESC);
 				while (rs.next()) {
-					prescripciones.add(
-							new Prescripcion(rs.getString(1), rs.getString(2)));
+					prescripciones.add(new Prescripcion(rs.getString(1),
+							rs.getString(2)));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -1084,9 +1065,11 @@ public class DataBase {
 			try {
 				rs = s.executeQuery();
 				while (rs.next()) {
-					cs.add(new Calendario(rs.getString("calendario_id"),
-							rs.getString("calendario_inicio"),
-							rs.getString("calendario_fin")));
+					Calendario c = new Calendario(rs.getString("CALENDARIO_ID"),
+							rs.getString("CALENDARIO_NOMBRE"));
+					List<Jornada> jornadas = cargarJornadasParaCalendario(c);
+					c.setJornadas(jornadas);
+					cs.add(c);
 				}
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
@@ -1098,6 +1081,37 @@ public class DataBase {
 			throw new Error("Problem", e);
 		}
 		return cs;
+	}
+
+	private List<Jornada> cargarJornadasParaCalendario(Calendario c) {
+		ArrayList<Jornada> js = new ArrayList<Jornada>();
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(CARGAR_JORNADAS_PARA_CALENDARIO);
+			ResultSet rs = null;
+			try {
+				s.setString(1, c.getId());
+				rs = s.executeQuery();
+				while (rs.next()) {
+					String id = rs.getString("JORNADA_ID");
+					String nombre = rs.getString("JORNADA_NOMBRE");
+					String dias = rs.getString("JORNADA_DIAS");
+					String horaInicio = rs.getString("JORNADA_HORA_INICIO");
+					String horaFin = rs.getString("JORNADA_HORA_FIN");
+					String inicio = rs.getString("JORNADA_INICIO");
+					String fin = rs.getString("JORNADA_FIN");
+					js.add(new Jornada(id, nombre, dias, horaInicio, horaFin,
+							inicio, fin));
+				}
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+		return js;
 	}
 
 	public String generarIdCalendario() {
@@ -1133,11 +1147,14 @@ public class DataBase {
 			PreparedStatement s = conn.prepareStatement(GUARDAR_CALENDARIO);
 			try {
 				s.setString(1, c.getId());
-				s.setString(2, new SimpleDateFormat("dd/MM/yyyy")
-						.format(c.getDiaInicio()));
-				s.setString(3, new SimpleDateFormat("dd/MM/yyyy")
-						.format(c.getDiaFin()));
+				s.setString(2, c.getNombre());
 				s.executeUpdate();
+				for (Jornada j : c.getJornadas()) {
+					s = conn.prepareStatement(GUARDAR_JORNADA_PARA_CALENDARIO);
+					s.setString(1, j.getId());
+					s.setString(2, c.getId());
+					s.executeUpdate();
+				}
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {
@@ -1170,8 +1187,7 @@ public class DataBase {
 		ArrayList<Cita> citas = new ArrayList<Cita>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from cita");
+			PreparedStatement pst = conn.prepareStatement("select * from cita");
 			try {
 
 				ResultSet rs = pst.executeQuery();
@@ -1179,8 +1195,7 @@ public class DataBase {
 				while (rs.next()) {
 
 					int id = Integer.parseInt(rs.getString("CITA_ID"));
-					int pacienteId = Integer
-							.parseInt(rs.getString("CITA_PACIENTE_ID"));
+					int pacienteId = Integer.parseInt(rs.getString("CITA_PACIENTE_ID"));
 					String fecha = rs.getString("CITA_FECHA");
 					String horaI = rs.getString("CITA_HORA_INICIO");
 					String horaF = rs.getString("CITA_HORA_FIN");
@@ -1211,5 +1226,87 @@ public class DataBase {
 		return citas;
 	}
 
-	
+	public List<Jornada> cargarJornadas() {
+		ArrayList<Jornada> jornadas = new ArrayList<Jornada>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement pst = conn.prepareStatement(JORNADAS_CARGAR);
+			try {
+
+				ResultSet rs = pst.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("JORNADA_ID");
+					String nombre = rs.getString("JORNADA_NOMBRE");
+					String dias = rs.getString("JORNADA_DIAS");
+					String horaInicio = rs.getString("JORNADA_HORA_INICIO");
+					String horaFin = rs.getString("JORNADA_HORA_FIN");
+					String inicio = rs.getString("JORNADA_INICIO");
+					String fin = rs.getString("JORNADA_FIN");
+
+					jornadas.add(new Jornada(id, nombre, dias, horaInicio,
+							horaFin, inicio, fin));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				pst.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+
+		return jornadas;
+	}
+
+	public void guardarCalendarioParaMedicos(Calendario c, List<Medico> meds) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(GUARDAR_MEDICO_CALENDARIO);
+			try {
+				for (Medico m : meds) {
+					s.setString(1, m.getId());
+					s.setString(2, c.getId());
+					s.executeUpdate();
+				}
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
+	public void editarCalendario(Calendario c) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(EDITAR_CALENDARIO);
+			try {
+				s.setString(2, c.getId());
+				s.setString(1, c.getNombre());
+				s.executeUpdate();
+				s = conn.prepareStatement(BORRAR_JORNADAS_PARA_CALENDARIO);
+				s.setString(1, c.getId());
+				s.executeUpdate();
+				for (Jornada j : c.getJornadas()) {
+					s = conn.prepareStatement(GUARDAR_JORNADA_PARA_CALENDARIO);
+					s.setString(1, j.getId());
+					s.setString(2, c.getId());
+					s.executeUpdate();
+				}
+			} catch (SQLException e) {
+				throw new Error("Problem", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem", e);
+		}
+	}
+
 }

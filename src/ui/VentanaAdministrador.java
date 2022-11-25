@@ -91,14 +91,22 @@ public class VentanaAdministrador extends JFrame {
 		v.setLocationRelativeTo(this);
 		v.setVisible(true);
 	}
+
 	private JButton getBtAsignarCalendarios() {
 		if (btAsignarCalendarios == null) {
 			btAsignarCalendarios = new JButton("Asignar calendarios");
 			btAsignarCalendarios.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					irVentanaAsignarCalendarios();
 				}
 			});
 		}
 		return btAsignarCalendarios;
+	}
+
+	protected void irVentanaAsignarCalendarios() {
+		VentanaAsignarCalendarios vac = new VentanaAsignarCalendarios();
+		vac.setLocationRelativeTo(this);
+		vac.setVisible(true);
 	}
 }

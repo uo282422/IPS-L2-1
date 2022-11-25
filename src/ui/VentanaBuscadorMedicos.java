@@ -23,18 +23,23 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import logic.Medico;
-import logic.Paciente;
-import logic.Sala;
+import nexus.GestorEspecialidades;
+import nexus.GestorMedicos;
 
 public class VentanaBuscadorMedicos extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPanel panel;
 	private JPanel panelSur;
 	private JButton btAceptar;
 	private JButton btCancelar;
 	private JPanel panelCentral;
 	private JPanel panelFiltros;
-	
+
+	private VentanaAsignarCalendarios vac;
 	private VentanaCrearCita vcc;
 	private VentanaAñadirMedicos vam;
 	private DefaultTableModel tm;
@@ -72,15 +77,17 @@ public class VentanaBuscadorMedicos extends JFrame {
 	private JButton btBorrar;
 	private JButton btAñadir;
 
-	private ArrayList<Medico> añadidos=new ArrayList<>();
-	
+	private GestorEspecialidades gestorEspecialidades = new GestorEspecialidades();
+	private GestorMedicos gestorMedicos = new GestorMedicos();
+
+	private ArrayList<Medico> añadidos = new ArrayList<>();
 
 	/**
 	 * Create the frame.
 	 */
 	public VentanaBuscadorMedicos(VentanaAñadirMedicos vam) {
-		this.vam=vam;
-		this.vcc=vam.getVCC();
+		this.vam = vam;
+		this.vcc = vam.getVCC();
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 922, 595);
 		panel = new JPanel();
@@ -93,38 +100,68 @@ public class VentanaBuscadorMedicos extends JFrame {
 		ponerModeloDefault();
 		ponerModeloAñadidos();
 	}
-	
+
+	/**
+	 * Create the frame.
+	 */
+	/**
+	 * @wbp.parser.constructor
+	 */
+	public VentanaBuscadorMedicos(VentanaAsignarCalendarios vac) {
+		this.vac = vac;
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 922, 595);
+		panel = new JPanel();
+		panel.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(panel);
+		panel.setLayout(new BorderLayout(0, 0));
+		panel.add(getPanelSur(), BorderLayout.SOUTH);
+		panel.add(getPanelCentral(), BorderLayout.CENTER);
+		ponerModeloDefault();
+		ponerModeloAñadidos();
+	}
+
 	private void ponerModeloDefault() {
 		cargarModeloCompletoTabla();
 		table.setModel(tm);
 	}
-	
+
 	private void ponerModeloAñadidos() {
 		actualizarModeloAñadidos();
 		tableVista.setModel(tma);
 	}
+
 	private void actualizarModeloAñadidos() {
-		tma=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido","Especialidad", "NºColegiado"},añadidos.size() );
-		for(int i=0;i<añadidos.size();i++) {
-			Medico m=añadidos.get(i);
+		tma = new DefaultTableModel(new String[] { "Dni", "Nombre", "Apellido",
+				"Especialidad", "NºColegiado" }, añadidos.size());
+		for (int i = 0; i < añadidos.size(); i++) {
+			Medico m = añadidos.get(i);
 			tma.setValueAt(m.getDni(), i, 0);
 			tma.setValueAt(m.getNombre(), i, 1);
 			tma.setValueAt(m.getApellido(), i, 2);
-			tma.setValueAt(vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
+			tma.setValueAt(gestorEspecialidades.buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
 			tma.setValueAt(m.getColegiado(), i, 4);
 		}
 	}
+
+	public ArrayList<Medico> getAñadidos() {
+		return añadidos;
+	}
+
 	private void cargarModeloCompletoTabla() {
-		tm=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido","Especialidad", "NºColegiado"},vcc.getgM().getMedicos().size() );
-		for(int i=0;i<vcc.getgM().getMedicos().size();i++) {
-			Medico m=vcc.getgM().getMedicos().get(i);
+		tm = new DefaultTableModel(new String[] { "Dni", "Nombre", "Apellido",
+				"Especialidad", "NºColegiado" },
+				gestorMedicos.getMedicos().size());
+		for (int i = 0; i < gestorMedicos.getMedicos().size(); i++) {
+			Medico m = gestorMedicos.getMedicos().get(i);
 			tm.setValueAt(m.getDni(), i, 0);
 			tm.setValueAt(m.getNombre(), i, 1);
 			tm.setValueAt(m.getApellido(), i, 2);
-			tm.setValueAt(vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
+			tm.setValueAt(gestorEspecialidades.buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
 			tm.setValueAt(m.getColegiado(), i, 4);
 		}
-		
+
 	}
 
 	private JPanel getPanelSur() {
@@ -139,18 +176,24 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelSur;
 	}
+
 	private JButton getBtAceptar() {
 		if (btAceptar == null) {
 			btAceptar = new JButton("Aceptar");
 			btAceptar.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					vam.añadirMedicos(añadidos);;
+					if (vac != null)
+						vac.actualizarMedicos();
+					if (vam != null)
+						vam.añadirMedicos(añadidos);
+					;
 					dispose();
 				}
 			});
 		}
 		return btAceptar;
 	}
+
 	private JButton getBtCancelar() {
 		if (btCancelar == null) {
 			btCancelar = new JButton("Cancelar");
@@ -162,6 +205,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return btCancelar;
 	}
+
 	private JPanel getPanelCentral() {
 		if (panelCentral == null) {
 			panelCentral = new JPanel();
@@ -171,6 +215,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelCentral;
 	}
+
 	private JPanel getPanelFiltros() {
 		if (panelFiltros == null) {
 			panelFiltros = new JPanel();
@@ -184,6 +229,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelFiltros;
 	}
+
 	private JPanel getPanel_1_1() {
 		if (panelNombre == null) {
 			panelNombre = new JPanel();
@@ -194,6 +240,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelNombre;
 	}
+
 	private JLabel getLbNombre() {
 		if (lbNombre == null) {
 			lbNombre = new JLabel("Nombre: ");
@@ -202,6 +249,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return lbNombre;
 	}
+
 	private JTextField getTfNombre() {
 		if (tfNombre == null) {
 			tfNombre = new JTextField();
@@ -209,6 +257,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return tfNombre;
 	}
+
 	private JCheckBox getChckbxNombre() {
 		if (chckbxNombre == null) {
 			chckbxNombre = new JCheckBox("");
@@ -216,6 +265,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return chckbxNombre;
 	}
+
 	private JPanel getPanelApellido() {
 		if (panelApellido == null) {
 			panelApellido = new JPanel();
@@ -226,6 +276,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelApellido;
 	}
+
 	private JLabel getLbApellido() {
 		if (lbApellido == null) {
 			lbApellido = new JLabel("Apellido:");
@@ -234,6 +285,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return lbApellido;
 	}
+
 	private JTextField getTfApellido() {
 		if (tfApellido == null) {
 			tfApellido = new JTextField();
@@ -241,6 +293,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return tfApellido;
 	}
+
 	private JCheckBox getChckbxApellido() {
 		if (chckbxApellido == null) {
 			chckbxApellido = new JCheckBox("");
@@ -248,6 +301,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return chckbxApellido;
 	}
+
 	private JPanel getPanelDni() {
 		if (panelDni == null) {
 			panelDni = new JPanel();
@@ -258,6 +312,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelDni;
 	}
+
 	private JLabel getLbDni() {
 		if (lbDni == null) {
 			lbDni = new JLabel("Dni: ");
@@ -266,6 +321,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return lbDni;
 	}
+
 	private JTextField getTfDni() {
 		if (tfDni == null) {
 			tfDni = new JTextField();
@@ -273,6 +329,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return tfDni;
 	}
+
 	private JCheckBox getChckbxDni() {
 		if (chckbxDni == null) {
 			chckbxDni = new JCheckBox("");
@@ -280,6 +337,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return chckbxDni;
 	}
+
 	private JPanel getPanelColegiado() {
 		if (panelColegiado == null) {
 			panelColegiado = new JPanel();
@@ -290,6 +348,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelColegiado;
 	}
+
 	private JLabel getLbColegiado() {
 		if (lbColegiado == null) {
 			lbColegiado = new JLabel("NºColegiado: ");
@@ -298,6 +357,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return lbColegiado;
 	}
+
 	private JTextField getTfColegiado() {
 		if (tfColegiado == null) {
 			tfColegiado = new JTextField();
@@ -305,6 +365,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return tfColegiado;
 	}
+
 	private JCheckBox getChckbxColegiado() {
 		if (chckbxColegiado == null) {
 			chckbxColegiado = new JCheckBox("");
@@ -312,6 +373,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return chckbxColegiado;
 	}
+
 	private JPanel getPanelEspecialidad() {
 		if (panelEspecialidad == null) {
 			panelEspecialidad = new JPanel();
@@ -322,6 +384,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelEspecialidad;
 	}
+
 	private JLabel getLbEspecialidad() {
 		if (lbEspecialidad == null) {
 			lbEspecialidad = new JLabel("Tarjeta: ");
@@ -330,6 +393,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return lbEspecialidad;
 	}
+
 	private JCheckBox getChckbxEspecialidad() {
 		if (chckbxEspecialidad == null) {
 			chckbxEspecialidad = new JCheckBox("");
@@ -337,6 +401,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return chckbxEspecialidad;
 	}
+
 	private JPanel getPanelBotones() {
 		if (panelBotones == null) {
 			panelBotones = new JPanel();
@@ -346,6 +411,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelBotones;
 	}
+
 	private JPanel getPanelFiltrar() {
 		if (panelFiltrar == null) {
 			panelFiltrar = new JPanel();
@@ -355,6 +421,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelFiltrar;
 	}
+
 	private JPanel getPanelVerTodos() {
 		if (panelVerTodos == null) {
 			panelVerTodos = new JPanel();
@@ -364,6 +431,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelVerTodos;
 	}
+
 	private JButton getBtFiltrar() {
 		if (btFiltrar == null) {
 			btFiltrar = new JButton("Filtrar");
@@ -376,61 +444,64 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return btFiltrar;
 	}
-	
+
 	private void filtrar() {
-		ArrayList<Medico> listaTodos=vcc.getgM().getMedicos();
-		ArrayList<Medico> listaFiltrados=new ArrayList<>();
-		for(Medico m : listaTodos) {
-			if(cumpleFiltros(m))
+		ArrayList<Medico> listaTodos = gestorMedicos.getMedicos();
+		ArrayList<Medico> listaFiltrados = new ArrayList<>();
+		for (Medico m : listaTodos) {
+			if (cumpleFiltros(m))
 				listaFiltrados.add(m);
 		}
 		ponerModeloFiltrado(listaFiltrados);
-		
+
 	}
+
 	private void ponerModeloFiltrado(ArrayList<Medico> lista) {
 		cargarModeloFiltrado(lista);
 		getTable().setModel(tm);
 	}
+
 	private void cargarModeloFiltrado(ArrayList<Medico> lista) {
-		tm=new DefaultTableModel(new String[] {"Dni", "Nombre", "Apellido","Especialidad", "NºColegiado"},lista.size() );
-		for(int i=0;i<lista.size();i++) {
-			Medico m=lista.get(i);
+		tm = new DefaultTableModel(new String[] { "Dni", "Nombre", "Apellido",
+				"Especialidad", "NºColegiado" }, lista.size());
+		for (int i = 0; i < lista.size(); i++) {
+			Medico m = lista.get(i);
 			tm.setValueAt(m.getDni(), i, 0);
 			tm.setValueAt(m.getNombre(), i, 1);
 			tm.setValueAt(m.getApellido(), i, 2);
-			tm.setValueAt(vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
+			tm.setValueAt(gestorEspecialidades.buscarPorId(m.getEspecialidad()).getNombre_esp(), i, 3);
 			tm.setValueAt(m.getColegiado(), i, 4);
 		}
-			
-		
-		
+
 	}
 
 	private boolean cumpleFiltros(Medico m) {
-		boolean valido=true;
-		if(getChckbxNombre().isSelected() && getTfNombre().getText()!="") {
-			if(!m.getNombre().startsWith(getTfNombre().getText()))
-				valido=false;
+		boolean valido = true;
+		if (getChckbxNombre().isSelected() && getTfNombre().getText() != "") {
+			if (!m.getNombre().startsWith(getTfNombre().getText()))
+				valido = false;
 		}
-		if(getChckbxApellido().isSelected() && getTfApellido().getText()!="") {
-			if(!m.getApellido().startsWith(getTfApellido().getText()))
-				valido=false;
+		if (getChckbxApellido().isSelected()
+				&& getTfApellido().getText() != "") {
+			if (!m.getApellido().startsWith(getTfApellido().getText()))
+				valido = false;
 		}
-		if(getChckbxDni().isSelected() && getTfDni().getText()!="") {
-			if(!m.getDni().startsWith(getTfDni().getText()))
-				valido=false;
+		if (getChckbxDni().isSelected() && getTfDni().getText() != "") {
+			if (!m.getDni().startsWith(getTfDni().getText()))
+				valido = false;
 		}
-		if(getChckbxColegiado().isSelected() && getTfColegiado().getText()!="") {
-			if(!m.getColegiado().startsWith(getTfColegiado().getText()))
-				valido=false;
+		if (getChckbxColegiado().isSelected()
+				&& getTfColegiado().getText() != "") {
+			if (!m.getColegiado().startsWith(getTfColegiado().getText()))
+				valido = false;
 		}
-		if(getChckbxEspecialidad().isSelected() ) {
-			if(!vcc.getGE().buscarPorId(m.getEspecialidad()).getNombre_esp().equals(cbEspecialidades.getSelectedItem()))
-				valido=false;
+		if (getChckbxEspecialidad().isSelected()) {
+			if (!gestorEspecialidades.buscarPorId(m.getEspecialidad()).getNombre_esp().equals(cbEspecialidades.getSelectedItem()))
+				valido = false;
 		}
-		
+
 		return valido;
-		
+
 	}
 
 	private JButton getBtVerTodos() {
@@ -438,9 +509,9 @@ public class VentanaBuscadorMedicos extends JFrame {
 			btVerTodos = new JButton("Ver todos");
 			btVerTodos.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					
+
 					resetear();
-					
+
 				}
 			});
 			btVerTodos.setHorizontalTextPosition(SwingConstants.CENTER);
@@ -450,20 +521,22 @@ public class VentanaBuscadorMedicos extends JFrame {
 
 	protected void resetear() {
 		ponerModeloDefault();
-		
+
 		getTfNombre().setText("");
 		getTfApellido().setText("");
 		getTfDni().setText("");
 		getTfColegiado().setText("");
-		getCbEspecialidades().setSelectedIndex(0);;
-		
+		getCbEspecialidades().setSelectedIndex(0);
+		;
+
 		getChckbxNombre().setSelected(false);
 		getChckbxApellido().setSelected(false);
 		getChckbxDni().setSelected(false);
 		getChckbxColegiado().setSelected(false);
 		getChckbxEspecialidad().setSelected(false);
-		
+
 	}
+
 	private JComboBox<String> getCbEspecialidades() {
 		if (cbEspecialidades == null) {
 			cbEspecialidades = new JComboBox();
@@ -471,11 +544,12 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return cbEspecialidades;
 	}
+
 	private void cargarComboEspecialidades() {
-		for(Especialidad esp : vcc.getGE().getListaEspecialidades()) {
+		for (Especialidad esp : gestorEspecialidades.getListaEspecialidades()) {
 			cbEspecialidades.addItem(esp.getNombre_esp());
 		}
-		
+
 	}
 
 	private JPanel getPanelVistas() {
@@ -487,6 +561,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return panelVistas;
 	}
+
 	private JScrollPane getScrollPaneTabla() {
 		if (scrollPaneTabla == null) {
 			scrollPaneTabla = new JScrollPane();
@@ -494,6 +569,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return scrollPaneTabla;
 	}
+
 	private JScrollPane getScrollPane_1() {
 		if (scrollPaneVista == null) {
 			scrollPaneVista = new JScrollPane();
@@ -501,6 +577,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return scrollPaneVista;
 	}
+
 	private JTable getTable() {
 		if (table == null) {
 			table = new JTable();
@@ -510,6 +587,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return table;
 	}
+
 	private JTable getTableVista() {
 		if (tableVista == null) {
 			tableVista = new JTable();
@@ -519,6 +597,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return tableVista;
 	}
+
 	private JButton getBtBorrar() {
 		if (btBorrar == null) {
 			btBorrar = new JButton("Borrar");
@@ -530,7 +609,6 @@ public class VentanaBuscadorMedicos extends JFrame {
 		}
 		return btBorrar;
 	}
-	
 
 	private JButton getBtAñadir() {
 		if (btAñadir == null) {
@@ -545,19 +623,19 @@ public class VentanaBuscadorMedicos extends JFrame {
 	}
 
 	protected void borrar() {
-		String d=(String) tma.getValueAt(tableVista.getSelectedRow(), 0);
-		
-		añadidos.remove(vcc.getgM().buscarPorDni(d));
+		String d = (String) tma.getValueAt(tableVista.getSelectedRow(), 0);
+
+		añadidos.remove(gestorMedicos.buscarPorDni(d));
 		ponerModeloAñadidos();
-		
-	}
-	protected void añadir() {
-		String d=(String) tm.getValueAt(table.getSelectedRow(), 0);
-		
-		añadidos.add(vcc.getgM().buscarPorDni(d));
-		ponerModeloAñadidos();
-		
+
 	}
 
-	
+	protected void añadir() {
+		String d = (String) tm.getValueAt(table.getSelectedRow(), 0);
+
+		añadidos.add(gestorMedicos.buscarPorDni(d));
+		ponerModeloAñadidos();
+
+	}
+
 }
