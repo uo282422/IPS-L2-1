@@ -67,8 +67,8 @@ public class VentanaLogin extends JFrame {
 		return btEntrarMedico;
 	}
 	protected void entrarComoMedico() {
-		VentanaHorario vH=new VentanaHorario();
-		vH.show();
+		VentanaMedico vm=new VentanaMedico();
+		vm.show();
 		
 	}
 

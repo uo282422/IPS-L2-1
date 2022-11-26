@@ -52,15 +52,8 @@ public class GestorJornada {
 		setMedicoJornada();
 		setHoraComienzoJornada();
 		setHoraFinJornada();
-		setCalendario();
 		setDiasJornada();
-		db.guardarCalendario(jornada.getCalendario());
 		db.guardarJornada(jornada);
-	}
-
-	private void setCalendario() {
-		jornada.creaCalendario(dInicio, dFin);
-		jornada.getCalendario().setId(db.generarIdCalendario());
 	}
 
 	private void setId(String id) {
@@ -73,9 +66,9 @@ public class GestorJornada {
 	 * 
 	 * @return String conteniendo dicho id.
 	 */
-	private String generarId() {
-		int id = Integer.parseInt(
-				db.cargarJornadaId().get(db.cargarJornadaId().size() - 1)) + 1;
+	public String generarId() {
+		int id = Integer.parseInt(db.cargarJornadaId().get(db.cargarJornadaId().size()
+				- 1)) + 1;
 		return id + "";
 	}
 
@@ -112,5 +105,13 @@ public class GestorJornada {
 
 	public List<Medico> cargarMedicos() {
 		return db.cargarMedicos();
+	}
+
+	public List<Jornada> cargarJornadas() {
+		return db.cargarJornadas();
+	}
+
+	public void guardarJornada(Jornada j) {
+		db.guardarJornada(j);
 	}
 }

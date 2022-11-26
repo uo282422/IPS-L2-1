@@ -200,15 +200,6 @@ public class VentanaCrearJornada extends JDialog {
 			}
 		}
 		{
-			JButton btCalendarios = new JButton("Calendarios guardados");
-			btCalendarios.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					calendariosGuardados();
-				}
-			});
-			jornadaPn.add(btCalendarios, BorderLayout.SOUTH);
-		}
-		{
 			JPanel btnPn = new JPanel();
 			btnPn.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(btnPn, BorderLayout.SOUTH);
@@ -258,12 +249,6 @@ public class VentanaCrearJornada extends JDialog {
 				btnPn.add(cancelarBtn);
 			}
 		}
-	}
-
-	protected void calendariosGuardados() {
-		VentanaCalendariosGuardados v = new VentanaCalendariosGuardados(this);
-		v.setLocationRelativeTo(this);
-		v.setVisible(true);
 	}
 
 	/**

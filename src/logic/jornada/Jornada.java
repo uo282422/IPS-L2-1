@@ -1,20 +1,20 @@
 package logic.jornada;
 
-import java.util.Date;
-
 import logic.Medico;
 import util.DataBase;
 
 public class Jornada {
 
 	private String id;
+	private String nombre;
 	private Medico medico;
 	private String dias;
 	private String horaComienzo;
 	private String horaFinal;
-	private Calendario c;
+	private String inicio;
+	private String fin;
 	private String medicoId;
-	private String calId;
+//	private String calId;
 
 	public Jornada() {
 		id = generarId();
@@ -22,8 +22,8 @@ public class Jornada {
 
 	private String generarId() {
 		DataBase db = new DataBase();
-		int id = Integer.parseInt(
-				db.cargarJornadaId().get(db.cargarJornadaId().size() - 1)) + 1;
+		int id = Integer.parseInt(db.cargarJornadaId().get(db.cargarJornadaId().size()
+				- 1)) + 1;
 		return id + "";
 	}
 
@@ -31,14 +31,31 @@ public class Jornada {
 		this.id = id;
 	}
 
-	public Jornada(String id, String dias, String hI, String hF, String medid,
-			String calId) {
+	public Jornada(String id, String nombre, String dias, String hI, String hF,
+			String i, String f) {
 		this.id = id;
+		this.nombre = nombre;
 		this.dias = dias;
 		this.horaComienzo = hI;
 		this.horaFinal = hF;
-		this.medicoId = medid;
-		this.calId = calId;
+		this.inicio = i;
+		this.fin = f;
+	}
+
+	public String getInicio() {
+		return inicio;
+	}
+
+	public void setInicio(String inicio) {
+		this.inicio = inicio;
+	}
+
+	public String getFin() {
+		return fin;
+	}
+
+	public void setFin(String fin) {
+		this.fin = fin;
 	}
 
 	public String getId() {
@@ -61,8 +78,17 @@ public class Jornada {
 		return horaFinal;
 	}
 
-	public Calendario getCalendario() {
-		return c;
+	@Override
+	public String toString() {
+		return nombre + "| " + id;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
 	}
 
 	public void setDias(String dias) {
@@ -77,20 +103,11 @@ public class Jornada {
 		this.horaFinal = horaFinal;
 	}
 
-	public void setCalendario(Calendario c) {
-		this.c = c;
-	}
-
 	public void setMedico(Medico m) {
 		medico = m;
 	}
 
-	public void creaCalendario(Date dInicio, Date dFin) {
-		c = new Calendario(dInicio, dFin);
-
-	}
-
-	public String getCalId() {
-		return calId;
-	}
+//	public String getCalId() {
+//		return calId;
+//	}
 }

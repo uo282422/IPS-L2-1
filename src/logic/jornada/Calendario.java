@@ -1,60 +1,52 @@
 package logic.jornada;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Calendario {
 	private String id;
-	private Date inicio;
-	private Date fin;
+	private String nombre;
+	private List<Jornada> jornadas = new ArrayList<Jornada>();
 
-	public Calendario(String id, Date inicio, Date fin) {
+	public Calendario(String id, String nombre) {
 		this.id = id;
-		this.inicio = inicio;
-		this.fin = fin;
-	}
-
-	public Calendario(Date inicio, Date fin) {
-		this.inicio = inicio;
-		this.fin = fin;
-	}
-
-	public Calendario(String id, String i, String f) {
-		this.id = id;
-		inicio = parseDate(i);
-		fin = parseDate(f);
-	}
-
-	private Date parseDate(String s) {
-		try {
-			return new SimpleDateFormat("dd/MM/yyyy").parse(s);
-		} catch (ParseException e) {
-			return null;
-		}
-
-	}
-	
-	public void setId(String id)
-	{
-		this.id = id;
-	}
-	public Date getDiaInicio() {
-		return inicio;
-	}
-
-	public Date getDiaFin() {
-		return fin;
+		this.nombre = nombre;
 	}
 
 	@Override
 	public String toString() {
-		return "Calendario [inicio="
-				+ new SimpleDateFormat("dd/MM/yyyy").format(inicio) + ", fin="
-				+ new SimpleDateFormat("dd/MM/yyyy").format(fin) + "]";
+		return nombre + " | ID: " + id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
 	}
 
 	public String getId() {
 		return id;
+	}
+
+	public void setNombre(String nombre) {
+		this.nombre = nombre;
+	}
+
+	public String getNombre() {
+		return nombre;
+	}
+
+	public void addJornada(Jornada j) {
+		jornadas.add(j);
+	}
+
+	public List<Jornada> getJornadas() {
+		return jornadas;
+	}
+
+	public void setJornadas(List<Jornada> jornadas) {
+		this.jornadas = jornadas;
+	}
+
+	public void deleteJornada(Jornada jornada) {
+		jornadas.remove(jornada);
 	}
 }

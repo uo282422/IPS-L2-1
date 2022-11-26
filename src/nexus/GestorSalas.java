@@ -1,5 +1,6 @@
 package nexus;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -10,11 +11,13 @@ import util.DataBase;
 
 public class GestorSalas {
 	private List<Sala>listaSalas;
+	private List<Sala>listaDisponibles;
 	private DataBase bd;
 	private GestorCitas gC;
 	public GestorSalas(GestorCitas gC) {
 		this.bd=new DataBase();
 		listaSalas=bd.cargarSalas();
+		
 		this.gC=gC;
 	}
 	
@@ -25,27 +28,38 @@ public class GestorSalas {
 	public List<Sala> getListaSalas(){
 		return listaSalas;
 	}
-
+	
+	public List<Sala> getListaSalasDisponibles(String fecha, String horaE, String horaS){
+		
+		listaDisponibles=new ArrayList<>();
+		for(Sala s : listaSalas) {
+			
+			if(comprobarSala(s.getId(), fecha, horaE, horaS)) {
+				listaDisponibles.add(s);
+			}
+		}
+		return listaDisponibles;
+	}
+	
+	
 	public boolean comprobarSala(int sala, String fecha, String horaE, String horaS) {
 		
 		Date fechaCandidato = fechaToDate(fecha);
 		Date horaECandidato = horaToDate(horaE);
 		Date horaSCandidato = horaToDate(horaS);
-		
 		for(Cita c: gC.getListaCitas()) {
-			if(c.getSala()==sala) {//la sala esta ocupada en algun moento
+			
+			if(c.getSala()==sala) {//la sala esta ocupada en algun moento por la cita del bucle
 				if(fechaToDate(c.getFecha()).equals(fechaCandidato)) {//si la fecha es la de hoy,ocupada hoy, pasamos a comprobar la hora
 					if ((horaECandidato.after(horaToDate(c.getHoraS())) || horaSCandidato
 							.before(horaToDate(c.getHoraE())) == false)){
-						
 						return false;
 					}
-						
 				}
-			}else return true;//la sala esta libre
+			}
 		}
 		
-		return false;
+		return true;
 	}
 	
 	
