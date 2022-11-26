@@ -2,9 +2,9 @@ package nexus;
 
 import java.util.ArrayList;
 
-import logic.Diagnostico;
 import logic.Seguimiento;
 import logic.cita.Cita;
+import logic.diagnostico.Diagnostico;
 import util.DataBase;
 
 public class GestorSeguimientos {
