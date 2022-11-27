@@ -1,6 +1,25 @@
 package logic;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Baja {
+
+	@Override
+	public String toString() {
+		return tipo.name() + " | ID:" + id + " | " + estado();
+	}
+
+	public String estado() {
+		LocalDate inicio = LocalDate.parse(fInicio, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		LocalDate fin = LocalDate.parse(fFin, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		if (fin.isBefore(LocalDate.now()))
+			return "terminada";
+		else if (inicio.isAfter(LocalDate.now()))
+			return "por empezar";
+		else
+			return "en curso";
+	}
 
 	public enum BajaTipos {
 		BAJA, VACACIONES, MOSCOSOS, OTROS;
@@ -92,6 +111,19 @@ public class Baja {
 
 	public void setObservaciones(String observaciones) {
 		Observaciones = observaciones;
+	}
+
+	public BajaTipos parseTipo(String string) {
+		switch (string) {
+		case "BAJA":
+			return BajaTipos.BAJA;
+		case "VACACIONES":
+			return BajaTipos.VACACIONES;
+		case "MOSCOSOS":
+			return BajaTipos.MOSCOSOS;
+		default:
+			return BajaTipos.OTROS;
+		}
 	}
 
 }

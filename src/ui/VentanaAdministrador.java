@@ -20,6 +20,7 @@ public class VentanaAdministrador extends JFrame {
 	private JButton btCrearJornada;
 	private JButton btBajasVacaciones;
 	private JButton btAsignarCalendarios;
+	private JButton btConsultarJornadasYBajas;
 
 	/**
 	 * Create the frame.
@@ -32,11 +33,12 @@ public class VentanaAdministrador extends JFrame {
 		this.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 
 		setContentPane(panelPrincipal);
-		panelPrincipal.setLayout(new GridLayout(4, 0, 0, 0));
+		panelPrincipal.setLayout(new GridLayout(5, 0, 0, 0));
 		panelPrincipal.add(getBtCrearCita());
 		panelPrincipal.add(getBtCrearJornada());
 		panelPrincipal.add(getBtAsignarCalendarios());
 		panelPrincipal.add(getBtBajasVacaciones());
+		panelPrincipal.add(getBtConsultarJornadasYBajas());
 	}
 
 	private JButton getBtCrearCita() {
@@ -76,7 +78,7 @@ public class VentanaAdministrador extends JFrame {
 
 	private JButton getBtBajasVacaciones() {
 		if (btBajasVacaciones == null) {
-			btBajasVacaciones = new JButton("Bajas y vacaciones");
+			btBajasVacaciones = new JButton("Asignar bajas y vacacion0es");
 			btBajasVacaciones.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					irVentanaBajas();
@@ -108,5 +110,24 @@ public class VentanaAdministrador extends JFrame {
 		VentanaAsignarCalendarios vac = new VentanaAsignarCalendarios();
 		vac.setLocationRelativeTo(this);
 		vac.setVisible(true);
+	}
+
+	private JButton getBtConsultarJornadasYBajas() {
+		if (btConsultarJornadasYBajas == null) {
+			btConsultarJornadasYBajas = new JButton(
+					"Consultar jornadas y bajas");
+			btConsultarJornadasYBajas.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					irVentanaConsultarJornadasYBajas();
+				}
+			});
+		}
+		return btConsultarJornadasYBajas;
+	}
+
+	protected void irVentanaConsultarJornadasYBajas() {
+		VentanaConsultarJornadasYBajasPorMedicos v = new VentanaConsultarJornadasYBajasPorMedicos();
+		v.setLocationRelativeTo(this);
+		v.setVisible(true);
 	}
 }

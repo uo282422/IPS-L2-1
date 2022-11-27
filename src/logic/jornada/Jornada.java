@@ -1,5 +1,8 @@
 package logic.jornada;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 import logic.Medico;
 import util.DataBase;
 
@@ -80,7 +83,18 @@ public class Jornada {
 
 	@Override
 	public String toString() {
-		return nombre + "| " + id;
+		return nombre + "| " + id + " | " + estado();
+	}
+
+	public String estado() {
+		LocalDate inicio = LocalDate.parse(this.inicio, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		LocalDate fin = LocalDate.parse(this.fin, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+		if (fin.isBefore(LocalDate.now()))
+			return "terminada";
+		else if (inicio.isAfter(LocalDate.now()))
+			return "por empezar";
+		else
+			return "en curso";
 	}
 
 	public String getNombre() {

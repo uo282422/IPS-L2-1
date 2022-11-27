@@ -111,7 +111,15 @@ public class GestorJornada {
 		return db.cargarJornadas();
 	}
 
+	public List<Jornada> cargarJornadasParaMedico(Medico m) {
+		return db.getJornadasDeMedico(m.getId());
+	}
+
 	public void guardarJornada(Jornada j) {
 		db.guardarJornada(j);
+	}
+
+	public void actualizarJornada(Jornada j) {
+		db.actualizarJornada(j);
 	}
 }

@@ -55,6 +55,7 @@ public class DataBase {
 	private static final String GUARDAR_JORNADA_PARA_CALENDARIO = "INSERT INTO JORNADA_CALENDARIO VALUES (?, ?)";
 	private static final String EDITAR_CALENDARIO = "UPDATE CALENDARIO SET CALENDARIO_NOMBRE = ? WHERE CALENDARIO_ID = ?";
 	private static final String BORRAR_JORNADAS_PARA_CALENDARIO = "DELETE FROM JORNADA_CALENDARIO WHERE CALENDARIO_ID = ?";
+	private static final String ACTUALIZAR_JORNADA = "UPDATE JORNADA SET JORNADA_NOMBRE = ?, JORNADA_DIAS = ?, JORNADA_HORA_INICIO = ?, JORNADA_HORA_FIN = ?, JORNADA_INICIO = ?, JORNADA_FIN = ? WHERE JORNADA_ID = ?";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -153,18 +154,20 @@ public class DataBase {
 
 		ArrayList<Jornada> jornadas = new ArrayList<Jornada>();
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			Statement s = conn.createStatement();
+			PreparedStatement s = conn.prepareStatement(CARGAR_JORNADAS_PARA_MEDICO);
 			try {
-				ResultSet rs = s.executeQuery(CARGAR_JORNADAS_PARA_MEDICO);
+				s.setString(1, medId);
+				ResultSet rs = s.executeQuery();
 				while (rs.next()) {
 					String id = rs.getString("jornada_id");
+					String nombre = rs.getString("JORNADA_NOMBRE");
 					String dias = rs.getString("jornada_dias");
 					String horaI = rs.getString("jornada_hora_inicio");
 					String horaF = rs.getString("jornada_hora_fin");
-					String inicio = rs.getString("JORNADA_INCIO");
+					String inicio = rs.getString("JORNADA_INICIO");
 					String fin = rs.getString("JORNADA_FIN");
 
-					jornadas.add(new Jornada(id, dias, horaI, horaF, medId,
+					jornadas.add(new Jornada(id, nombre, dias, horaI, horaF,
 							inicio, fin));
 
 				}
@@ -1036,6 +1039,7 @@ public class DataBase {
 		b.sethInicio(rs.getString("baja_hora_inicio"));
 		b.sethFin(rs.getString("baja_hora_fin"));
 		b.setObservaciones(rs.getString("baja_observaciones"));
+		b.setTipo(b.parseTipo(rs.getString("baja_tipo")));
 		return b;
 	}
 
@@ -1460,4 +1464,27 @@ public class DataBase {
 
 	}
 
+	public void actualizarJornada(Jornada j) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(ACTUALIZAR_JORNADA);
+			try {
+				s.setString(1, j.getNombre());
+				s.setString(2, j.getDias());
+				s.setString(3, j.getHoraComienzo());
+				s.setString(4, j.getHoraFinal());
+				s.setString(5, j.getInicio());
+				s.setString(6, j.getFin());
+				s.setString(7, j.getId());
+				s.executeUpdate();
+
+			} catch (SQLException e) {
+				throw new Error("Problem1", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem2", e);
+		}
+	}
 }

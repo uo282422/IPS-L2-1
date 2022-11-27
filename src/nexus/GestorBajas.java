@@ -28,17 +28,19 @@ public class GestorBajas {
 			return true;
 		for (Baja b : bajas) {
 			try {
-				Date bInicio = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
-						.parse(b.getfInicio() + ";" + b.gethInicio());
-				Date bFin = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
-						.parse(b.getfFin() + ";" + b.gethFin());
-				String sinicio = new SimpleDateFormat("dd/MM/yyyy")
-						.format(inicio);
+				Date bInicio = new SimpleDateFormat(
+						"dd/MM/yyyy;HH:mm").parse(b.getfInicio() + ";"
+								+ b.gethInicio());
+				Date bFin = new SimpleDateFormat(
+						"dd/MM/yyyy;HH:mm").parse(b.getfFin() + ";"
+								+ b.gethFin());
+				String sinicio = new SimpleDateFormat(
+						"dd/MM/yyyy").format(inicio);
 				String sfin = new SimpleDateFormat("dd/MM/yyyy").format(fin);
-				Date dInicio = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
-						.parse(sinicio + ";" + hInicio);
-				Date dFin = new SimpleDateFormat("dd/MM/yyyy;HH:mm")
-						.parse(sfin + ";" + hFin);
+				Date dInicio = new SimpleDateFormat(
+						"dd/MM/yyyy;HH:mm").parse(sinicio + ";" + hInicio);
+				Date dFin = new SimpleDateFormat("dd/MM/yyyy;HH:mm").parse(sfin
+						+ ";" + hFin);
 				if (dInicio.before(bFin) && dInicio.after(bInicio)
 						|| dFin.before(bFin) && dFin.after(bInicio)) {
 					idColision = b.getId();
@@ -92,5 +94,13 @@ public class GestorBajas {
 
 	public void update(boolean update) {
 		this.update = update;
+	}
+
+	public List<Baja> cargarBajasParaMedico(Medico m) {
+		return db.getBajas(m);
+	}
+
+	public void actualizarBajar(Baja b) {
+		db.actualizarBaja(b);
 	}
 }
