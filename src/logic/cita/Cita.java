@@ -7,6 +7,7 @@ import java.util.List;
 
 import logic.Prescripcion;
 import logic.diagnostico.Diagnostico;
+import logic.procedimiento.Procedimiento;
 
 public class Cita {
 
@@ -31,6 +32,7 @@ public class Cita {
 
 	private List<Prescripcion> prescripciones = new ArrayList<Prescripcion>();
 	private List<Diagnostico> diagnosticos = new ArrayList<Diagnostico>();
+	private List<Procedimiento> procedimientos = new ArrayList<Procedimiento>();
 
 	public Cita(int id, int pacienteId, String fecha, String horaI,
 			String horaF, boolean urgente, int salaId, int telefono,
@@ -301,6 +303,14 @@ public class Cita {
 
 	public List<Diagnostico> getDiagnosticos() {
 		return this.diagnosticos;
+	}
+
+	public void addProcedimiento(Procedimiento p) {
+		this.procedimientos.add(p);
+	}
+
+	public List<Procedimiento> getProcedimientos() {
+		return this.procedimientos;
 	}
 
 }
