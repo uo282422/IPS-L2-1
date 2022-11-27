@@ -387,7 +387,7 @@ public class VentanaBuscadorMedicos extends JFrame {
 
 	private JLabel getLbEspecialidad() {
 		if (lbEspecialidad == null) {
-			lbEspecialidad = new JLabel("Tarjeta: ");
+			lbEspecialidad = new JLabel("Especialidad: ");
 			lbEspecialidad.setFont(new Font("Tahoma", Font.PLAIN, 14));
 			lbEspecialidad.setHorizontalAlignment(SwingConstants.CENTER);
 		}
