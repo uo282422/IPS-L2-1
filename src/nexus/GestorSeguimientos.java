@@ -30,9 +30,9 @@ public class GestorSeguimientos {
 		return null;
 	}
 
-	public void insertarNuevoSeguimiento(Diagnostico d, String str) {
+	public void insertarNuevoSeguimiento(Diagnostico d,String estado, String str) {
 		Cita c=new GestorCitas().getCita(d.getCitaId());
-		Seguimiento s =new Seguimiento(bd.generarIdSeguimiento(), c.getFecha(), "SIN SEGUIMIENTO", str);
+		Seguimiento s =new Seguimiento(bd.generarIdSeguimiento(), String.valueOf(c.getIdCita()), estado, str);
 		bd.insertarSeguimiento(s);
 		
 	}

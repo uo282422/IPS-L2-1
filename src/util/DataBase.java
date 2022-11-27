@@ -322,25 +322,7 @@ public class DataBase {
 				conn.close();
 			}
 			
-			pst = conn.prepareStatement(GUARDAR_DIAGNOSTICOS);
-			try {
-
-				for (Diagnostico d : cita.getDiagnosticos()) {
-					pst.setString(1, String.valueOf(cita.getIdCita()));
-					pst.setString(2, d.getcapitulo_id());
-					pst.setString(3, d.getFecha());
-					pst.setString(4, d.getHora());
-					pst.setBoolean(5, d.getSeguimiento());
-					pst.execute();
-				}
-
-			} catch (SQLException e) {
-				throw new Error("Error al linkear epecialidad-cita", e);
-
-			} finally {
-				pst.close();
-				conn.close();
-			}
+			
 
 		} catch (SQLException e) {
 			throw new Error("Problem", e);
@@ -874,20 +856,40 @@ public class DataBase {
 				s.setInt(1, serializeAcudio(c.isAcudio()));
 				s.setString(2, c.getIdCita() + "");
 				s.executeUpdate();
+				
 				s2.setString(1, c.getIdCita() + "");
 				for (String causa : c.getCausas()) {
 					s2.setString(2, causa);
 					s2.executeUpdate();
 				}
+				
 
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
 			} finally {
 				s.close();
+			}
+			PreparedStatement pst = conn.prepareStatement(GUARDAR_DIAGNOSTICOS);
+			try {
+
+				for (Diagnostico d : c.getDiagnosticos()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, d.getcapitulo_id());
+					pst.setString(3, d.getFecha());
+					pst.setString(4, d.getHora());
+					pst.setBoolean(5, d.getSeguimiento());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				throw new Error("Error al linkear epecialidad-cita", e);
+
+			} finally {
+				pst.close();
 				conn.close();
 			}
 		} catch (SQLException e) {
-			throw new Error("Problem", e);
+			throw new Error("Problemas", e);
 		}
 	}
 

@@ -24,6 +24,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.MaskFormatter;
 
+import logic.Seguimiento;
 import logic.cita.Cita;
 import logic.diagnostico.Diagnostico;
 import logic.diagnostico.DiagnosticoCapitulo;
@@ -31,6 +32,9 @@ import logic.diagnostico.DiagnosticoGrupo;
 import logic.diagnostico.DiagnosticoSubgrupo;
 import logic.diagnostico.DiagnosticoTabla;
 import nexus.GestorDiagnosticos;
+import nexus.GestorSalas;
+import nexus.GestorSeguimientos;
+import util.DataBase;
 
 public class VentanaDiagnostico extends JFrame {
 
@@ -68,7 +72,8 @@ public class VentanaDiagnostico extends JFrame {
 	private JLabel lblSeguimiento;
 	private JCheckBox chckbxSeguimiento;
 	private JTextArea taSeguimiento;
-
+	private DataBase bd;
+	private GestorSeguimientos gS;
 	private DefaultComboBoxModel<DiagnosticoTabla> tablas = new DefaultComboBoxModel<DiagnosticoTabla>();
 	private DefaultComboBoxModel<DiagnosticoGrupo> grupos = new DefaultComboBoxModel<DiagnosticoGrupo>();
 	private DefaultComboBoxModel<DiagnosticoSubgrupo> subgrupos = new DefaultComboBoxModel<DiagnosticoSubgrupo>();
@@ -78,17 +83,17 @@ public class VentanaDiagnostico extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaDiagnostico(Cita c, VentanaCita vc) {
-
+		this.bd=new DataBase();
 		this.cita = c;
 		this.vc = vc;
 		this.gd = new GestorDiagnosticos();
-
+		this.gS=new GestorSeguimientos();
 		for (DiagnosticoTabla t : gd.getTablas()) {
 			tablas.addElement(t);
 		}
 
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 960, 800);
+		setBounds(100, 100, 1325, 800);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -116,6 +121,15 @@ public class VentanaDiagnostico extends JFrame {
 							((DiagnosticoCapitulo) cbCapitulo.getSelectedItem()).getIdCapitulo(), txtFecha.getText(),
 							txtHora.getText(), chckbxSeguimiento.isSelected());
 					d.setDescripcion(((DiagnosticoCapitulo) cbCapitulo.getSelectedItem()).getNombre());
+					
+					
+					if(chckbxSeguimiento.isSelected()) {
+						
+						gS.insertarNuevoSeguimiento(d, "ABIERTO", getTaSeguimiento().getText());
+					}else {
+						gS.insertarNuevoSeguimiento(d,"SIN SEGUIMIENTO", getTaSeguimiento().getText());
+					}
+					
 					cita.addDiagnostico(d);
 					vc.refrescarInfo();
 					dispose();
@@ -415,7 +429,7 @@ public class VentanaDiagnostico extends JFrame {
 		return lblSeguimiento;
 	}
 
-	private JCheckBox getChckbxSeguimiento() {
+	public JCheckBox getChckbxSeguimiento() {
 		if (chckbxSeguimiento == null) {
 			chckbxSeguimiento = new JCheckBox("Realizar seguimiento");
 			chckbxSeguimiento.setFont(new Font("Dialog", Font.BOLD, 14));
@@ -423,7 +437,7 @@ public class VentanaDiagnostico extends JFrame {
 		return chckbxSeguimiento;
 	}
 
-	private JTextArea getTaSeguimiento() {
+	public JTextArea getTaSeguimiento() {
 		if (taSeguimiento == null) {
 			taSeguimiento = new JTextArea();
 		}
