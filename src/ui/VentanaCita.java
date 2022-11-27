@@ -34,6 +34,8 @@ import javax.swing.border.EmptyBorder;
 import logic.Prescripcion;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import logic.diagnostico.Diagnostico;
+import logic.procedimiento.Procedimiento;
 import nexus.GestorCitas;
 
 public class VentanaCita extends JFrame {
@@ -100,6 +102,18 @@ public class VentanaCita extends JFrame {
 	private JTextField txtOtrosDatos;
 	private JLabel lblPrescripcionesAdded;
 	private JList<Prescripcion> listPrescripcionesAdded;
+	private JPanel pnCamposDiagnosticos;
+	private JPanel pnPreviewDiagnosticos;
+	private JLabel lblProcedimientosAdded;
+	private JList<Procedimiento> listProcedimientosAdded;
+	private JLabel lblDiagnosticosAdded;
+	private JList<Diagnostico> listDiagnosticosAdded;
+	private JButton btnProcedimientosAdd;
+	private JButton btnProcedimientosRemove;
+	private JButton btnDiagnosticosAdd;
+	private JButton btnDiagnosticosRemove;
+	private Component horizontalStrut_7;
+	private Component horizontalStrut_8;
 
 	/**
 	 * Launch the application.
@@ -136,13 +150,15 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnCentral() {
 		if (pnCentral == null) {
 			pnCentral = new JPanel();
-			pnCentral.setLayout(new GridLayout(4, 2, 0, 0));
+			pnCentral.setLayout(new GridLayout(5, 2, 0, 0));
 			pnCentral.add(getPnCamposGenerales());
 			pnCentral.add(getPnPreviewGenerales());
 			pnCentral.add(getPnCamposCausas());
 			pnCentral.add(getPnPreviewCausas());
 			pnCentral.add(getPnCamposProcedimientos());
 			pnCentral.add(getPnPreviewProcedimientos());
+			pnCentral.add(getPnCamposDiagnosticos());
+			pnCentral.add(getPnPreviewDiagnosticos());
 			pnCentral.add(getPnCamposPrescripciones());
 			pnCentral.add(getPnPreviewPrescripciones());
 		}
@@ -165,8 +181,7 @@ public class VentanaCita extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					c.setAcudio(acudio());
 					guardarDatos();
-					JOptionPane.showMessageDialog(null,
-							"La información de la cita se ha guaradado.");
+					JOptionPane.showMessageDialog(null, "La información de la cita se ha guaradado.");
 					dispose();
 				}
 			});
@@ -271,8 +286,8 @@ public class VentanaCita extends JFrame {
 	}
 
 	/**
-	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la
-	 * lista recibida.
+	 * Este método recibe una lista y devuelve un modelo de Combo lleno con la lista
+	 * recibida.
 	 * 
 	 * @param l List<String> con la que se quiere generar el modelo de combo
 	 * @return DefaultComboBoxModel<String> conteniendo la lista recibida.
@@ -296,8 +311,7 @@ public class VentanaCita extends JFrame {
 	private JList<String> getListCausasAñadidas() {
 		if (listCausasAñadidas == null) {
 			listCausasAñadidas = new JList<String>();
-			listCausasAñadidas
-					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listCausasAñadidas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		}
 		return listCausasAñadidas;
 	}
@@ -312,8 +326,7 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnCamposGenerales() {
 		if (pnCamposGenerales == null) {
 			pnCamposGenerales = new JPanel();
-			FlowLayout fl_pnCamposGenerales = (FlowLayout) pnCamposGenerales
-					.getLayout();
+			FlowLayout fl_pnCamposGenerales = (FlowLayout) pnCamposGenerales.getLayout();
 			fl_pnCamposGenerales.setAlignment(FlowLayout.LEFT);
 			pnCamposGenerales.add(getPnAcude());
 			pnCamposGenerales.add(getPnHora());
@@ -348,18 +361,31 @@ public class VentanaCita extends JFrame {
 	}
 
 	protected void refrescarInfo() {
-		StringBuilder sb = new StringBuilder(String.format(
-				"  CITA Nº%d\n  --------------------\n\n", c.getIdCita()));
-		sb.append(String.format("  Nombre del paciente: %s %s\n",
-				c.getNombrePaciente(), c.getApellidoPaciente()));
+		StringBuilder sb = new StringBuilder(String.format("  CITA Nº%d\n  --------------------\n\n", c.getIdCita()));
+		sb.append(String.format("  Nombre del paciente: %s %s\n", c.getNombrePaciente(), c.getApellidoPaciente()));
 		sb.append(String.format("  Hora: %s\n", c.getHoraE()));
 		sb.append(String.format("  Fecha: %s\n", c.getFecha()));
 		sb.append(String.format("  Sala: %d\n", c.getSala()));
 		sb.append(String.format("  Urgente: %s\n", c.isAcudio().toString()));
-		sb.append(String.format("  Hora de entrada: %s\n", c.getHoraEntrada() == null ? "NO ESTABLECIDA" : c.getHoraEntrada()));
-		sb.append(String.format("  Hora de salida: %s\n", c.getHoraSalida() == null ? "NO ESTABLECIDA" : c.getHoraSalida()));
+		sb.append(String.format("  Hora de entrada: %s\n",
+				c.getHoraEntrada() == null ? "NO ESTABLECIDA" : c.getHoraEntrada()));
+		sb.append(String.format("  Hora de salida: %s\n",
+				c.getHoraSalida() == null ? "NO ESTABLECIDA" : c.getHoraSalida()));
 
 		taPreview.setText(sb.toString());
+		
+		final DefaultListModel<Diagnostico> modelD = new DefaultListModel<Diagnostico>();
+		for (Diagnostico d : c.getDiagnosticos()) {
+			modelD.addElement(d);
+		}
+		getListDiagnosticosAdded().setModel(modelD);
+		
+		final DefaultListModel<Procedimiento> modelP = new DefaultListModel<Procedimiento>();
+		for (Procedimiento p : c.getProcedimientos()) {
+			modelP.addElement(p);
+		}
+		getListProcedimientosAdded().setModel(modelP);
+		
 		validate();
 	}
 
@@ -391,7 +417,7 @@ public class VentanaCita extends JFrame {
 		}
 		return btAlterar;
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	private void abrirVentanaHora() {
 		VentanaHora vh = new VentanaHora(c, this);
@@ -422,6 +448,9 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnCamposProcedimientos() {
 		if (pnCamposProcedimientos == null) {
 			pnCamposProcedimientos = new JPanel();
+			pnCamposProcedimientos.add(getBtnProcedimientosAdd());
+			pnCamposProcedimientos.add(getHorizontalStrut_8());
+			pnCamposProcedimientos.add(getBtnProcedimientosRemove());
 		}
 		return pnCamposProcedimientos;
 	}
@@ -429,8 +458,7 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnPrescripcionesCombo() {
 		if (pnPrescripcionesCombo == null) {
 			pnPrescripcionesCombo = new JPanel();
-			FlowLayout fl_pnPrescripcionesCombo = (FlowLayout) pnPrescripcionesCombo
-					.getLayout();
+			FlowLayout fl_pnPrescripcionesCombo = (FlowLayout) pnPrescripcionesCombo.getLayout();
 			fl_pnPrescripcionesCombo.setAlignment(FlowLayout.LEFT);
 			pnPrescripcionesCombo.add(getLbPrescripciones());
 			pnPrescripcionesCombo.add(getCbPrescripciones());
@@ -452,6 +480,9 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnPreviewProcedimientos() {
 		if (pnPreviewProcedimientos == null) {
 			pnPreviewProcedimientos = new JPanel();
+			pnPreviewProcedimientos.setLayout(new BorderLayout(0, 0));
+			pnPreviewProcedimientos.add(getLblProcedimientosAdded(), BorderLayout.NORTH);
+			pnPreviewProcedimientos.add(getListProcedimientosAdded(), BorderLayout.CENTER);
 		}
 		return pnPreviewProcedimientos;
 	}
@@ -460,9 +491,9 @@ public class VentanaCita extends JFrame {
 		if (pnPreviewPrescripciones == null) {
 			pnPreviewPrescripciones = new JPanel();
 			pnPreviewPrescripciones.setLayout(new BorderLayout(0, 0));
-            pnPreviewPrescripciones.add(getLblPrescripcionesAdded(), BorderLayout.NORTH);
-            pnPreviewPrescripciones.add(getListPrescripcionesAdded(), BorderLayout.CENTER);
-			
+			pnPreviewPrescripciones.add(getLblPrescripcionesAdded(), BorderLayout.NORTH);
+			pnPreviewPrescripciones.add(getListPrescripcionesAdded(), BorderLayout.CENTER);
+
 		}
 		return pnPreviewPrescripciones;
 	}
@@ -512,8 +543,7 @@ public class VentanaCita extends JFrame {
 			btNuevaCausa = new JButton("Nueva Causa");
 			btNuevaCausa.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					gestor.nuevaCausa(JOptionPane
-							.showInputDialog("Introduzca la nueva causa"));
+					gestor.nuevaCausa(JOptionPane.showInputDialog("Introduzca la nueva causa"));
 				}
 			});
 		}
@@ -551,10 +581,8 @@ public class VentanaCita extends JFrame {
 	}
 
 	protected void actualizarPrescripciones() {
-		Prescripcion p = ((Prescripcion) getCbPrescripciones()
-				.getSelectedItem());
-		Prescripcion nuevaP = new Prescripcion(p.getIdPrescripcion(),
-				p.toString()); // Obligatorio para mantener modelo
+		Prescripcion p = ((Prescripcion) getCbPrescripciones().getSelectedItem());
+		Prescripcion nuevaP = new Prescripcion(p.getIdPrescripcion(), p.toString()); // Obligatorio para mantener modelo
 		nuevaP.setCantidad(getTxtCantidad().getText());
 		nuevaP.setDuracion((Integer) getSpDuracion().getValue());
 		nuevaP.setIntervalo((Integer) getSpIntervalo().getValue());
@@ -581,8 +609,7 @@ public class VentanaCita extends JFrame {
 	private JPanel getPnPrescripcionesDetalles() {
 		if (pnPrescripcionesDetalles == null) {
 			pnPrescripcionesDetalles = new JPanel();
-			FlowLayout flowLayout = (FlowLayout) pnPrescripcionesDetalles
-					.getLayout();
+			FlowLayout flowLayout = (FlowLayout) pnPrescripcionesDetalles.getLayout();
 			flowLayout.setAlignment(FlowLayout.LEFT);
 			pnPrescripcionesDetalles.add(getLblCantidad());
 			pnPrescripcionesDetalles.add(getTxtCantidad());
@@ -635,8 +662,8 @@ public class VentanaCita extends JFrame {
 	private JSpinner getSpIntervalo() {
 		if (spIntervalo == null) {
 			spIntervalo = new JSpinner();
-			spIntervalo.setModel(new SpinnerNumberModel(Integer.valueOf(6),
-					Integer.valueOf(6), null, Integer.valueOf(6)));
+			spIntervalo
+					.setModel(new SpinnerNumberModel(Integer.valueOf(6), Integer.valueOf(6), null, Integer.valueOf(6)));
 		}
 		return spIntervalo;
 	}
@@ -679,8 +706,8 @@ public class VentanaCita extends JFrame {
 	private JSpinner getSpDuracion() {
 		if (spDuracion == null) {
 			spDuracion = new JSpinner();
-			spDuracion.setModel(new SpinnerNumberModel(Integer.valueOf(1),
-					Integer.valueOf(1), null, Integer.valueOf(1)));
+			spDuracion
+					.setModel(new SpinnerNumberModel(Integer.valueOf(1), Integer.valueOf(1), null, Integer.valueOf(1)));
 		}
 		return spDuracion;
 	}
@@ -724,10 +751,121 @@ public class VentanaCita extends JFrame {
 	private JList<Prescripcion> getListPrescripcionesAdded() {
 		if (listPrescripcionesAdded == null) {
 			listPrescripcionesAdded = new JList<Prescripcion>();
-			listCausasAñadidas
-					.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+			listCausasAñadidas.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		}
 		return listPrescripcionesAdded;
+	}
+
+	private JPanel getPnCamposDiagnosticos() {
+		if (pnCamposDiagnosticos == null) {
+			pnCamposDiagnosticos = new JPanel();
+			pnCamposDiagnosticos.add(getBtnDiagnosticosAdd());
+			pnCamposDiagnosticos.add(getHorizontalStrut_7());
+			pnCamposDiagnosticos.add(getBtnDiagnosticosRemove());
+		}
+		return pnCamposDiagnosticos;
+	}
+
+	private JPanel getPnPreviewDiagnosticos() {
+		if (pnPreviewDiagnosticos == null) {
+			pnPreviewDiagnosticos = new JPanel();
+			pnPreviewDiagnosticos.setLayout(new BorderLayout(0, 0));
+			pnPreviewDiagnosticos.add(getLblDiagnosticosAdded(), BorderLayout.NORTH);
+			pnPreviewDiagnosticos.add(getListDiagnosticosAdded(), BorderLayout.CENTER);
+		}
+		return pnPreviewDiagnosticos;
+	}
+
+	private JLabel getLblProcedimientosAdded() {
+		if (lblProcedimientosAdded == null) {
+			lblProcedimientosAdded = new JLabel("Procedimientos:");
+		}
+		return lblProcedimientosAdded;
+	}
+
+	private JList<Procedimiento> getListProcedimientosAdded() {
+		if (listProcedimientosAdded == null) {
+			listProcedimientosAdded = new JList<Procedimiento>();
+		}
+		return listProcedimientosAdded;
+	}
+
+	private JLabel getLblDiagnosticosAdded() {
+		if (lblDiagnosticosAdded == null) {
+			lblDiagnosticosAdded = new JLabel("Diagnosticos:");
+		}
+		return lblDiagnosticosAdded;
+	}
+
+	private JList<Diagnostico> getListDiagnosticosAdded() {
+		if (listDiagnosticosAdded == null) {
+			listDiagnosticosAdded = new JList<Diagnostico>();
+		}
+		return listDiagnosticosAdded;
+	}
+
+	private JButton getBtnProcedimientosAdd() {
+		if (btnProcedimientosAdd == null) {
+			btnProcedimientosAdd = new JButton("Nuevo procedimiento");
+			btnProcedimientosAdd.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaProcedimiento();
+				}
+			});
+		}
+		return btnProcedimientosAdd;
+	}
+
+	@SuppressWarnings("deprecation")
+	private void abrirVentanaProcedimiento() {
+		VentanaProcedimiento vp = new VentanaProcedimiento(c, this);
+		vp.show();
+	}
+
+	private JButton getBtnProcedimientosRemove() {
+		if (btnProcedimientosRemove == null) {
+			btnProcedimientosRemove = new JButton("Eliminar");
+		}
+		return btnProcedimientosRemove;
+	}
+
+	private JButton getBtnDiagnosticosAdd() {
+		if (btnDiagnosticosAdd == null) {
+			btnDiagnosticosAdd = new JButton("Nuevo diagnostico");
+			btnDiagnosticosAdd.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					abrirVentanaDiagnostico();
+				}
+			});
+		}
+		return btnDiagnosticosAdd;
+	}
+
+	@SuppressWarnings("deprecation")
+	private void abrirVentanaDiagnostico() {
+		VentanaDiagnostico vh = new VentanaDiagnostico(c, this);
+		vh.show();
+	}
+
+	private JButton getBtnDiagnosticosRemove() {
+		if (btnDiagnosticosRemove == null) {
+			btnDiagnosticosRemove = new JButton("Eliminar");
+		}
+		return btnDiagnosticosRemove;
+	}
+
+	private Component getHorizontalStrut_7() {
+		if (horizontalStrut_7 == null) {
+			horizontalStrut_7 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_7;
+	}
+
+	private Component getHorizontalStrut_8() {
+		if (horizontalStrut_8 == null) {
+			horizontalStrut_8 = Box.createHorizontalStrut(20);
+		}
+		return horizontalStrut_8;
 	}
 }

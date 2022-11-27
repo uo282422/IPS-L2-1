@@ -6,9 +6,9 @@ public class Seguimiento {
 	private String estado;
 	private String comentarios;
 	
-	public Seguimiento(String id, String dia, String est, String com) {
+	public Seguimiento(String id, String cita, String est, String com) {
 		this.id_seguimiento=id;
-		this.id_cita=dia;
+		this.id_cita=cita;
 		this.estado=est;
 		this.comentarios=com;
 	}

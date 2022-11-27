@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import logic.Baja;
-import logic.Diagnostico;
 import logic.Enfermedad;
 import logic.Medico;
 import logic.Paciente;
@@ -20,8 +19,17 @@ import logic.Seguimiento;
 import logic.Vacuna;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
+import logic.diagnostico.Diagnostico;
+import logic.diagnostico.DiagnosticoCapitulo;
+import logic.diagnostico.DiagnosticoGrupo;
+import logic.diagnostico.DiagnosticoSubgrupo;
+import logic.diagnostico.DiagnosticoTabla;
 import logic.jornada.Calendario;
 import logic.jornada.Jornada;
+import logic.procedimiento.Procedimiento;
+import logic.procedimiento.ProcedimientoSeccion;
+import logic.procedimiento.ProcedimientoSistema;
+import logic.procedimiento.ProcedimientoTipo;
 import ui.Especialidad;
 
 public class DataBase {
@@ -56,6 +64,15 @@ public class DataBase {
 	private static final String EDITAR_CALENDARIO = "UPDATE CALENDARIO SET CALENDARIO_NOMBRE = ? WHERE CALENDARIO_ID = ?";
 	private static final String BORRAR_JORNADAS_PARA_CALENDARIO = "DELETE FROM JORNADA_CALENDARIO WHERE CALENDARIO_ID = ?";
 	private static final String ACTUALIZAR_JORNADA = "UPDATE JORNADA SET JORNADA_NOMBRE = ?, JORNADA_DIAS = ?, JORNADA_HORA_INICIO = ?, JORNADA_HORA_FIN = ?, JORNADA_INICIO = ?, JORNADA_FIN = ? WHERE JORNADA_ID = ?";
+	private static final String CARGAR_TABLAS = "SELECT * FROM DIAGNOSTICO_TABLA";
+	private static final String CARGAR_GRUPOS_POR_TABLA = "SELECT * FROM DIAGNOSTICO_GRUPO WHERE TABLA_ID = ?";
+	private static final String CARGAR_SUBGRUPOS_POR_GRUPO = "SELECT * FROM DIAGNOSTICO_SUBGRUPO WHERE GRUPO_ID = ?";
+	private static final String CARGAR_CAPITULOS_POR_SUBGRUPO = "SELECT * FROM DIAGNOSTICO_CAPITULO WHERE SUBGRUPO_ID = ?";
+	private static final String GUARDAR_DIAGNOSTICOS = "INSERT INTO DIAGNOSTICO VALUES(?,?,?,?,?)";
+	private static final String CARGAR_SECCIONES = "SELECT * FROM PROCEDIMIENTO_SECCION";
+	private static final String CARGAR_SISTEMAS_POR_SECCION = "SELECT * FROM PROCEDIMIENTO_SISTEMA WHERE SECCION_ID = ?";
+	private static final String CARGAR_TIPOS_POR_SISTEMA = "SELECT * FROM PROCEDIMIENTO_TIPO WHERE SISTEMA_ID = ?";
+	private static final String GUARDAR_PROCEDIMIENTOS = "INSERT INTO PROCEDIMIENTO VALUES(?,?,?,?)";
 
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
@@ -102,7 +119,7 @@ public class DataBase {
 				ResultSet rs = s.executeQuery("select * from diagnostico");
 				while (rs.next()) {
 					String citaid = rs.getString("cita_id");
-					String apartadoid = rs.getString("apartado_id");
+					String apartadoid = rs.getString("capitulo_id");
 					String fecha = rs.getString("diagnostico_fecha");
 					String hora = rs.getString("diagnostico_hora");
 					boolean seg = rs.getBoolean("seguimiento");
@@ -861,6 +878,7 @@ public class DataBase {
 				s.setInt(1, serializeAcudio(c.isAcudio()));
 				s.setString(2, c.getIdCita() + "");
 				s.executeUpdate();
+
 				s2.setString(1, c.getIdCita() + "");
 				for (String causa : c.getCausas()) {
 					s2.setString(2, causa);
@@ -871,10 +889,45 @@ public class DataBase {
 				throw new Error("Problem", e);
 			} finally {
 				s.close();
+			}
+			PreparedStatement pst = conn.prepareStatement(GUARDAR_PROCEDIMIENTOS);
+			try {
+
+				for (Procedimiento p : c.getProcedimientos()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, p.getTipoId());
+					pst.setString(3, p.getFecha());
+					pst.setString(4, p.getHora());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				throw new Error("Error al crear procedimientos", e);
+
+			} finally {
+				pst.close();
+			}
+			pst = conn.prepareStatement(GUARDAR_DIAGNOSTICOS);
+			try {
+
+				for (Diagnostico d : c.getDiagnosticos()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, d.getcapitulo_id());
+					pst.setString(3, d.getFecha());
+					pst.setString(4, d.getHora());
+					pst.setBoolean(5, d.getSeguimiento());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				throw new Error("Error al linkear epecialidad-cita", e);
+
+			} finally {
+				pst.close();
 				conn.close();
 			}
 		} catch (SQLException e) {
-			throw new Error("Problem", e);
+			throw new Error("Problemas", e);
 		}
 	}
 
@@ -1486,5 +1539,239 @@ public class DataBase {
 		} catch (SQLException e) {
 			throw new Error("Problem2", e);
 		}
+	}
+
+	public List<DiagnosticoTabla> cargarTablas() {
+
+		ArrayList<DiagnosticoTabla> tablas = new ArrayList<DiagnosticoTabla>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery(CARGAR_TABLAS);
+				while (rs.next()) {
+
+					String id = rs.getString("tabla_id");
+					String nombre = rs.getString("tabla_descripcion");
+
+					tablas.add(new DiagnosticoTabla(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar tablas", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para tablas", e);
+		}
+
+		return tablas;
+
+	}
+
+	public List<DiagnosticoGrupo> cargarGrupoPorTabla(String idTabla) {
+
+		ArrayList<DiagnosticoGrupo> grupos = new ArrayList<DiagnosticoGrupo>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_GRUPOS_POR_TABLA);
+				ps.setString(1, idTabla);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("grupo_id");
+					String nombre = rs.getString("grupo_descripcion");
+
+					grupos.add(new DiagnosticoGrupo(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar grupos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para grupos", e);
+		}
+
+		return grupos;
+	}
+
+	public List<DiagnosticoSubgrupo> cargarSubgrupoPorGrupo(String idGrupo) {
+		ArrayList<DiagnosticoSubgrupo> subgrupos = new ArrayList<DiagnosticoSubgrupo>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_SUBGRUPOS_POR_GRUPO);
+				ps.setString(1, idGrupo);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("subgrupo_id");
+					String nombre = rs.getString("subgrupo_descripcion");
+					boolean ignorar = rs.getBoolean("subgrupo_ignorar");
+
+					if (!ignorar) {
+						subgrupos.add(new DiagnosticoSubgrupo(id, nombre));
+					}
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar subgrupos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para subgrupos", e);
+		}
+
+		return subgrupos;
+	}
+
+	public List<DiagnosticoCapitulo> cargarCapitulosPorSubgrupo(
+			String idSubgrupo) {
+		ArrayList<DiagnosticoCapitulo> capitulos = new ArrayList<DiagnosticoCapitulo>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_CAPITULOS_POR_SUBGRUPO);
+				ps.setString(1, idSubgrupo);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("capitulo_id");
+					String nombre = rs.getString("capitulo_descripcion");
+
+					capitulos.add(new DiagnosticoCapitulo(id, nombre));
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar capitulos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para capitulos", e);
+		}
+
+		return capitulos;
+	}
+
+	public List<ProcedimientoSeccion> cargarSecciones() {
+		ArrayList<ProcedimientoSeccion> secciones = new ArrayList<ProcedimientoSeccion>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery(CARGAR_SECCIONES);
+				while (rs.next()) {
+
+					String id = rs.getString("seccion_id");
+					String nombre = rs.getString("seccion_descripcion");
+
+					secciones.add(new ProcedimientoSeccion(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar secciones", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para secciones", e);
+		}
+
+		return secciones;
+	}
+
+	public List<ProcedimientoSistema> cargarSistemasPorSeccion(
+			String idSeccion) {
+		ArrayList<ProcedimientoSistema> sistemas = new ArrayList<ProcedimientoSistema>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_SISTEMAS_POR_SECCION);
+				ps.setString(1, idSeccion);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("sistema_id");
+					String nombre = rs.getString("sistema_descripcion");
+
+					sistemas.add(new ProcedimientoSistema(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar sistemas", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para sistemas", e);
+		}
+
+		return sistemas;
+	}
+
+	public List<ProcedimientoTipo> cargarTiposPorSistema(String idSistema) {
+		ArrayList<ProcedimientoTipo> tipos = new ArrayList<ProcedimientoTipo>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_TIPOS_POR_SISTEMA);
+				ps.setString(1, idSistema);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("tipo_id");
+					String nombre = rs.getString("tipo_descripcion");
+
+					tipos.add(new ProcedimientoTipo(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar tipos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para tipos", e);
+		}
+
+		return tipos;
 	}
 }

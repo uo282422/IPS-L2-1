@@ -25,10 +25,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.MaskFormatter;
 
-import logic.Diagnostico;
 import logic.Paciente;
 import logic.Seguimiento;
 import logic.cita.Cita;
+import logic.diagnostico.Diagnostico;
 import nexus.GestorCitas;
 import nexus.GestorDiagnosticos;
 import nexus.GestorPacientes;
