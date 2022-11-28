@@ -137,7 +137,7 @@ public class VentanaCita extends JFrame {
 	public VentanaCita(String idCita) {
 		this.c = gestor.getCita(idCita);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 938, 621);
+		setBounds(100, 100, 1041, 732);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
