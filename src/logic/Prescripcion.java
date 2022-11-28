@@ -68,7 +68,20 @@ public class Prescripcion {
 	}
 	
 	public String toString() {
-		return nombre;
+		String text = String.format("%s - %s", idPrescripcion, nombre);
+		if (cantidad != "") {
+			text += String.format(" %s gr", cantidad);
+		}
+		if (intervalo != 0) {
+			text += String.format(", cada %d hr", intervalo);
+		}
+		if (duracion != 0) {
+			text += String.format(" durante %d dias", duracion);
+		}
+		if (otrosDatos != "") {
+			text += String.format("  \n%s", otrosDatos);
+		}
+		return text;
 	}
 
 }

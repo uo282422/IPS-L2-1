@@ -130,6 +130,7 @@ public class VentanaAlternativos extends JFrame {
 		}
 		return btAsignar;
 	}
+
 	public Medico getAsignado() {
 		return asignado;
 	}

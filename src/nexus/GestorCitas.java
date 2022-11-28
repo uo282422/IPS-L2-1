@@ -358,4 +358,8 @@ public class GestorCitas {
 		return bd.cargarPrescripciones();
 	}
 
+	public List<Prescripcion> cargarPrescripcionesOrdenadas(int idPaciente) {
+		return bd.cargarPrescripcionesPorPaciente(idPaciente);
+	}
+
 }

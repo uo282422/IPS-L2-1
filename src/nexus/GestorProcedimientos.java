@@ -2,6 +2,7 @@ package nexus;
 
 import java.util.List;
 
+import logic.procedimiento.Procedimiento;
 import logic.procedimiento.ProcedimientoSeccion;
 import logic.procedimiento.ProcedimientoSistema;
 import logic.procedimiento.ProcedimientoTipo;
@@ -25,6 +26,10 @@ public class GestorProcedimientos {
 
 	public List<ProcedimientoTipo> getTiposPorSistema(String idSistema) {
 		return bd.cargarTiposPorSistema(idSistema);
+	}
+
+	public List<Procedimiento> cargarProcedimientosOrdenados(int idPaciente) {
+		return bd.cargarProcedimientosOrdenados(idPaciente);
 	}
 
 }

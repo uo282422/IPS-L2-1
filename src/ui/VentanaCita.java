@@ -594,6 +594,8 @@ public class VentanaCita extends JFrame {
 			model.addElement(presc);
 		}
 		getListPrescripcionesAdded().setModel(model);
+		txtCantidad.setText("");
+		txtOtrosDatos.setText("");
 	}
 
 	private JPanel getPnCamposPrescripciones() {

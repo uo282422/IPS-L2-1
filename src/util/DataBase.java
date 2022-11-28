@@ -73,7 +73,11 @@ public class DataBase {
 	private static final String CARGAR_SISTEMAS_POR_SECCION = "SELECT * FROM PROCEDIMIENTO_SISTEMA WHERE SECCION_ID = ?";
 	private static final String CARGAR_TIPOS_POR_SISTEMA = "SELECT * FROM PROCEDIMIENTO_TIPO WHERE SISTEMA_ID = ?";
 	private static final String GUARDAR_PROCEDIMIENTOS = "INSERT INTO PROCEDIMIENTO VALUES(?,?,?,?)";
-
+	private static final String CARGAR_PROCEDIMIENTOS_POR_PACIENTE = "SELECT cita_id, tipo_id, procedimiento_fecha, procedimiento_hora, tipo_descripcion FROM CITA c, PROCEDIMIENTO p, PROCEDIMIENTO_TIPO t WHERE t.tipo_id = p.tipo_id AND p.cita_id = c.cita_id AND c.cita_paciente_id = ?";
+	private static final String CARGAR_DIAGNOSTICOS_POR_PACIENTE = "SELECT cita_id, capitulo_id, diagnostico_fecha, diagnostico_hora, capitulo_descripcion, seguimiento FROM CITA c, DIAGNOSTICO d, DIAGNOSTICO_CAPITULO p WHERE p.capitulo_id = d.capitulo_id AND d.cita_id = c.cita_id AND c.cita_paciente_id = ?";
+	private static final String GUARDAR_PRESCRIPCIONES = "INSERT INTO PRESCRIPCION_CITA VALUES(?,?,?,?,?,?)";
+	private static final String CARGAR_PRESCRIPCIONES_POR_PACIENTE = "SELECT prescripcion_id, prescripcion_nombre, prescripcion_cantidad, prescripcion_intervalo, prescripcion_duracion, prescripcion_otros FROM PRESCRIPCION p, PRESCRIPCION_CITA pc, CITA c WHERE p.prescripcion_id = pc.prescripcion_id AND pc.cita_id = c.cita_id AND c.cita_paciente_id = ?";
+	
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
 	 * 
@@ -920,7 +924,28 @@ public class DataBase {
 				}
 
 			} catch (SQLException e) {
-				throw new Error("Error al linkear epecialidad-cita", e);
+				throw new Error("Error al crear diagnosticos", e);
+
+			} finally {
+				pst.close();
+			}
+			
+			pst = conn.prepareStatement(GUARDAR_PRESCRIPCIONES);
+			try {
+
+				for (Prescripcion p : c.getPrescripciones()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, p.getIdPrescripcion());
+					pst.setString(3, p.getCantidad());
+					pst.setInt(4, p.getIntervalo());
+					pst.setInt(5, p.getDuracion());
+					pst.setString(6, p.getOtrosDatos());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				//throw new Error("Error al crear prescripciones", e);
 
 			} finally {
 				pst.close();
@@ -1773,5 +1798,124 @@ public class DataBase {
 		}
 
 		return tipos;
+	}
+
+	public List<Diagnostico> cargarDiagnosticosPorPaciente(int idPaciente) {
+		ArrayList<Diagnostico> diagnosticos = new ArrayList<Diagnostico>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_DIAGNOSTICOS_POR_PACIENTE);
+				ps.setString(1, String.valueOf(idPaciente));
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("cita_id");
+					String c = rs.getString("capitulo_id");
+					String f = rs.getString("diagnostico_fecha");
+					String h = rs.getString("diagnostico_hora");
+					String x = rs.getString("capitulo_descripcion");
+					boolean s = rs.getBoolean("seguimiento");
+					
+					Diagnostico d = new Diagnostico(id, c, f, h, s);
+					d.setDescripcion(x);
+
+					diagnosticos.add(d);
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar diagnosticos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para diagnosticos", e);
+		}
+
+		return diagnosticos;
+	}
+
+	public List<Procedimiento> cargarProcedimientosOrdenados(int idPaciente) {
+		ArrayList<Procedimiento> procedimientos = new ArrayList<Procedimiento>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_PROCEDIMIENTOS_POR_PACIENTE);
+				ps.setString(1, String.valueOf(idPaciente));
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("cita_id");
+					String tipo = rs.getString("tipo_id");
+					String f = rs.getString("procedimiento_fecha");
+					String h = rs.getString("procedimiento_hora");
+					String d = rs.getString("tipo_descripcion");
+					
+					Procedimiento p = new Procedimiento(id, tipo, f, h);
+					p.setDescripcion(d);
+
+					procedimientos.add(p);
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar procedimientos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para procedimientos", e);
+		}
+
+		return procedimientos;
+	}
+
+	public List<Prescripcion> cargarPrescripcionesPorPaciente(int idPaciente) {
+		ArrayList<Prescripcion> prescripciones = new ArrayList<Prescripcion>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_PRESCRIPCIONES_POR_PACIENTE);
+				ps.setString(1, String.valueOf(idPaciente));
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String idPresc = rs.getString("prescripcion_id");
+					String nombre = rs.getString("prescripcion_nombre");
+					String cantidad = rs.getString("prescripcion_cantidad");
+					int intervalo = rs.getInt("prescripcion_intervalo");
+					int duracion = rs.getInt("prescripcion_duracion");
+					String otrosDatos = rs.getString("prescripcion_otros");
+					
+					prescripciones.add(new Prescripcion(idPresc, nombre, cantidad, intervalo, duracion, otrosDatos));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar prescripciones", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para prescripciones", e);
+		}
+
+		return prescripciones;
 	}
 }
