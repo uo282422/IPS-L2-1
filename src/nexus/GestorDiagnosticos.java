@@ -54,4 +54,8 @@ public class GestorDiagnosticos {
 	public List<DiagnosticoCapitulo> getCapitulosPorSubgrupo(String idSubgrupo) {
 		return bd.cargarCapitulosPorSubgrupo(idSubgrupo);
 	}
+
+	public List<Diagnostico> cargarDiagnosticosOrdenados(int idPaciente) {
+		return bd.cargarDiagnosticosPorPaciente(idPaciente);
+	}
 }
