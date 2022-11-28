@@ -35,6 +35,7 @@ import logic.Prescripcion;
 import logic.cita.Cita;
 import logic.cita.Enum_acudio;
 import logic.diagnostico.Diagnostico;
+import logic.procedimiento.Procedimiento;
 import nexus.GestorCitas;
 
 public class VentanaCita extends JFrame {
@@ -104,7 +105,7 @@ public class VentanaCita extends JFrame {
 	private JPanel pnCamposDiagnosticos;
 	private JPanel pnPreviewDiagnosticos;
 	private JLabel lblProcedimientosAdded;
-	private JList listProcedimientosAdded;
+	private JList<Procedimiento> listProcedimientosAdded;
 	private JLabel lblDiagnosticosAdded;
 	private JList<Diagnostico> listDiagnosticosAdded;
 	private JButton btnProcedimientosAdd;
@@ -136,7 +137,7 @@ public class VentanaCita extends JFrame {
 	public VentanaCita(String idCita) {
 		this.c = gestor.getCita(idCita);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 938, 621);
+		setBounds(100, 100, 1041, 732);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -373,11 +374,17 @@ public class VentanaCita extends JFrame {
 
 		taPreview.setText(sb.toString());
 		
-		final DefaultListModel<Diagnostico> model = new DefaultListModel<Diagnostico>();
+		final DefaultListModel<Diagnostico> modelD = new DefaultListModel<Diagnostico>();
 		for (Diagnostico d : c.getDiagnosticos()) {
-			model.addElement(d);
+			modelD.addElement(d);
 		}
-		getListDiagnosticosAdded().setModel(model);
+		getListDiagnosticosAdded().setModel(modelD);
+		
+		final DefaultListModel<Procedimiento> modelP = new DefaultListModel<Procedimiento>();
+		for (Procedimiento p : c.getProcedimientos()) {
+			modelP.addElement(p);
+		}
+		getListProcedimientosAdded().setModel(modelP);
 		
 		validate();
 	}
@@ -587,6 +594,8 @@ public class VentanaCita extends JFrame {
 			model.addElement(presc);
 		}
 		getListPrescripcionesAdded().setModel(model);
+		txtCantidad.setText("");
+		txtOtrosDatos.setText("");
 	}
 
 	private JPanel getPnCamposPrescripciones() {
@@ -777,9 +786,9 @@ public class VentanaCita extends JFrame {
 		return lblProcedimientosAdded;
 	}
 
-	private JList getListProcedimientosAdded() {
+	private JList<Procedimiento> getListProcedimientosAdded() {
 		if (listProcedimientosAdded == null) {
-			listProcedimientosAdded = new JList();
+			listProcedimientosAdded = new JList<Procedimiento>();
 		}
 		return listProcedimientosAdded;
 	}
@@ -810,8 +819,10 @@ public class VentanaCita extends JFrame {
 		return btnProcedimientosAdd;
 	}
 
+	@SuppressWarnings("deprecation")
 	private void abrirVentanaProcedimiento() {
-		// nuevo procedimiento, pasar cita y ventana
+		VentanaProcedimiento vp = new VentanaProcedimiento(c, this);
+		vp.show();
 	}
 
 	private JButton getBtnProcedimientosRemove() {

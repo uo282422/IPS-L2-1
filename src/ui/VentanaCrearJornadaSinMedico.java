@@ -89,7 +89,7 @@ public class VentanaCrearJornadaSinMedico extends JFrame {
 		this.vcc = vcc;
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 831, 534);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
@@ -175,7 +175,7 @@ public class VentanaCrearJornadaSinMedico extends JFrame {
 		for (Component c : getPnCentralSuperiorDer().getComponents()) {
 			JToggleButton b = (JToggleButton) c;
 			if (b.isSelected())
-				dias += b.getName();
+				dias += b.getText().charAt(0);
 		}
 		return dias;
 	}

@@ -26,6 +26,10 @@ import logic.diagnostico.DiagnosticoSubgrupo;
 import logic.diagnostico.DiagnosticoTabla;
 import logic.jornada.Calendario;
 import logic.jornada.Jornada;
+import logic.procedimiento.Procedimiento;
+import logic.procedimiento.ProcedimientoSeccion;
+import logic.procedimiento.ProcedimientoSistema;
+import logic.procedimiento.ProcedimientoTipo;
 import ui.Especialidad;
 
 public class DataBase {
@@ -59,12 +63,21 @@ public class DataBase {
 	private static final String GUARDAR_JORNADA_PARA_CALENDARIO = "INSERT INTO JORNADA_CALENDARIO VALUES (?, ?)";
 	private static final String EDITAR_CALENDARIO = "UPDATE CALENDARIO SET CALENDARIO_NOMBRE = ? WHERE CALENDARIO_ID = ?";
 	private static final String BORRAR_JORNADAS_PARA_CALENDARIO = "DELETE FROM JORNADA_CALENDARIO WHERE CALENDARIO_ID = ?";
+	private static final String ACTUALIZAR_JORNADA = "UPDATE JORNADA SET JORNADA_NOMBRE = ?, JORNADA_DIAS = ?, JORNADA_HORA_INICIO = ?, JORNADA_HORA_FIN = ?, JORNADA_INICIO = ?, JORNADA_FIN = ? WHERE JORNADA_ID = ?";
 	private static final String CARGAR_TABLAS = "SELECT * FROM DIAGNOSTICO_TABLA";
 	private static final String CARGAR_GRUPOS_POR_TABLA = "SELECT * FROM DIAGNOSTICO_GRUPO WHERE TABLA_ID = ?";
 	private static final String CARGAR_SUBGRUPOS_POR_GRUPO = "SELECT * FROM DIAGNOSTICO_SUBGRUPO WHERE GRUPO_ID = ?";
 	private static final String CARGAR_CAPITULOS_POR_SUBGRUPO = "SELECT * FROM DIAGNOSTICO_CAPITULO WHERE SUBGRUPO_ID = ?";
 	private static final String GUARDAR_DIAGNOSTICOS = "INSERT INTO DIAGNOSTICO VALUES(?,?,?,?,?)";
-
+	private static final String CARGAR_SECCIONES = "SELECT * FROM PROCEDIMIENTO_SECCION";
+	private static final String CARGAR_SISTEMAS_POR_SECCION = "SELECT * FROM PROCEDIMIENTO_SISTEMA WHERE SECCION_ID = ?";
+	private static final String CARGAR_TIPOS_POR_SISTEMA = "SELECT * FROM PROCEDIMIENTO_TIPO WHERE SISTEMA_ID = ?";
+	private static final String GUARDAR_PROCEDIMIENTOS = "INSERT INTO PROCEDIMIENTO VALUES(?,?,?,?)";
+	private static final String CARGAR_PROCEDIMIENTOS_POR_PACIENTE = "SELECT cita_id, tipo_id, procedimiento_fecha, procedimiento_hora, tipo_descripcion FROM CITA c, PROCEDIMIENTO p, PROCEDIMIENTO_TIPO t WHERE t.tipo_id = p.tipo_id AND p.cita_id = c.cita_id AND c.cita_paciente_id = ?";
+	private static final String CARGAR_DIAGNOSTICOS_POR_PACIENTE = "SELECT cita_id, capitulo_id, diagnostico_fecha, diagnostico_hora, capitulo_descripcion, seguimiento FROM CITA c, DIAGNOSTICO d, DIAGNOSTICO_CAPITULO p WHERE p.capitulo_id = d.capitulo_id AND d.cita_id = c.cita_id AND c.cita_paciente_id = ?";
+	private static final String GUARDAR_PRESCRIPCIONES = "INSERT INTO PRESCRIPCION_CITA VALUES(?,?,?,?,?,?)";
+	private static final String CARGAR_PRESCRIPCIONES_POR_PACIENTE = "SELECT prescripcion_id, prescripcion_nombre, prescripcion_cantidad, prescripcion_intervalo, prescripcion_duracion, prescripcion_otros FROM PRESCRIPCION p, PRESCRIPCION_CITA pc, CITA c WHERE p.prescripcion_id = pc.prescripcion_id AND pc.cita_id = c.cita_id AND c.cita_paciente_id = ?";
+	
 	/**
 	 * Realiza una consulta a la base de datos para obtener todos los médicos.
 	 * 
@@ -86,7 +99,8 @@ public class DataBase {
 					String dni = rs.getString("medico_dni");
 					String coleg = rs.getString("medico_colegiado");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
+					medicos.add(new Medico(id, nombre, apellido, email, esp,
+							dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -114,7 +128,8 @@ public class DataBase {
 					String hora = rs.getString("diagnostico_hora");
 					boolean seg = rs.getBoolean("seguimiento");
 
-					diagnosticos.add(new Diagnostico(citaid, apartadoid, fecha, hora, seg));
+					diagnosticos.add(new Diagnostico(citaid, apartadoid, fecha,
+							hora, seg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -160,18 +175,21 @@ public class DataBase {
 
 		ArrayList<Jornada> jornadas = new ArrayList<Jornada>();
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			Statement s = conn.createStatement();
+			PreparedStatement s = conn.prepareStatement(CARGAR_JORNADAS_PARA_MEDICO);
 			try {
-				ResultSet rs = s.executeQuery(CARGAR_JORNADAS_PARA_MEDICO);
+				s.setString(1, medId);
+				ResultSet rs = s.executeQuery();
 				while (rs.next()) {
 					String id = rs.getString("jornada_id");
+					String nombre = rs.getString("JORNADA_NOMBRE");
 					String dias = rs.getString("jornada_dias");
 					String horaI = rs.getString("jornada_hora_inicio");
 					String horaF = rs.getString("jornada_hora_fin");
-					String inicio = rs.getString("JORNADA_INCIO");
+					String inicio = rs.getString("JORNADA_INICIO");
 					String fin = rs.getString("JORNADA_FIN");
 
-					jornadas.add(new Jornada(id, dias, horaI, horaF, medId, inicio, fin));
+					jornadas.add(new Jornada(id, nombre, dias, horaI, horaF,
+							inicio, fin));
 
 				}
 				rs.close();
@@ -248,8 +266,9 @@ public class DataBase {
 					// correo + otros);
 
 					if (valido)
-						pacientes.add(new Paciente(Integer.parseInt(id), nombre, apellido, Integer.parseInt(telefono),
-								correo, otros, dni, nhc, tarjeta));
+						pacientes.add(new Paciente(Integer.parseInt(id), nombre,
+								apellido, Integer.parseInt(telefono), correo,
+								otros, dni, nhc, tarjeta));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -264,12 +283,12 @@ public class DataBase {
 		return pacientes;
 	}
 
-	public void crearCita(Cita cita, ArrayList<Medico> medicos, ArrayList<Especialidad> especialidades) {
+	public void crearCita(Cita cita, ArrayList<Medico> medicos,
+			ArrayList<Especialidad> especialidades) {
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
 
-			PreparedStatement pst = conn
-					.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?,NULL, NULL)");
+			PreparedStatement pst = conn.prepareStatement("insert into cita values (?,?,?,?,?,?,?,?,?,?,?,?,NULL, NULL)");
 
 			try {
 				pst.setString(1, cita.getIdCita() + "");
@@ -311,26 +330,6 @@ public class DataBase {
 					pst.setString(1, cita.getIdCita() + "");
 					pst.setString(2, e.getId_esp());
 					pst.setInt(3, e.getUnidades());
-					pst.execute();
-				}
-
-			} catch (SQLException e) {
-				throw new Error("Error al linkear epecialidad-cita", e);
-
-			} finally {
-				pst.close();
-				conn.close();
-			}
-			
-			pst = conn.prepareStatement(GUARDAR_DIAGNOSTICOS);
-			try {
-
-				for (Diagnostico d : cita.getDiagnosticos()) {
-					pst.setString(1, String.valueOf(cita.getIdCita()));
-					pst.setString(2, d.getcapitulo_id());
-					pst.setString(3, d.getFecha());
-					pst.setString(4, d.getHora());
-					pst.setBoolean(5, d.getSeguimiento());
 					pst.execute();
 				}
 
@@ -403,7 +402,8 @@ public class DataBase {
 					String nhc = rs.getString("paciente_nhc");
 					String tarjeta = rs.getString("paciente_tarjeta");
 
-					paciente = new Paciente(id, nombre, apellido, telefono, correo, otros, dni, nhc, tarjeta);
+					paciente = new Paciente(id, nombre, apellido, telefono,
+							correo, otros, dni, nhc, tarjeta);
 				}
 
 				rs.close();
@@ -494,8 +494,9 @@ public class DataBase {
 					String motivos = rs.getString("cita_motivos");
 					int acudio = rs.getInt("cita_acudio");
 					List<String> causas = getCausas(id);
-					c = new Cita(idI, idPaciente, fecha, hora_inicio, hora_fin, urgente, sala, telefonoCita, correoCita,
-							otrosCita, parseAcudio(acudio), causas, motivos);
+					c = new Cita(idI, idPaciente, fecha, hora_inicio, hora_fin,
+							urgente, sala, telefonoCita, correoCita, otrosCita,
+							parseAcudio(acudio), causas, motivos);
 					c.setNombrePaciente(nombrePaciente);
 					c.setIdCita(Integer.parseInt(id));
 				}
@@ -639,8 +640,9 @@ public class DataBase {
 					List<String> causas = getCausas(rs.getString("cita_id"));
 					String motivos = rs.getString("cita_motivos");
 
-					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, parseAcudio(acudio), causas, motivos));
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas, motivos));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -660,8 +662,7 @@ public class DataBase {
 		ArrayList<Medico> medicos = new ArrayList<Medico>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from medico m, medico_cita c where c.cita_id = ? and m.medico_id = c.medico_id");
+			PreparedStatement pst = conn.prepareStatement("select * from medico m, medico_cita c where c.cita_id = ? and m.medico_id = c.medico_id");
 			try {
 				pst.setString(1, idCita + "");
 
@@ -678,7 +679,8 @@ public class DataBase {
 					String dni = rs.getString("medico_dni");
 					String coleg = rs.getString("medico_colegiado");
 
-					medicos.add(new Medico(id, nombre, apellido, email, esp, dni, coleg));
+					medicos.add(new Medico(id, nombre, apellido, email, esp,
+							dni, coleg));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -710,9 +712,12 @@ public class DataBase {
 					String nombre = rs.getString("ENFERMEDAD_NOMBRE");
 					String descripcion = rs.getString("ENFERMEDAD_DESCRIPCION");
 					boolean enCita = rs.getBoolean("ENFERMEDAD_EN_CITA");
-					int idCita = enCita ? Integer.parseInt(rs.getString("ENFERMEDAD_CITA_ID")) : 0;
+					int idCita = enCita
+							? Integer.parseInt(rs.getString("ENFERMEDAD_CITA_ID"))
+							: 0;
 
-					enfermedades.add(new Enfermedad(id, nombre, descripcion, idPaciente, enCita, idCita));
+					enfermedades.add(new Enfermedad(id, nombre, descripcion,
+							idPaciente, enCita, idCita));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -744,9 +749,12 @@ public class DataBase {
 					String nombre = rs.getString("VACUNA_NOMBRE");
 					String descripcion = rs.getString("VACUNA_DESCRIPCION");
 					boolean enCita = rs.getBoolean("VACUNA_EN_CITA");
-					int idCita = enCita ? Integer.parseInt(rs.getString("VACUNA_CITA_ID")) : 0;
+					int idCita = enCita
+							? Integer.parseInt(rs.getString("VACUNA_CITA_ID"))
+							: 0;
 
-					vacunas.add(new Vacuna(id, nombre, descripcion, idPaciente, enCita, idCita));
+					vacunas.add(new Vacuna(id, nombre, descripcion, idPaciente,
+							enCita, idCita));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -788,8 +796,7 @@ public class DataBase {
 		ArrayList<Cita> citas = new ArrayList<Cita>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn.prepareStatement(
-					"select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = ? and c.cita_fecha = ?");
+			PreparedStatement pst = conn.prepareStatement("select * from cita c, medico_cita m where c.cita_id = m.cita_id and m.medico_id = ? and c.cita_fecha = ?");
 			try {
 				pst.setString(1, idMedico);
 				pst.setString(2, fecha);
@@ -811,8 +818,9 @@ public class DataBase {
 					List<String> causas = getCausas(rs.getString("cita_id"));
 					String motivos = rs.getString("cita_motivos");
 
-					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, parseAcudio(acudio), causas, motivos));
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas, motivos));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -874,6 +882,7 @@ public class DataBase {
 				s.setInt(1, serializeAcudio(c.isAcudio()));
 				s.setString(2, c.getIdCita() + "");
 				s.executeUpdate();
+
 				s2.setString(1, c.getIdCita() + "");
 				for (String causa : c.getCausas()) {
 					s2.setString(2, causa);
@@ -884,10 +893,66 @@ public class DataBase {
 				throw new Error("Problem", e);
 			} finally {
 				s.close();
+			}
+			PreparedStatement pst = conn.prepareStatement(GUARDAR_PROCEDIMIENTOS);
+			try {
+
+				for (Procedimiento p : c.getProcedimientos()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, p.getTipoId());
+					pst.setString(3, p.getFecha());
+					pst.setString(4, p.getHora());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				throw new Error("Error al crear procedimientos", e);
+
+			} finally {
+				pst.close();
+			}
+			pst = conn.prepareStatement(GUARDAR_DIAGNOSTICOS);
+			try {
+
+				for (Diagnostico d : c.getDiagnosticos()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, d.getcapitulo_id());
+					pst.setString(3, d.getFecha());
+					pst.setString(4, d.getHora());
+					pst.setBoolean(5, d.getSeguimiento());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				throw new Error("Error al crear diagnosticos", e);
+
+			} finally {
+				pst.close();
+			}
+			
+			pst = conn.prepareStatement(GUARDAR_PRESCRIPCIONES);
+			try {
+
+				for (Prescripcion p : c.getPrescripciones()) {
+					pst.setString(1, String.valueOf(c.getIdCita()));
+					pst.setString(2, p.getIdPrescripcion());
+					pst.setString(3, p.getCantidad());
+					pst.setInt(4, p.getIntervalo());
+					pst.setInt(5, p.getDuracion());
+					pst.setString(6, p.getOtrosDatos());
+					pst.execute();
+				}
+
+			} catch (SQLException e) {
+				e.printStackTrace();
+				//throw new Error("Error al crear prescripciones", e);
+
+			} finally {
+				pst.close();
 				conn.close();
 			}
 		} catch (SQLException e) {
-			throw new Error("Problem", e);
+			throw new Error("Problemas", e);
 		}
 	}
 
@@ -926,16 +991,16 @@ public class DataBase {
 		ArrayList<Especialidad> especialidades = new ArrayList<Especialidad>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement pst = conn
-					.prepareStatement("select especialidad_id, especialidad_nombre from especialidad");
+			PreparedStatement pst = conn.prepareStatement("select especialidad_id, especialidad_nombre from especialidad");
 
 			try {
 
 				ResultSet rs = pst.executeQuery();
 
 				while (rs.next()) {
-					especialidades.add(
-							new Especialidad(rs.getString("especialidad_id"), rs.getString("especialidad_nombre")));
+					especialidades.add(new Especialidad(
+							rs.getString("especialidad_id"),
+							rs.getString("especialidad_nombre")));
 
 				}
 				rs.close();
@@ -981,7 +1046,8 @@ public class DataBase {
 			try {
 				ResultSet rs = s.executeQuery(LISTAR_PRESC);
 				while (rs.next()) {
-					prescripciones.add(new Prescripcion(rs.getString(1), rs.getString(2)));
+					prescripciones.add(new Prescripcion(rs.getString(1),
+							rs.getString(2)));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -1051,6 +1117,7 @@ public class DataBase {
 		b.sethInicio(rs.getString("baja_hora_inicio"));
 		b.sethFin(rs.getString("baja_hora_fin"));
 		b.setObservaciones(rs.getString("baja_observaciones"));
+		b.setTipo(b.parseTipo(rs.getString("baja_tipo")));
 		return b;
 	}
 
@@ -1138,7 +1205,8 @@ public class DataBase {
 			try {
 				rs = s.executeQuery();
 				while (rs.next()) {
-					Calendario c = new Calendario(rs.getString("CALENDARIO_ID"), rs.getString("CALENDARIO_NOMBRE"));
+					Calendario c = new Calendario(rs.getString("CALENDARIO_ID"),
+							rs.getString("CALENDARIO_NOMBRE"));
 					List<Jornada> jornadas = cargarJornadasParaCalendario(c);
 					c.setJornadas(jornadas);
 					cs.add(c);
@@ -1171,7 +1239,8 @@ public class DataBase {
 					String horaFin = rs.getString("JORNADA_HORA_FIN");
 					String inicio = rs.getString("JORNADA_INICIO");
 					String fin = rs.getString("JORNADA_FIN");
-					js.add(new Jornada(id, nombre, dias, horaInicio, horaFin, inicio, fin));
+					js.add(new Jornada(id, nombre, dias, horaInicio, horaFin,
+							inicio, fin));
 				}
 			} catch (SQLException e) {
 				throw new Error("Problem", e);
@@ -1279,8 +1348,9 @@ public class DataBase {
 					List<String> causas = getCausas(rs.getString("cita_id"));
 					String motivos = rs.getString("cita_motivos");
 
-					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF, urgente, salaId, Integer.parseInt(telefono),
-							correo, otros, parseAcudio(acudio), causas, motivos));
+					citas.add(new Cita(id, pacienteId, fecha, horaI, horaF,
+							urgente, salaId, Integer.parseInt(telefono), correo,
+							otros, parseAcudio(acudio), causas, motivos));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -1315,7 +1385,8 @@ public class DataBase {
 					String inicio = rs.getString("JORNADA_INICIO");
 					String fin = rs.getString("JORNADA_FIN");
 
-					jornadas.add(new Jornada(id, nombre, dias, horaInicio, horaFin, inicio, fin));
+					jornadas.add(new Jornada(id, nombre, dias, horaInicio,
+							horaFin, inicio, fin));
 				}
 				rs.close();
 			} catch (SQLException e) {
@@ -1428,11 +1499,11 @@ public class DataBase {
 
 	}
 
-	public void actualizarEstadoSeguimiento(String estado, String com, String citaId) {
+	public void actualizarEstadoSeguimiento(String estado, String com,
+			String citaId) {
 		System.out.println(estado + " " + com + " " + citaId);
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
-			PreparedStatement s = conn.prepareStatement(
-					"UPDATE seguimiento SET seguimiento_estado = ?, seguimiento_comentarios = ? WHERE cita_id = ?");
+			PreparedStatement s = conn.prepareStatement("UPDATE seguimiento SET seguimiento_estado = ?, seguimiento_comentarios = ? WHERE cita_id = ?");
 			try {
 				s.setString(1, estado);
 				s.setString(2, com);
@@ -1469,6 +1540,30 @@ public class DataBase {
 			throw new Error("Problem2", e);
 		}
 
+	}
+
+	public void actualizarJornada(Jornada j) {
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement s = conn.prepareStatement(ACTUALIZAR_JORNADA);
+			try {
+				s.setString(1, j.getNombre());
+				s.setString(2, j.getDias());
+				s.setString(3, j.getHoraComienzo());
+				s.setString(4, j.getHoraFinal());
+				s.setString(5, j.getInicio());
+				s.setString(6, j.getFin());
+				s.setString(7, j.getId());
+				s.executeUpdate();
+
+			} catch (SQLException e) {
+				throw new Error("Problem1", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problem2", e);
+		}
 	}
 
 	public List<DiagnosticoTabla> cargarTablas() {
@@ -1512,9 +1607,9 @@ public class DataBase {
 			try {
 				ps = conn.prepareStatement(CARGAR_GRUPOS_POR_TABLA);
 				ps.setString(1, idTabla);
-				
+
 				rs = ps.executeQuery();
-				
+
 				while (rs.next()) {
 
 					String id = rs.getString("grupo_id");
@@ -1546,15 +1641,15 @@ public class DataBase {
 			try {
 				ps = conn.prepareStatement(CARGAR_SUBGRUPOS_POR_GRUPO);
 				ps.setString(1, idGrupo);
-				
+
 				rs = ps.executeQuery();
-				
+
 				while (rs.next()) {
 
 					String id = rs.getString("subgrupo_id");
 					String nombre = rs.getString("subgrupo_descripcion");
 					boolean ignorar = rs.getBoolean("subgrupo_ignorar");
-					
+
 					if (!ignorar) {
 						subgrupos.add(new DiagnosticoSubgrupo(id, nombre));
 					}
@@ -1573,7 +1668,8 @@ public class DataBase {
 		return subgrupos;
 	}
 
-	public List<DiagnosticoCapitulo> cargarCapitulosPorSubgrupo(String idSubgrupo) {
+	public List<DiagnosticoCapitulo> cargarCapitulosPorSubgrupo(
+			String idSubgrupo) {
 		ArrayList<DiagnosticoCapitulo> capitulos = new ArrayList<DiagnosticoCapitulo>();
 
 		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
@@ -1582,14 +1678,14 @@ public class DataBase {
 			try {
 				ps = conn.prepareStatement(CARGAR_CAPITULOS_POR_SUBGRUPO);
 				ps.setString(1, idSubgrupo);
-				
+
 				rs = ps.executeQuery();
-				
+
 				while (rs.next()) {
 
 					String id = rs.getString("capitulo_id");
 					String nombre = rs.getString("capitulo_descripcion");
-					
+
 					capitulos.add(new DiagnosticoCapitulo(id, nombre));
 				}
 				rs.close();
@@ -1606,4 +1702,220 @@ public class DataBase {
 		return capitulos;
 	}
 
+	public List<ProcedimientoSeccion> cargarSecciones() {
+		ArrayList<ProcedimientoSeccion> secciones = new ArrayList<ProcedimientoSeccion>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			Statement s = conn.createStatement();
+			try {
+				ResultSet rs = s.executeQuery(CARGAR_SECCIONES);
+				while (rs.next()) {
+
+					String id = rs.getString("seccion_id");
+					String nombre = rs.getString("seccion_descripcion");
+
+					secciones.add(new ProcedimientoSeccion(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar secciones", e);
+			} finally {
+				s.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para secciones", e);
+		}
+
+		return secciones;
+	}
+
+	public List<ProcedimientoSistema> cargarSistemasPorSeccion(
+			String idSeccion) {
+		ArrayList<ProcedimientoSistema> sistemas = new ArrayList<ProcedimientoSistema>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_SISTEMAS_POR_SECCION);
+				ps.setString(1, idSeccion);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("sistema_id");
+					String nombre = rs.getString("sistema_descripcion");
+
+					sistemas.add(new ProcedimientoSistema(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar sistemas", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para sistemas", e);
+		}
+
+		return sistemas;
+	}
+
+	public List<ProcedimientoTipo> cargarTiposPorSistema(String idSistema) {
+		ArrayList<ProcedimientoTipo> tipos = new ArrayList<ProcedimientoTipo>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_TIPOS_POR_SISTEMA);
+				ps.setString(1, idSistema);
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("tipo_id");
+					String nombre = rs.getString("tipo_descripcion");
+
+					tipos.add(new ProcedimientoTipo(id, nombre));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar tipos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para tipos", e);
+		}
+
+		return tipos;
+	}
+
+	public List<Diagnostico> cargarDiagnosticosPorPaciente(int idPaciente) {
+		ArrayList<Diagnostico> diagnosticos = new ArrayList<Diagnostico>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_DIAGNOSTICOS_POR_PACIENTE);
+				ps.setString(1, String.valueOf(idPaciente));
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("cita_id");
+					String c = rs.getString("capitulo_id");
+					String f = rs.getString("diagnostico_fecha");
+					String h = rs.getString("diagnostico_hora");
+					String x = rs.getString("capitulo_descripcion");
+					boolean s = rs.getBoolean("seguimiento");
+					
+					Diagnostico d = new Diagnostico(id, c, f, h, s);
+					d.setDescripcion(x);
+
+					diagnosticos.add(d);
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar diagnosticos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para diagnosticos", e);
+		}
+
+		return diagnosticos;
+	}
+
+	public List<Procedimiento> cargarProcedimientosOrdenados(int idPaciente) {
+		ArrayList<Procedimiento> procedimientos = new ArrayList<Procedimiento>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_PROCEDIMIENTOS_POR_PACIENTE);
+				ps.setString(1, String.valueOf(idPaciente));
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String id = rs.getString("cita_id");
+					String tipo = rs.getString("tipo_id");
+					String f = rs.getString("procedimiento_fecha");
+					String h = rs.getString("procedimiento_hora");
+					String d = rs.getString("tipo_descripcion");
+					
+					Procedimiento p = new Procedimiento(id, tipo, f, h);
+					p.setDescripcion(d);
+
+					procedimientos.add(p);
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar procedimientos", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para procedimientos", e);
+		}
+
+		return procedimientos;
+	}
+
+	public List<Prescripcion> cargarPrescripcionesPorPaciente(int idPaciente) {
+		ArrayList<Prescripcion> prescripciones = new ArrayList<Prescripcion>();
+
+		try (Connection conn = DriverManager.getConnection(url, user, pass)) {
+			PreparedStatement ps = null;
+			ResultSet rs = null;
+			try {
+				ps = conn.prepareStatement(CARGAR_PRESCRIPCIONES_POR_PACIENTE);
+				ps.setString(1, String.valueOf(idPaciente));
+
+				rs = ps.executeQuery();
+
+				while (rs.next()) {
+
+					String idPresc = rs.getString("prescripcion_id");
+					String nombre = rs.getString("prescripcion_nombre");
+					String cantidad = rs.getString("prescripcion_cantidad");
+					int intervalo = rs.getInt("prescripcion_intervalo");
+					int duracion = rs.getInt("prescripcion_duracion");
+					String otrosDatos = rs.getString("prescripcion_otros");
+					
+					prescripciones.add(new Prescripcion(idPresc, nombre, cantidad, intervalo, duracion, otrosDatos));
+
+				}
+				rs.close();
+			} catch (SQLException e) {
+				throw new Error("Problema al cargar prescripciones", e);
+			} finally {
+				ps.close();
+				conn.close();
+			}
+		} catch (SQLException e) {
+			throw new Error("Problema conexion para prescripciones", e);
+		}
+
+		return prescripciones;
+	}
 }
